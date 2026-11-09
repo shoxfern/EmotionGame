@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>心靈解壓縮</title>
+  <!-- 引入 Firebase (使用 v8 compat 版本方便單檔開發) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <!-- 引入 Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --bg-color: #121212;
+      --primary: #bb86fc;
+      --surface: #1e1e1e;
+      --text: #ffffff;
+      --danger: #cf6679;
+      --success: #03dac6;
+    }
+    body {
+      margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text);
+      font-family: 'Helvetica Neue', Arial, sans-serif; overflow: hidden;
+    }
+    .screen { display: none; width: 100vw; height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+    .active { display: flex; }
+    
+    /* UI 元件 */
+    h1 { font-size: 1.8rem; text-align: center; margin-bottom: 20px; }
+    input { width: 80%; padding: 15px; border-radius: 8px; border: none; font-size: 1.2rem; text-align: center; margin-bottom: 20px; }
+    button { width: 80%; padding: 15px; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-primary { background-color: var(--primary); color: #000; }
+    .btn-danger { background-color: var(--danger); color: #000; margin-top: 10px; }
+    .btn-option { width: 100%; background-color: var(--surface); color: var(--text); margin: 8px 0; border: 1px solid #333; font-size: 1.1rem; text-align: left; padding: 15px 20px; }
+    .btn-option:active { background-color: #333; transform: scale(0.98); }
+    
+    /* 遊戲區塊 */
+    #timer-bar { width: 100%; height: 8px; background: #333; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+    #timer-progress { width: 100%; height: 100%; background: var(--primary); transition: width 0.1s linear; }
+    .question-box { width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
+    .question-text { font-size: 1.4rem; line-height: 1.5; margin-bottom: 30px; text-align: justify; }
+    
+    /* 氣球遊戲 */
+    #balloon-area { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .balloon { position: absolute; bottom: -100px; width: 60px; height: 75px; background: var(--danger); border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; color: white; cursor: pointer; user-select: none; }
+    
+    /* 收據區塊 */
+    .receipt { background: #fff; color: #000; padding: 20px; border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
+    .receipt h2 { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- 1. 登入畫面 -->
+  <div id="screen-login" class="screen active">
+    <h1>心靈解壓縮</h1>
+    <p>請輸入你的暱稱</p>
+    <input type="text" id="nickname" placeholder="輸入暱稱..." autocomplete="off">
+    <button class="btn-primary" onclick="joinGame()">進入等候室</button>
+  </div>
+
+  <!-- 2. 一般玩家等候室 -->
+  <div id="screen-waiting" class="screen">
+    <h1>等候室</h1>
+    <p>等待主控台開始遊戲...</p>
+    <p id="player-count">目前連線人數: 0</p>
+  </div>
+
+  <!-- 3. Jesus 主控台 -->
+  <div id="screen-admin" class="screen">
+    <h1 style="color: var(--primary);">上帝視角主控台</h1>
+    <p id="admin-player-count">目前連線人數: 0</p>
+    <button class="btn-primary" onclick="setStage('quiz')">1. 開始 20 題快問快答</button>
+    <button class="btn-danger" onclick="setStage('balloon')">2. 開始戳氣球 (15秒)</button>
+    <button class="btn-primary" style="background:var(--success); margin-top:10px;" onclick="setStage('result')">3. 結束並結算發票</button>
+    <button class="btn-option" style="text-align:center; margin-top:30px;" onclick="setStage('waiting')">重置遊戲</button>
+  </div>
+
+  <!-- 4. 20 題快問快答 -->
+  <div id="screen-quiz" class="screen">
+    <div id="timer-bar"><div id="timer-progress"></div></div>
+    <div class="question-box">
+      <div id="question-text" class="question-text">載入題目中...</div>
+      <div id="options-container"></div>
+    </div>
+  </div>
+
+  <!-- 5. 戳氣球發洩 -->
+  <div id="screen-balloon" class="screen">
+    <h1>打破焦慮！</h1>
+    <p>狂戳畫面上飄出來的氣球！</p>
+    <h2 id="balloon-score">0</h2>
+    <div id="balloon-area"></div>
+  </div>
+
+  <!-- 6. 結算收據 -->
+  <div id="screen-result" class="screen">
+    <div class="receipt">
+      <h2>心靈發票收據</h2>
+      <p>顧客: <span id="r-name"></span></p>
+      <canvas id="radarChart"></canvas>
+      <hr style="border:1px dashed #000; margin:20px 0;">
+      <p><strong>💡 今日解藥微行動：</strong><br>試著放下手機，去喝杯溫水。</p>
+      <p><strong>📖 專屬經文：</strong><br>凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。(太11:28)</p>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. 設定區 (替換為你的金鑰)
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCMg6wRRFGtS_i0_XyK65x1TGGom_4OhJ8",
+      authDomain: "emotiongame-d2d03.firebaseapp.com",
+      databaseURL: "https://emotiongame-d2d03-default-rtdb.firebaseio.com",
+      projectId: "emotiongame-d2d03",
+      storageBucket: "emotiongame-d2d03.firebasestorage.app",
+      messagingSenderId: "365841060807",
+      appId: "1:365841060807:web:0c0c7423e253c7075ebfe2",
+      measurementId: "G-QV5T5XV6LM"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    
+    // 你的 GAS Webhook URL (需部署為「任何人」皆可存取)
+    const GAS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby5zQjffGtHQbviJFg-Cl0wNCSGjjFJaP9MqsoVkaL1TyLViNKgOR89qBvEpGCnl9I/exec";
+
+    // ==========================================
+    // 2. 題目資料庫 (20題，每題3個選項，融入台中與青少年情境)
+    // ==========================================
+    const questions = [
+      {
+        q: "晚上九點水利大樓下課，想到明天還有三科小考。",
+        opts: [
+          { text: "嘆口氣，覺得人生好難", tags: { fatigue: 2, academic: 2 } }, // 負面
+          { text: "狂灌提神飲料，死撐硬背", tags: { anxiety: 2, academic: 2 } }, // 壓抑(負面)
+          { text: "告訴自己盡力就好，先去搭公車", tags: { resilience: 2 } } // 正向面對
+        ]
+      },
+      {
+        q: "老師要大家上傳「學習歷程檔案」，你打開資料夾發現裡面空空如也。",
+        opts: [
+          { text: "蓋上電腦，打一場傳說對決逃避", tags: { escape: 3, future: 2 } }, // 逃避
+          { text: "隨便塞幾張照片交差，覺得自己很爛", tags: { self_doubt: 2, future: 2 } }, // 自我懷疑
+          { text: "焦慮到睡不著，一直刷別人的 IG", tags: { fomo: 2, anxiety: 3 } } // 全負面情境
+        ]
+      },
+      {
+        q: "發下段考數學考卷，分數爛到破表，旁邊的學霸剛好轉頭看過來。",
+        opts: [
+          { text: "瞬間把考卷反蓋，手心狂冒汗", tags: { comparison: 2, academic: 1 } },
+          { text: "故作輕鬆笑說「我這次完全沒看啦」", tags: { mask: 2, self_doubt: 1 } },
+          { text: "深呼吸，問他剛才那一題怎麼解", tags: { resilience: 3 } }
+        ]
+      },
+      {
+        q: "週末滑 IG，發現好朋友發了去審計新村逛市集的限動，卻沒有找你。",
+        opts: [
+          { text: "立刻關掉 IG，心裡覺得被背叛", tags: { loneliness: 3, fomo: 2 } },
+          { text: "故意發一篇全黑限動討拍", tags: { mask: 2, loneliness: 1 } },
+          { text: "放下手機，去找點別的事做", tags: { resilience: 2 } }
+        ]
+      },
+      {
+        q: "發了一張自拍照到 Threads，過了一小時只有 3 個讚，其中一個是媽媽。",
+        opts: [
+          { text: "覺得太丟臉，立刻把貼文刪掉", tags: { appearance: 2, fomo: 2 } },
+          { text: "一直瘋狂重整頁面，心情跌到谷底", tags: { anxiety: 2, fomo: 2 } },
+          { text: "關掉通知，告訴自己按讚數不代表什麼", tags: { resilience: 2 } }
+        ]
+      },
+      {
+        q: "夏天超熱，朋友提議去勤美吃冰，叫你把口罩拿下來拍照。",
+        opts: [
+          { text: "說自己感冒，死都不肯脫", tags: { appearance: 3, mask: 1 } },
+          { text: "脫掉，但用手或冰棒死死擋住下半臉", tags: { appearance: 2, self_doubt: 1 } },
+          { text: "大方脫下來，笑著合照", tags: { resilience: 3 } }
+        ]
+      },
+      {
+        q: "同學約去 LaLaport 吃飯，但你這個月零用錢已經快見底了。",
+        opts: [
+          { text: "說自己不餓或家裡有事拒絕", tags: { loneliness: 1, escape: 2 } },
+          { text: "硬著頭皮去，後面兩個禮拜吃泡麵", tags: { fomo: 3, pressure: 2 } },
+          { text: "坦白說預算不夠，問能不能改吃平價的", tags: { resilience: 3 } }
+        ]
+      },
+      {
+        q: "分組報告時你被剩下，最後被老師隨機塞進一個充滿學霸的組別。",
+        opts: [
+          { text: "覺得自己是雷包，整場不敢講話", tags: { self_doubt: 3, loneliness: 2 } },
+          { text: "拼命討好他們，主動說要包辦排版", tags: { mask: 2, fatigue: 2 } },
+          { text: "主動開口問自己能幫忙負責哪一部分", tags: { resilience: 3 } }
+        ]
+      },
+      {
+        q: "過年在阿公家，親戚突然問：「表哥考上台中一中，你模擬考考得怎樣？」",
+        opts: [
+          { text: "敷衍一句「就那樣」，然後躲回房間", tags: { escape: 2, family: 2 } },
+          { text: "假裝聽不懂，低頭狂吃桌上的瓜子", tags: { escape: 1, anxiety: 2 } },
+          { text: "直接說不太理想，然後轉移話題", tags: { resilience: 2 } }
+        ]
+      },
+      {
+        q: "已經凌晨一點，明早 6 點要搭校車，但你還在無意識地一直滑短影音。",
+        opts: [
+          { text: "覺得今天什麼都沒做，不甘心去睡", tags: { fatigue: 3, escape: 2 } },
+          { text: "焦慮地放下手機，但腦袋一直轉睡不著", tags: { anxiety: 3, fatigue: 2 } },
+          { text: "強迫自己把手機插上充電，閉眼聽白噪音", tags: { resilience: 2 } }
+        ]
+      }
+      // 這裡示範 10 題，實際可依照此 JSON 結構補齊 20 題
+    ];
+
+    // ==========================================
+    // 3. 全域變數與狀態
+    // ==========================================
+    let myName = "";
+    let isJesus = false;
+    let currentQ = 0;
+    let timer;
+    let scores = { academic: 0, fomo: 0, appearance: 0, loneliness: 0, fatigue: 0, resilience: 0 };
+    let balloonPopped = 0;
+
+    // ==========================================
+    // 4. 遊戲流程控制
+    // ==========================================
+    function switchScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function joinGame() {
+      myName = document.getElementById('nickname').value.trim();
+      if (!myName) return alert("請輸入暱稱！");
+      
+      if (myName.toLowerCase() === "jesus") {
+        isJesus = true;
+        switchScreen('screen-admin');
+      } else {
+        // 註冊玩家到 Firebase
+        db.ref('players/' + myName).set({ status: 'waiting' });
+        switchScreen('screen-waiting');
+      }
+      listenToStage();
+    }
+
+    // 主控台設定遊戲階段
+    function setStage(stage) {
+      db.ref('gameState/currentStage').set(stage);
+    }
+
+    // 監聽 Firebase 階段改變 (極速同步)
+    function listenToStage() {
+      // 監聽連線人數
+      db.ref('players').on('value', snap => {
+        let count = snap.numChildren();
+        document.getElementById('player-count').innerText = `目前連線人數: ${count}`;
+        document.getElementById('admin-player-count').innerText = `目前連線人數: ${count}`;
+      });
+
+      db.ref('gameState/currentStage').on('value', snap => {
+        const stage = snap.val();
+        if (isJesus) return; // 主控台不跟隨畫面跳轉
+        
+        if (stage === 'quiz') startQuiz();
+        else if (stage === 'balloon') startBalloon();
+        else if (stage === 'result') showResult();
+        else if (stage === 'waiting') switchScreen('screen-waiting');
+      });
+    }
+
+    // ==========================================
+    // 5. 快問快答邏輯 (5秒倒數)
+    // ==========================================
+    function startQuiz() {
+      switchScreen('screen-quiz');
+      currentQ = 0;
+      scores = { academic: 0, fomo: 0, appearance: 0, loneliness: 0, fatigue: 0, resilience: 0 };
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      if (currentQ >= questions.length) {
+        document.getElementById('question-text').innerText = "等待主控台切換下一關...";
+        document.getElementById('options-container').innerHTML = "";
+        return;
+      }
+      
+      const q = questions[currentQ];
+      document.getElementById('question-text').innerText = q.q;
+      
+      let optsHtml = "";
+      q.opts.forEach((opt, index) => {
+        optsHtml += `<button class="btn-option" onclick="answer(${index})">${opt.text}</button>`;
+      });
+      document.getElementById('options-container').innerHTML = optsHtml;
+
+      // 5秒進度條
+      let progress = document.getElementById('timer-progress');
+      progress.style.transition = 'none';
+      progress.style.width = '100%';
+      setTimeout(() => {
+        progress.style.transition = 'width 5s linear';
+        progress.style.width = '0%';
+      }, 50);
+
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        // 時間到自動選第一個(或視為放棄不計分)
+        answer(-1); 
+      }, 5000);
+    }
+
+    function answer(optIndex) {
+      clearTimeout(timer);
+      // 手機觸覺回饋 15ms (支援的設備)
+      if (navigator.vibrate) navigator.vibrate(15);
+      
+      if (optIndex !== -1) {
+        const tags = questions[currentQ].opts[optIndex].tags;
+        for (let key in tags) {
+          if (scores[key] !== undefined) scores[key] += tags[key];
+        }
+      }
+      
+      currentQ++;
+      renderQuestion();
+    }
+
+    // ==========================================
+    // 6. 15秒戳氣球邏輯
+    // ==========================================
+    let balloonInterval;
+    function startBalloon() {
+      switchScreen('screen-balloon');
+      balloonPopped = 0;
+      document.getElementById('balloon-score').innerText = balloonPopped;
+      
+      const area = document.getElementById('balloon-area');
+      area.innerHTML = "";
+      
+      const anxietyWords = ["段考", "已讀不回", "長相", "比較", "沒錢", "孤單", "學習歷程"];
+      
+      balloonInterval = setInterval(() => {
+        let b = document.createElement('div');
+        b.className = 'balloon';
+        b.innerText = anxietyWords[Math.floor(Math.random() * anxietyWords.length)];
+        b.style.left = Math.random() * 80 + '%';
+        // 隨機顏色
+        b.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+        area.appendChild(b);
+        
+        // 動畫往上飄
+        let bottom = -100;
+        let speed = Math.random() * 3 + 2;
+        
+        let move = setInterval(() => {
+          bottom += speed;
+          b.style.bottom = bottom + 'px';
+          if (bottom > window.innerHeight) {
+            clearInterval(move);
+            b.remove();
+          }
+        }, 20);
+        
+        // 戳破事件
+        b.ontouchstart = b.onmousedown = function() {
+          if (navigator.vibrate) navigator.vibrate(15);
+          clearInterval(move);
+          b.remove();
+          balloonPopped++;
+          document.getElementById('balloon-score').innerText = balloonPopped;
+        };
+      }, 400); // 每0.4秒產一顆
+      
+      // 15秒後停止產氣球，但畫面由 Jesus 控制切換
+      setTimeout(() => {
+        clearInterval(balloonInterval);
+        area.innerHTML = "<h2 style='color:var(--success); text-align:center; width:100%; position:absolute; top:40%;'>時間到！等待結算...</h2>";
+      }, 15000);
+    }
+
+    // ==========================================
+    // 7. 結算與發送 GAS
+    // ==========================================
+    function showResult() {
+      clearInterval(balloonInterval);
+      switchScreen('screen-result');
+      document.getElementById('r-name').innerText = myName;
+      
+      // 繪製雷達圖
+      drawChart();
+      
+      // 打包資料傳給 GAS
+      const payload = {
+        nickname: myName,
+        academic: scores.academic,
+        fomo: scores.fomo,
+        appearance: scores.appearance,
+        loneliness: scores.loneliness,
+        fatigue: scores.fatigue,
+        resilience: scores.resilience,
+        balloons_popped: balloonPopped
+      };
+      
+      fetch(GAS_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      }).then(res => console.log("GAS 傳送完成")).catch(e => console.log("GAS 錯誤", e));
+    }
+
+    function drawChart() {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['課業焦慮', '社群FOMO', '容貌焦慮', '孤單感', '身心耗竭'],
+          datasets: [{
+            label: '心靈指數',
+            data: [scores.academic, scores.fomo, scores.appearance, scores.loneliness, scores.fatigue],
+            backgroundColor: 'rgba(187, 134, 252, 0.2)',
+            borderColor: 'rgba(187, 134, 252, 1)',
+            pointBackgroundColor: 'rgba(187, 134, 252, 1)'
+          }]
+        },
+        options: { scales: { r: { beginAtZero: true, suggestedMax: 10 } } }
+      });
+    }
+  </script>
+</body>
+</html>
