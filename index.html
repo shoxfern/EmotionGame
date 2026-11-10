@@ -14,7 +14,7 @@
     :root {
       /* 蒼月草與羊皮紙奇幻溫潤色調 */
       --bg-gradient: linear-gradient(160deg, #f5f2eb 0%, #e6eef2 55%, #eef2eb 100%);
-      --parchment: rgba(252, 250, 245, 0.95);
+      --parchment: rgba(252, 250, 245, 0.96);
       --moon-blue: #4a7c9b;
       --moon-light: #7da8c4;
       --sage-green: #5c8a72;
@@ -34,6 +34,7 @@
       color: var(--text-main);
       font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
       overflow: hidden; width: 100vw; height: 100vh;
+      display: flex; flex-direction: column;
       font-size: 17px;
     }
 
@@ -55,36 +56,48 @@
       100% { transform: translateY(-115vh) translateX(30px) scale(1.2); opacity: 0; }
     }
 
-    /* 頂部左右工具列 (含團隊常駐登出按鈕) */
-    .top-bar-left {
-      position: fixed; top: 14px; left: 16px; z-index: 100;
-      display: none;
+    /* 專屬頂部導覽列 (獨立區塊，絕不遮擋下方遊戲與手札內容) */
+    .app-header {
+      position: relative; z-index: 100;
+      width: 100%; height: 54px; padding: 0 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(245, 242, 235, 0.78);
+      border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+      backdrop-filter: blur(8px);
+      flex-shrink: 0;
     }
-    .top-bar {
-      position: fixed; top: 14px; right: 16px; z-index: 100;
-      display: flex; gap: 8px;
+    .header-left, .header-right {
+      display: flex; align-items: center; gap: 8px; min-width: 90px;
     }
+    .header-right { justify-content: flex-end; }
+    .header-brand {
+      font-family: 'Noto Serif TC', serif; font-weight: 900; font-size: 1.05rem;
+      color: var(--moon-blue); letter-spacing: 2px;
+    }
+
     .btn-top {
       background: var(--parchment); color: var(--text-main);
       border: 1.5px solid var(--gold-accent);
-      padding: 8px 15px; border-radius: 999px; font-size: 0.9rem; font-weight: 700;
-      cursor: pointer; width: auto; box-shadow: 0 3px 10px rgba(44, 53, 61, 0.1);
-      font-family: 'Noto Serif TC', serif;
+      padding: 6px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; width: auto; box-shadow: 0 2px 6px rgba(44, 53, 61, 0.08);
+      font-family: 'Noto Serif TC', serif; white-space: nowrap;
     }
     .btn-logout-top {
       border-color: var(--rose-muted); color: var(--rose-muted);
+      display: none;
     }
 
+    /* 畫面容器：自動扣掉頂部導覽列高度，絕不重疊 */
     .screen {
       display: none; position: relative; z-index: 1;
-      width: 100vw; height: 100vh; flex-direction: column;
+      width: 100vw; height: calc(100vh - 54px); flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 20px; overflow-y: auto; animation: gentleFade 0.4s ease-out;
+      padding: 16px 18px; overflow-y: auto; animation: gentleFade 0.35s ease-out;
     }
     .active { display: flex; }
 
     @keyframes gentleFade {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -94,7 +107,7 @@
       border: 2px solid var(--gold-accent);
       outline: 1px solid var(--gold-light);
       outline-offset: -7px;
-      border-radius: 22px; padding: 32px 24px; width: 100%; max-width: 420px;
+      border-radius: 22px; padding: 30px 24px; width: 100%; max-width: 420px;
       text-align: center;
       box-shadow: 0 12px 32px rgba(44, 53, 61, 0.12), 0 2px 6px rgba(197, 160, 89, 0.15);
       backdrop-filter: blur(8px);
@@ -102,30 +115,30 @@
 
     h1 { 
       font-family: 'Noto Serif TC', serif;
-      font-size: 2.45rem; text-align: center; margin: 0 0 10px 0; 
+      font-size: 2.35rem; text-align: center; margin: 0 0 10px 0; 
       color: var(--text-main);
       letter-spacing: 3px; font-weight: 900;
       position: relative; display: inline-block;
     }
     h1::after {
       content: "✦ ─── ✦ ─── ✦";
-      display: block; font-size: 0.8rem; color: var(--gold-accent);
+      display: block; font-size: 0.78rem; color: var(--gold-accent);
       letter-spacing: 4px; margin-top: 4px; font-weight: normal;
     }
     
-    p.subtitle { color: var(--text-sub); text-align: center; font-size: 1.05rem; margin: 8px 0 22px 0; line-height: 1.6; font-weight: 500; }
+    p.subtitle { color: var(--text-sub); text-align: center; font-size: 1.02rem; margin: 8px 0 22px 0; line-height: 1.6; font-weight: 500; }
 
     input { 
-      width: 100%; padding: 15px 18px; border-radius: 14px; 
+      width: 100%; padding: 14px 18px; border-radius: 14px; 
       border: 2px solid var(--border-line); background: #ffffff;
-      color: var(--text-main); font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 16px;
+      color: var(--text-main); font-size: 1.15rem; font-weight: 700; text-align: center; margin-bottom: 16px;
       outline: none; transition: 0.25s;
     }
     input:focus { border-color: var(--moon-blue); box-shadow: 0 0 0 3px rgba(74, 124, 155, 0.2); }
 
     button { 
-      width: 100%; padding: 15px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.3); 
-      font-size: 1.15rem; font-weight: 700; cursor: pointer;
+      width: 100%; padding: 14px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.3); 
+      font-size: 1.1rem; font-weight: 700; cursor: pointer;
       transition: all 0.2s ease;
       box-shadow: 0 4px 12px rgba(44, 53, 61, 0.12);
       font-family: 'Noto Serif TC', 'Noto Sans TC', sans-serif;
@@ -138,12 +151,12 @@
     .btn-gold { background: linear-gradient(135deg, #c5a059, #a8833e); color: #fff; margin-top: 10px; }
     .btn-logout { background: #fff1f2; color: var(--rose-muted); border: 1.5px solid #fecdd3; margin-top: 12px; box-shadow: none; }
     
-    /* 放大選項按鈕字體 */
+    /* 選項按鈕 */
     .btn-option { 
       width: 100%; max-width: 520px; background: var(--parchment); 
-      color: var(--text-main); margin: 9px 0; border: 2px solid var(--border-line); 
-      font-size: 1.15rem; font-weight: 700; text-align: left; padding: 17px 20px; border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(44, 53, 61, 0.06); transition: 0.2s; line-height: 1.5;
+      color: var(--text-main); margin: 8px 0; border: 2px solid var(--border-line); 
+      font-size: 1.1rem; font-weight: 700; text-align: left; padding: 15px 18px; border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(44, 53, 61, 0.06); transition: 0.2s; line-height: 1.45;
       font-family: 'Noto Sans TC', sans-serif;
     }
     .btn-option:hover, .btn-option:active { 
@@ -155,45 +168,47 @@
       font-weight: 900; box-shadow: 0 0 14px rgba(92, 138, 114, 0.3);
     }
 
-    /* 快問快答進度與計時 */
-    .quiz-header { width: 100%; max-width: 520px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 1.05rem; font-weight: 700; color: var(--text-sub); font-family: 'Noto Serif TC', serif; }
-    #timer-bar { width: 100%; max-width: 520px; height: 10px; background: rgba(220,214,200,0.7); border-radius: 999px; margin-bottom: 16px; overflow: hidden; }
+    /* 快問快答排版 */
+    #screen-quiz { justify-content: flex-start; padding-top: 14px; }
+    .quiz-header { width: 100%; max-width: 520px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 1.02rem; font-weight: 700; color: var(--text-sub); font-family: 'Noto Serif TC', serif; }
+    #timer-bar { width: 100%; max-width: 520px; height: 10px; background: rgba(220,214,200,0.7); border-radius: 999px; margin-bottom: 14px; overflow: hidden; flex-shrink: 0; }
     #timer-progress { width: 100%; height: 100%; background: linear-gradient(90deg, var(--sage-green), var(--moon-blue), var(--gold-accent)); transition: width 0.1s linear; }
     
     .question-box { 
       width: 100%; max-width: 520px; flex: 1; display: flex; flex-direction: column; 
-      justify-content: flex-start; max-height: 82vh; position: relative; 
+      justify-content: flex-start; position: relative; padding-bottom: 20px;
     }
     .question-card {
       background: var(--parchment); border: 2px solid var(--gold-accent);
-      border-radius: 20px; padding: 24px 22px; margin-bottom: 12px;
+      border-radius: 20px; padding: 20px; margin-bottom: 10px;
       box-shadow: 0 8px 24px rgba(44, 53, 61, 0.08);
     }
     .question-tag {
       display: inline-block; background: #e6eef2; color: var(--moon-blue);
-      border: 1px solid #c2d6e3; padding: 4px 14px; border-radius: 999px; font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;
+      border: 1px solid #c2d6e3; padding: 4px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px;
     }
-    .question-text { font-size: 1.35rem; line-height: 1.6; margin: 0; color: var(--text-main); font-weight: 900; font-family: 'Noto Serif TC', serif; }
+    .question-text { font-size: 1.28rem; line-height: 1.55; margin: 0; color: var(--text-main); font-weight: 900; font-family: 'Noto Serif TC', serif; }
     
     #quiz-waiting-overlay { 
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
       background: rgba(252, 250, 245, 0.96); border-radius: 20px; flex-direction: column; 
-      align-items: center; justify-content: center; z-index: 10; font-size: 1.4rem; 
+      align-items: center; justify-content: center; z-index: 10; font-size: 1.35rem; 
       color: var(--sage-green); font-weight: 900; text-align: center;
       padding: 24px; border: 2px solid var(--gold-accent);
       font-family: 'Noto Serif TC', serif;
     }
 
     /* 主控台樣式 */
-    .admin-container { width: 100%; max-width: 500px; max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
-    .admin-dashboard { background: var(--parchment); padding: 16px; border-radius: 16px; width: 100%; text-align: center; margin: 8px 0; border: 1.5px solid var(--gold-accent); }
-    .progress-text { font-size: 1.35rem; font-weight: 900; color: var(--sage-green); margin: 6px 0; }
-    .player-list-box { width: 100%; background: var(--parchment); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 12px; margin: 8px 0; max-height: 140px; overflow-y: auto; }
-    .player-chip { display: inline-flex; align-items: center; background: #fff; color: var(--text-main); padding: 5px 12px; border-radius: 999px; font-size: 0.88rem; font-weight: 700; margin: 3px; border: 1px solid var(--border-line); }
+    #screen-admin { justify-content: flex-start; padding-top: 14px; }
+    .admin-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
+    .admin-dashboard { background: var(--parchment); padding: 15px; border-radius: 16px; width: 100%; text-align: center; margin: 6px 0; border: 1.5px solid var(--gold-accent); }
+    .progress-text { font-size: 1.3rem; font-weight: 900; color: var(--sage-green); margin: 6px 0; }
+    .player-list-box { width: 100%; background: var(--parchment); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 12px; margin: 6px 0; max-height: 135px; overflow-y: auto; }
+    .player-chip { display: inline-flex; align-items: center; background: #fff; color: var(--text-main); padding: 5px 12px; border-radius: 999px; font-size: 0.86rem; font-weight: 700; margin: 3px; border: 1px solid var(--border-line); }
     .player-chip span.kick-btn { color: var(--rose-muted); margin-left: 6px; cursor: pointer; font-weight: 900; }
     .config-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-top: 8px; text-align: left; }
-    .config-item label { display: block; font-size: 0.78rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
-    .config-item input { margin-bottom: 0; padding: 8px; font-size: 1.05rem; border-radius: 8px; }
+    .config-item label { display: block; font-size: 0.76rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
+    .config-item input { margin-bottom: 0; padding: 8px; font-size: 1rem; border-radius: 8px; }
 
     /* 4秒深呼吸過場 */
     #screen-breathe { background: radial-gradient(circle at center, #eef5f9 0%, #dde8f0 100%); }
@@ -212,17 +227,17 @@
       100% { transform: scale(0.65); opacity: 0; }
     }
 
-    /* 戳氣球畫面 (氣球與字體全面放大、數量加倍) */
+    /* 戳氣球畫面 */
     #screen-balloon { padding: 10px; justify-content: flex-start; overflow: hidden; user-select: none; }
     .balloon-hud {
-      z-index: 20; text-align: center; pointer-events: none; margin-top: 8px;
-      background: var(--parchment); padding: 12px 24px; border-radius: 18px;
+      z-index: 20; text-align: center; pointer-events: none; margin-top: 4px;
+      background: var(--parchment); padding: 10px 22px; border-radius: 18px;
       box-shadow: 0 6px 18px rgba(44,53,61,0.1); border: 1.5px solid var(--gold-accent);
     }
-    #balloon-area { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: 5; touch-action: none; }
+    #balloon-area { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 5; touch-action: none; }
     
     .balloon { 
-      position: absolute; bottom: -150px; width: 104px; height: 122px; 
+      position: absolute; bottom: -150px; width: 106px; height: 124px; 
       border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%; 
       display: flex; flex-direction: column; align-items: center; justify-content: center; 
       font-size: 1.12rem; font-weight: 900; color: #ffffff; text-align: center;
@@ -237,7 +252,7 @@
       border: 2.5px solid #fff;
     }
     .balloon::after { content: ""; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); width: 2px; height: 16px; background: rgba(197, 160, 89, 0.8); }
-    .balloon-cat-tag { font-size: 0.75rem; background: rgba(0,0,0,0.28); padding: 2px 8px; border-radius: 999px; margin-bottom: 4px; font-weight: 700; }
+    .balloon-cat-tag { font-size: 0.74rem; background: rgba(0,0,0,0.28); padding: 2px 8px; border-radius: 999px; margin-bottom: 4px; font-weight: 700; }
 
     @keyframes floatUp {
       0% { transform: translateY(0) rotate(-2deg); }
@@ -257,27 +272,28 @@
       100% { transform: translate(var(--tx), var(--ty)) rotate(120deg) scale(0); opacity: 0; }
     }
 
-    /* 結算手札收據樣式 */
+    /* 結算手札收據樣式 (自然垂直捲動，不壓迫版面) */
+    #screen-result { justify-content: flex-start; padding-top: 12px; padding-bottom: 28px; }
     .receipt { 
-      background: var(--parchment); color: var(--text-main); padding: 24px 20px; border-radius: 20px; 
-      width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; 
-      box-shadow: 0 16px 36px rgba(44, 53, 61, 0.15); text-align: left; position: relative;
-      border: 2px solid var(--gold-accent);
+      background: var(--parchment); color: var(--text-main); padding: 22px 18px; border-radius: 20px; 
+      width: 100%; max-width: 460px;
+      box-shadow: 0 14px 34px rgba(44, 53, 61, 0.14); text-align: left; position: relative;
+      border: 2px solid var(--gold-accent); margin-bottom: 20px;
     }
-    .receipt h2 { font-family: 'Noto Serif TC', serif; text-align: center; border-bottom: 1.5px dashed var(--gold-accent); padding-bottom: 10px; color: var(--text-main); margin: 0 0 10px 0; font-size: 1.55rem; letter-spacing: 2px; }
-    .receipt-section { background: rgba(255,255,255,0.8); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 14px 16px; margin: 12px 0; }
-    .receipt-section h4 { font-family: 'Noto Serif TC', serif; margin: 0 0 8px 0; color: var(--text-main); font-size: 1.05rem; display: flex; align-items: center; justify-content: space-between; }
+    .receipt h2 { font-family: 'Noto Serif TC', serif; text-align: center; border-bottom: 1.5px dashed var(--gold-accent); padding-bottom: 10px; color: var(--text-main); margin: 0 0 10px 0; font-size: 1.5rem; letter-spacing: 2px; }
+    .receipt-section { background: rgba(255,255,255,0.82); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 14px 15px; margin: 12px 0; }
+    .receipt-section h4 { font-family: 'Noto Serif TC', serif; margin: 0 0 8px 0; color: var(--text-main); font-size: 1.02rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px; }
     
-    /* 副情緒占比條 */
-    .emotion-bar-row { margin: 9px 0; font-size: 0.92rem; }
-    .emotion-bar-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 700; color: var(--text-sub); }
-    .emotion-bar-bg { width: 100%; height: 9px; background: #e6e2d8; border-radius: 999px; overflow: hidden; }
+    /* 第二部分：內心比重條 */
+    .emotion-bar-row { margin: 10px 0; font-size: 0.94rem; }
+    .emotion-bar-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 700; color: var(--text-main); }
+    .emotion-bar-bg { width: 100%; height: 10px; background: #e6e2d8; border-radius: 999px; overflow: hidden; }
     .emotion-bar-fill { height: 100%; border-radius: 999px; transition: width 0.8s ease-out; }
 
     /* 氣球統計小標籤 */
     .balloon-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
-    .balloon-stat-item { background: #fff; border: 1px solid var(--border-line); border-radius: 8px; padding: 7px 11px; font-size: 0.9rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-    .balloon-stat-count { font-weight: 900; color: var(--moon-blue); font-size: 1rem; }
+    .balloon-stat-item { background: #fff; border: 1px solid var(--border-line); border-radius: 8px; padding: 7px 11px; font-size: 0.88rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+    .balloon-stat-count { font-weight: 900; color: var(--moon-blue); font-size: 0.98rem; }
 
     /* 彈出視窗 */
     .modal-overlay {
@@ -290,12 +306,12 @@
       padding: 22px; border-radius: 20px; width: 100%; max-width: 410px; max-height: 85vh;
       overflow-y: auto; text-align: center; box-shadow: 0 20px 45px rgba(0,0,0,0.22);
     }
-    .verse-list-item { text-align: left; font-size: 0.95rem; padding: 9px 0; border-bottom: 1px solid var(--border-line); line-height: 1.55; color: var(--text-main); font-weight: 500; }
+    .verse-list-item { text-align: left; font-size: 0.94rem; padding: 9px 0; border-bottom: 1px solid var(--border-line); line-height: 1.55; color: var(--text-main); font-weight: 500; }
   </style>
 </head>
 <body>
 
-  <!-- 豐富蒼月草微光泡泡背景 (12顆漂浮泡泡) -->
+  <!-- 豐富蒼月草微光泡泡背景 -->
   <div class="bg-mana">
     <div class="mana-orb" style="width:85px; height:85px; left:6%; animation-duration:16s;"></div>
     <div class="mana-orb" style="width:55px; height:55px; left:18%; animation-duration:12s; animation-delay:2s;"></div>
@@ -309,17 +325,18 @@
     <div class="mana-orb" style="width:45px; height:45px; left:52%; animation-duration:11s; animation-delay:3.5s;"></div>
   </div>
 
-  <!-- 左上角常駐登出按鈕 (登入後顯示，方便團隊模式隨時登出換帳號) -->
-  <div id="top-bar-left" class="top-bar-left">
-    <button class="btn-top btn-logout-top" onclick="logout()">🚪 登出</button>
-  </div>
+  <!-- 獨立頂部導覽列：左邊登出、中間標題、右邊分享，完全不遮擋下方畫面 -->
+  <header class="app-header">
+    <div class="header-left">
+      <button id="btn-header-logout" class="btn-top btn-logout-top" onclick="logout()">🚪 登出</button>
+    </div>
+    <div class="header-brand">✦ 慮易on燃 ✦</div>
+    <div class="header-right">
+      <button class="btn-top" onclick="openQrModal()">✦ 分享</button>
+    </div>
+  </header>
 
-  <!-- 右上角單純分享按鈕 -->
-  <div class="top-bar">
-    <button class="btn-top" onclick="openQrModal()">✦ 分享連結</button>
-  </div>
-
-  <!-- 單純的分享彈窗 -->
+  <!-- 分享彈窗 -->
   <div id="qr-modal" class="modal-overlay" onclick="closeQrModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin-top:0; font-family:'Noto Serif TC',serif; color:var(--moon-blue);">✦ 邀請進入《慮易on燃》</h3>
@@ -349,7 +366,7 @@
     </div>
   </div>
 
-  <!-- 2. 團隊等候室 (必須等主控台按下開始才會進入遊戲，絕不自動偷跑) -->
+  <!-- 2. 團隊等候室 -->
   <div id="screen-waiting" class="screen">
     <div class="story-card">
       <h1>旅途等候室</h1>
@@ -364,18 +381,18 @@
   </div>
 
   <!-- 3. Jesus 主控台 -->
-  <div id="screen-admin" class="screen" style="justify-content:flex-start; padding-top:55px;">
+  <div id="screen-admin" class="screen">
     <div class="admin-container">
-      <h1 style="font-size:1.8rem;">👑 旅途引導主控台</h1>
+      <h1 style="font-size:1.75rem;">👑 旅途引導主控台</h1>
       <p id="admin-player-count" style="color:var(--sage-green); font-weight:700; margin:4px 0;">目前連線人數: 0</p>
       
-      <!-- 參數調整面板 (可設定題數、每題秒數預設7秒、氣球秒數) -->
+      <!-- 參數調整面板 (可設定題數1~60、每題秒數預設7秒、氣球秒數) -->
       <div class="admin-dashboard">
-        <div style="font-size:0.95rem; font-weight:700; color:var(--moon-blue); font-family:'Noto Serif TC',serif;">⚙️ 遊戲參數設定 (修改後即時套用)</div>
+        <div style="font-size:0.95rem; font-weight:700; color:var(--moon-blue); font-family:'Noto Serif TC',serif;">⚙️ 遊戲參數設定 (題庫共 60 題)</div>
         <div class="config-grid">
           <div class="config-item">
-            <label>總題數 (1~40)</label>
-            <input type="number" id="cfg-q-count" min="1" max="40" value="15" onchange="saveGameSettings()">
+            <label>抽題數 (1~60)</label>
+            <input type="number" id="cfg-q-count" min="1" max="60" value="15" onchange="saveGameSettings()">
           </div>
           <div class="config-item">
             <label>每題秒數 (預設7秒)</label>
@@ -398,7 +415,7 @@
       </div>
 
       <div class="admin-dashboard">
-        <div id="admin-q-title" style="font-size:1.05rem; font-weight:700; color:var(--text-main);">目前階段: 等候室待機中 (等待主控台按開始)</div>
+        <div id="admin-q-title" style="font-size:1.02rem; font-weight:700; color:var(--text-main);">目前階段: 等候室待機中 (等待主控台按開始)</div>
         <div id="admin-progress-text" class="progress-text">已完成人數: 0 / 0</div>
         <div id="admin-live-balloons" style="font-size:1rem; color:var(--gold-accent); font-weight:700; margin-bottom:4px; display:none;">🎈 全場即時擊破氣球：<span id="admin-live-balloon-num" style="font-size:1.4rem; font-weight:900;">0</span> 顆</div>
       </div>
@@ -436,13 +453,13 @@
   <!-- 5. 戳氣球發洩 -->
   <div id="screen-balloon" class="screen">
     <div class="balloon-hud">
-      <h1 style="font-size:1.75rem; margin-bottom:2px;">✦ 拂去思緒氣球</h1>
-      <p style="margin:0; font-size:0.92rem; color:var(--text-sub); font-weight:700;">輕觸或滑過氣球，將累積的壓力化作花瓣消散</p>
-      <div style="display:flex; align-items:center; justify-content:center; gap:22px; margin-top:5px; font-weight:900; font-family:'Noto Serif TC',serif;">
-        <div>已拂去：<span id="balloon-score" style="font-size:2.1rem; color:var(--sage-green);">0</span></div>
-        <div>剩餘：<span id="balloon-timer" style="font-size:1.85rem; color:var(--rose-muted);">15</span> 秒</div>
+      <h1 style="font-size:1.65rem; margin-bottom:2px;">✦ 拂去思緒氣球</h1>
+      <p style="margin:0; font-size:0.88rem; color:var(--text-sub); font-weight:700;">輕觸或滑過氣球，將累積的壓力化作花瓣消散</p>
+      <div style="display:flex; align-items:center; justify-content:center; gap:22px; margin-top:4px; font-weight:900; font-family:'Noto Serif TC',serif;">
+        <div>已拂去：<span id="balloon-score" style="font-size:2rem; color:var(--sage-green);">0</span></div>
+        <div>剩餘：<span id="balloon-timer" style="font-size:1.75rem; color:var(--rose-muted);">15</span> 秒</div>
       </div>
-      <div id="combo-badge" style="font-size:1.05rem; color:var(--gold-accent); font-weight:900; height:22px;"></div>
+      <div id="combo-badge" style="font-size:1rem; color:var(--gold-accent); font-weight:900; height:22px;"></div>
     </div>
     <div id="balloon-area"></div>
   </div>
@@ -466,16 +483,22 @@
       
       <!-- 👤 玩家報告 -->
       <div id="player-report-view">
+        <!-- 第一部分：五大壓力來源雷達圖 -->
         <div class="receipt-section">
-          <h4><span>🧭 思緒與壓力來源分佈</span><span id="top-anxiety-badge" style="color:var(--moon-blue); font-size:0.85rem; font-family:'Noto Sans TC',sans-serif;"></span></h4>
-          <canvas id="radarChart" style="max-height:220px;"></canvas>
+          <h4>
+            <span>🧭 思緒與壓力來源分佈</span>
+            <span id="top-anxiety-badge" style="color:var(--moon-blue); font-size:0.85rem; font-family:'Noto Sans TC',sans-serif;"></span>
+          </h4>
+          <canvas id="radarChart" style="max-height:230px;"></canvas>
         </div>
 
+        <!-- 第二部分：五大內心比重 (完美主義、孤獨、不確定性、與人比較、自我否定) -->
         <div class="receipt-section">
-          <h4><span>📊 內心伴隨情緒比重</span></h4>
+          <h4><span>📊 內心比重分析</span></h4>
           <div id="secondary-emotions-box"></div>
         </div>
 
+        <!-- 氣球統計 -->
         <div class="receipt-section" style="background:#f5f8fa; border-color:#c9dce8;">
           <h4>
             <span style="color:var(--moon-blue);">🎈 本回拂去的壓力氣球</span>
@@ -485,11 +508,13 @@
           <div id="player-balloon-breakdown" class="balloon-stat-grid"></div>
         </div>
 
+        <!-- 微行動建議 -->
         <div class="receipt-section" style="background:#f0f6f2; border-color:#bdd6c8;">
           <h4 style="color:#2d5a43;">🌿 日常前行的微小建議</h4>
           <div id="action-text" style="font-size:1rem; color:#234735; line-height:1.6; font-weight:700;">載入中...</div>
         </div>
 
+        <!-- 聖經祝福話語 -->
         <div class="receipt-section" style="background:#faf6ec; border-color:#e2d1a8;">
           <h4 style="color:#7c5e26;">
             <span>📖 旅途中的祝福話語</span>
@@ -551,7 +576,6 @@
     const db = firebase.database();
     const GAS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby5zQjffGtHQbviJFg-Cl0wNCSGjjFJaP9MqsoVkaL1TyLViNKgOR89qBvEpGCnl9I/exec";
 
-    // 自動判斷網址是否為「獨立單人暢玩 (?mode=solo)」
     const urlParams = new URLSearchParams(window.location.search);
     let isSoloMode = (urlParams.get('mode') === 'solo');
 
@@ -561,7 +585,7 @@
     let targetBalloonSeconds = 15;
 
     // ==========================================
-    // 2. Web Audio API 音效引擎 (溫潤泡泡聲與 7 秒心跳聲)
+    // 2. Web Audio API 音效引擎
     // ==========================================
     let audioCtx;
     let heartbeatTimeout;
@@ -633,51 +657,65 @@
     function stopHeartbeat() { clearTimeout(heartbeatTimeout); }
 
     // ==========================================
-    // 3. 24 種壓力氣球資料庫
+    // 3. 25 種壓力氣球資料庫 (對應全新五大壓力來源)
     // ==========================================
     const balloonCatalog = [
-      { word: "段考炸裂", cat: "課業與未來", color: "#5b7c99" },
-      { word: "模擬考排名", cat: "課業與未來", color: "#4a7c9b" },
-      { word: "學習歷程檔案", cat: "課業與未來", color: "#6889a6" },
-      { word: "怕考不上大學", cat: "課業與未來", color: "#5b7c99" },
-      { word: "選錯科系", cat: "課業與未來", color: "#7395b0" },
-      { word: "未來找不到工作", cat: "課業與未來", color: "#4a7c9b" },
-      { word: "AI搶工作", cat: "課業與未來", color: "#54728c" },
-      { word: "備審生不出來", cat: "課業與未來", color: "#6889a6" },
+      { word: "家人的沉重期待", cat: "家長期望", color: "#b85d6f" },
+      { word: "親戚愛比較", cat: "家長期望", color: "#c46d7e" },
+      { word: "爸媽碎念成績", cat: "家長期望", color: "#a85263" },
+      { word: "家庭低氣壓", cat: "家長期望", color: "#b85d6f" },
+      { word: "怕讓父母失望", cat: "家長期望", color: "#c46d7e" },
 
-      { word: "家人沉重期待", cat: "家庭期待", color: "#b85d6f" },
-      { word: "親戚愛比較", cat: "家庭期待", color: "#c46d7e" },
-      { word: "爸媽碎念", cat: "家庭期待", color: "#a85263" },
-      { word: "家庭低氣壓", cat: "家庭期待", color: "#b85d6f" },
+      { word: "段考模擬考炸裂", cat: "未來課業", color: "#4a7c9b" },
+      { word: "學習歷程生不出", cat: "未來課業", color: "#5b7c99" },
+      { word: "怕考不上理想大學", cat: "未來課業", color: "#6889a6" },
+      { word: "選錯科系怎麼辦", cat: "未來課業", color: "#4a7c9b" },
+      { word: "未來找不到好工作", cat: "未來課業", color: "#54728c" },
 
-      { word: "怕被同學討厭", cat: "人際社交", color: "#7a6f9b" },
-      { word: "分組落單", cat: "人際社交", color: "#887da8" },
-      { word: "怕背後被議論", cat: "人際社交", color: "#6c618c" },
-      { word: "在班上像透明人", cat: "人際社交", color: "#7a6f9b" },
-      { word: "和朋友冷戰", cat: "人際社交", color: "#887da8" },
+      { word: "訊息已讀不回", cat: "社群媒體", color: "#c59359" },
+      { word: "限動沒人按愛心", cat: "社群媒體", color: "#b8864c" },
+      { word: "看別人限動好羨慕", cat: "社群媒體", color: "#c59359" },
+      { word: "半夜捨不得關手機", cat: "社群媒體", color: "#b07d45" },
+      { word: "網路話題跟不上", cat: "社群媒體", color: "#c59359" },
 
-      { word: "訊息已讀不回", cat: "社群比較", color: "#c59359" },
-      { word: "朋友聚會沒揪", cat: "社群比較", color: "#b8864c" },
-      { word: "同儕比較壓力", cat: "社群比較", color: "#c59359" },
-      { word: "零用錢見底", cat: "社群比較", color: "#b07d45" },
+      { word: "不敢脫下口罩", cat: "外表自我形象", color: "#5c8a72" },
+      { word: "覺得自己不夠好看", cat: "外表自我形象", color: "#68997f" },
+      { word: "便服日穿搭焦慮", cat: "外表自我形象", color: "#4f7a63" },
+      { word: "站在鏡子前沒自信", cat: "外表自我形象", color: "#5c8a72" },
+      { word: "在意別人看我的眼神", cat: "外表自我形象", color: "#68997f" },
 
-      { word: "失眠睡不著", cat: "身心耗竭", color: "#5c8a72" },
-      { word: "每天燃燒殆盡", cat: "身心耗竭", color: "#68997f" },
-      { word: "拖延症自責", cat: "身心耗竭", color: "#4f7a63" }
+      { word: "怕被同學討厭", cat: "人際關係", color: "#7a6f9b" },
+      { word: "分組報告落單", cat: "人際關係", color: "#887da8" },
+      { word: "怕背後被議論", cat: "人際關係", color: "#6c618c" },
+      { word: "和好朋友冷戰", cat: "人際關係", color: "#7a6f9b" },
+      { word: "在班上像透明人", cat: "人際關係", color: "#887da8" }
     ];
 
     // ==========================================
-    // 4. 完整 52 句聖經經文庫與微行動庫
+    // 4. 完整 52 句聖經經文庫與微行動庫 (對應全新五大來源)
     // ==========================================
     const categoryNames = {
-      academic: "課業、未來大學與工作期待",
-      fomo: "社群比較與偽裝討好",
-      appearance: "自我形象與外表在乎",
-      loneliness: "人際關係與怕被孤立",
-      fatigue: "身心耗竭與拖延無力"
+      parental: "家長期望",
+      academic: "未來課業",
+      social_media: "社群媒體",
+      appearance: "外表自我形象",
+      interpersonal: "人際關係"
     };
 
     const bibleVerses = {
+      parental: [
+        "凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。(太 11:28)",
+        "我的心哪，你當默默無聲，專等候神，因為我的盼望是從他而來。(詩 62:5)",
+        "但那等候耶和華的必從新得力。他們必如鷹展翅上騰；他們奔跑卻不困倦，行走卻不疲乏。(賽 40:31)",
+        "疲乏的，他賜能力；軟弱的，他加力量。(賽 40:29)",
+        "你們得救在乎歸回安息；你們得力在乎平靜安穩。(賽 30:15)",
+        "耶和華必賜力量給他的百姓；耶和華必賜平安的福給他的百姓。(詩 29:11)",
+        "惟獨惟有他是我磐石，我的拯救；他是我的高臺，我必不很動搖。(詩 62:2)",
+        "惟有耶和華所親愛的，必叫他安然睡覺。(詩 127:2)",
+        "我躺下睡覺，我醒著，耶和華都保佑我。(詩 3:5)",
+        "我必安然躺下睡覺，因為獨有你耶和華使我安然居住。(詩 4:8)",
+        "我的肉體和我的心腸衰退；但神是我心裡的力量，又是我的福分，直到永遠。(詩 73:26)"
+      ],
       academic: [ 
         "當將你的事交託耶和華，並倚靠他，他就必成全。(詩 37:5)", 
         "你所做的，要交託耶和華，你所謀的，就必成立。(箴 16:3)", 
@@ -691,7 +729,7 @@
         "我靠著那加給我力量的，凡事都能做。(腓 4:13)", 
         "人心籌算自己的道路；惟耶和華指引他的腳步。(箴 16:9)" 
       ],
-      fomo: [ 
+      social_media: [ 
         "不要效法這個世界，只要心意更新而變化。(羅 12:2)", 
         "因為我們不敢將自己和那自薦的人同列、相比。他們用自己度量自己，用自己比較自己，乃是不通達的。(林後 10:12)", 
         "各人應當察驗自己的行為；這樣，他所誇的就專在自己，不在別人了。(加 6:4)", 
@@ -715,7 +753,7 @@
         "你這甚蒙眷愛的人哪，不要懼怕，願你平安！你總要堅強。(但 10:19)", 
         "我的佳偶，你甚美麗！你甚美麗！(歌 4:1)" 
       ],
-      loneliness: [ 
+      interpersonal: [ 
         "我父母離棄我，耶和華必收留我。(詩 27:10)", 
         "我雖然行過死蔭的幽谷，也不怕遭害，因為你與我同在。(詩 23:4)", 
         "婦人焉能忘記她吃奶的嬰孩，不憐恤她所生的兒子？即或有忘記的，我卻不忘記你。看哪，我將你銘刻在我掌上。(賽 49:15-16)", 
@@ -726,100 +764,356 @@
         "愛弟兄，要彼此親熱；推讓，要彼此爭先。(羅 12:10)", 
         "有了我的命令又遵守的，這人就是愛我的；愛我的必蒙我父愛他，我也要愛他，並且要向他顯現。(約 14:21)", 
         "你們要彼此相愛，像我愛你們一樣；這就是我的命令。(約 15:12)" 
-      ],
-      fatigue: [ 
-        "凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。(太 11:28)", 
-        "我的心哪，你當默默無聲，專等候神，因為我的盼望是從他而來。(詩 62:5)", 
-        "但那等候耶和華的必從新得力。他們必如鷹展翅上騰；他們奔跑卻不困倦，行走卻不疲乏。(賽 40:31)", 
-        "疲乏的，他賜能力；軟弱的，他加力量。(賽 40:29)", 
-        "你們得救在乎歸回安息；你們得力在乎平靜安穩。(賽 30:15)", 
-        "耶和華必賜力量給他的百姓；耶和華必賜平安的福給他的百姓。(詩 29:11)", 
-        "惟獨惟有他是我磐石，我的拯救；他是我的高臺，我必不很動搖。(詩 62:2)", 
-        "惟有耶和華所親愛的，必叫他安然睡覺。(詩 127:2)", 
-        "我躺下睡覺，我醒著，耶和華都保佑我。(詩 3:5)", 
-        "我必安然躺下睡覺，因為獨有你耶和華使我安然居住。(詩 4:8)", 
-        "我的肉體和我的心腸衰退；但神是我心裡的力量，又是我的福分，直到永遠。(詩 73:26)" 
       ]
     };
 
     const microActions = {
-      academic: [
-        "把桌面清空只留下一本書，先完成 10 分鐘能做完的小進度就好。",
-        "在紙上寫下 3 件這禮拜你已經做得不錯的小事，肯定自己的步伐。",
-        "去洗把臉、喝杯溫水，告訴自己：「一次解決一件事，前方的路會慢慢清晰。」"
+      parental: [
+        "練習在心裡劃出溫柔的界線，告訴自己：「父母的焦慮是他們的課題，我有自己成長的步調。」",
+        "今天找一個不受打擾的 15 分鐘，戴上耳機聽首喜歡的歌，讓緊繃的神經好好喘口氣。",
+        "寫下一件「我是為了自己開心而做」的小事，找回對自己生活的掌控感。"
       ],
-      fomo: [
-        "給自己 2 小時的「靜心時間」，暫時把社群通知關掉，享受片刻自由。",
-        "主動跟身邊一位真實的朋友聊聊天，感受面對面的溫度。",
-        "去吃一樣自己很喜歡的小點心，不用拍照打卡，單純享受當下的美好。"
+      academic: [
+        "把桌面清空只留下一本書，先完成 10 分鐘能做完的小進度就好，不用一次想完未來的全部。",
+        "在紙上寫下 3 件這禮拜你已經努力完成的小事，肯定自己踏實的步伐。",
+        "去洗把臉、喝杯溫水，告訴自己：「一次解決眼前的一件事，未來的路會越走越清晰。」"
+      ],
+      social_media: [
+        "給自己 2 小時的「靜心留白時間」，暫時把 IG 與社群通知關掉，享受不被打擾的自由。",
+        "放下螢幕，去跟身邊真實的朋友說說話，感受面對面最真實的溫度。",
+        "去吃一樣自己很喜歡的小點心，不用拍照打卡，單純用五感享受當下的美好。"
       ],
       appearance: [
-        "看著鏡子裡的自己微笑 3 秒，謝謝身體今天陪你走過一整天。",
-        "明天選一件自己穿起來最舒服自在的衣服出門。",
-        "減少瀏覽會讓你產生外表比較的帳號，把目光放回自己獨特的價值上。"
+        "看著鏡子裡的自己微笑 3 秒，在心裡謝謝身體今天依然陪伴你走過一整天。",
+        "明天選一件自己穿起來最舒服自在的衣服出門，把「自己舒服」放在第一位。",
+        "退追或隱藏幾個會讓你產生外貌焦慮與比較的帳號，把目光放回自己獨特的價值上。"
       ],
-      loneliness: [
-        "今天主動對身邊的一位同學、家人或店員說聲「謝謝」或點頭微笑。",
-        "找一位你信任的朋友或夥伴，聊聊最近心裡的一件小事。",
-        "散步 10 分鐘聽首平靜的音樂，享受與自己相處的溫柔時光。"
-      ],
-      fatigue: [
-        "今晚提早 30 分鐘把手機放到床頭碰不到的地方，讓身心好好歇息。",
-        "閉上眼睛做 3 次深長的腹式呼吸，把緊繃的肩膀慢慢放下來。",
-        "允許自己今天有一段「完全不追進度」的留白時間，不用感到罪惡。"
+      interpersonal: [
+        "今天主動對身邊的一位同學、家人或店員說聲「謝謝」或點頭微笑，感受簡單的善意。",
+        "不必強迫自己討好所有人，找一位你真正信任的朋友或帶領者，聊聊最近心裡的一件小事。",
+        "散步 10 分鐘聽首平靜的音樂，練習享受與自己獨處的溫柔時光。"
       ]
     };
 
-    // 40 題完整題庫
+    // ==========================================
+    // 5. 全新 60 題青少年深度題庫
+    // 第一部分標籤：parental(家長期望), academic(未來課業), social_media(社群媒體), appearance(外表自我形象), interpersonal(人際關係)
+    // 第二部分標籤：perfectionism(完美主義), loneliness_inner(孤獨), uncertainty(不確定性), comparison(與人比較), self_denial(自我否定)
+    // ==========================================
     const masterQuestions = [
-      { cat: "未來升學與出路", q: "想到未來要考大學或選科系，完全不知道自己對什麼有興趣。", opts: [{ text: "覺得很茫然，乾脆先不去想，過一天算一天", tags: { escape: 2, future: 2 } }, { text: "壓力很大，怕選錯科系以後出社會找不到好工作", tags: { academic: 2, future: 2 } }, { text: "找信任的學長姐或師長聊聊，一步步探索方向", tags: { resilience: 2 } }]},
-      { cat: "家人期待壓力", q: "長輩常說「現在不好好讀書，以後出社會只能領底薪」，聽了心裡很煩。", opts: [{ text: "直接臭臉走開或關起房門，心裡超悶", tags: { family: 2, fatigue: 1 } }, { text: "默默把焦慮吞下去，覺得自己好像真的很失敗", tags: { self_doubt: 2, family: 2 } }, { text: "明白長輩只是擔心，把專注力放回自己能掌控的事", tags: { resilience: 2 } }]},
-      { cat: "未來就業焦慮", q: "看到新聞報導說現在物價房價飆漲、AI 又會取代許多未來的工作機會。", opts: [{ text: "覺得未來一片黑暗，怎麼努力都追不上，乾脆躺平", tags: { future: 3, anxiety: 2 } }, { text: "擔心自己以後養不起自己，越想越心慌", tags: { future: 2, anxiety: 2 } }, { text: "多嘗試不同領域，培養 AI 取代不了的溝通與創造力", tags: { resilience: 2 } }]},
-      { cat: "家人期待壓力", q: "父母總是幫你規劃好未來的路（考什麼學校、做什麼工作），但那不是你想要的。", opts: [{ text: "表面敷衍答應，心裡卻充滿抗拒不想配合", tags: { family: 2, escape: 2 } }, { text: "不敢拒絕怕他們失望，每天活在沉重的期待壓力中", tags: { family: 3, fatigue: 2 } }, { text: "試著整理自己的想法，找時機溫和地跟父母溝通", tags: { resilience: 2 } }]},
-      { cat: "課業與升學", q: "每次模擬考成績出來，離心目中的理想大學落差一大截。", opts: [{ text: "躲進被子裡難過，覺得自己這輩子沒希望了", tags: { academic: 3, self_doubt: 2 } }, { text: "躺在床上放空滑短影音麻痺自己，逃避現實成績", tags: { escape: 3, fatigue: 2 } }, { text: "先抓出最容易補救的錯題，一科一科慢慢救", tags: { resilience: 2 } }]},
-      { cat: "課業與未來", q: "晚上從水利大樓補習班下課，看著滿街的學生，突然不知道自己每天忙成這樣是為了什麼。", opts: [{ text: "嘆一口大氣，覺得活著好累、好想徹底放假", tags: { fatigue: 3, academic: 2 } }, { text: "一邊焦慮自己進度落後別人，一邊又提不起勁", tags: { fatigue: 2, anxiety: 2 } }, { text: "買杯喜歡的飲料犒賞自己，回家早點睡補眠", tags: { resilience: 2 } }]},
-      { cat: "家人比較壓力", q: "過年或家庭聚餐時，親戚又開始問：「表哥考上頂大，你現在成績排第幾名啊？」", opts: [{ text: "立刻戴上耳機假裝聽不見，躲回房間", tags: { family: 2, escape: 2 } }, { text: "覺得面子掛不住，在餐桌上如坐針氈", tags: { family: 2, self_doubt: 2 } }, { text: "禮貌微笑回「還在努力中」，心裡知道人生是自己的", tags: { resilience: 2 } }]},
-      { cat: "未來經濟與獨立", q: "想到未來上大學的學費、生活費跟出社會後的開銷，就覺得壓力很大。", opts: [{ text: "覺得長大好辛苦，很不想面對未來的成人世界", tags: { future: 2, fatigue: 2 } }, { text: "擔心造成家裡經濟負擔，心裡默默給自己很大壓力", tags: { family: 2, anxiety: 2 } }, { text: "開始學習記帳與規劃儲蓄，一步步建立安全感", tags: { resilience: 2 } }]},
-      { cat: "升學歷程焦慮", q: "老師提醒「學習歷程檔案」跟備審資料截止日快到了，打開電腦卻一片空白。", opts: [{ text: "立刻把電腦蓋上，先去追劇或發呆逃避一下", tags: { escape: 3, future: 2 } }, { text: "覺得別人經歷都超豐富，自己卻什麼都拿不出來", tags: { self_doubt: 3, academic: 2 } }, { text: "先把這學期做過的報告和活動照片整理成一個資料夾", tags: { resilience: 2 } }]},
-      { cat: "科系與志向迷惘", q: "看了一堆大學科系介紹，發現自己好像什麼都不討厭，但也沒有特別熱愛的目標。", opts: [{ text: "覺得自己很沒用，連夢想都沒有，隨便填一填算了", tags: { self_doubt: 3, future: 2 } }, { text: "焦慮到失眠，很怕現在選錯以後後悔一輩子", tags: { anxiety: 3, future: 2 } }, { text: "先從自己比較擅長的科目切入，允許自己邊走邊調整", tags: { resilience: 2 } }]},
-      { cat: "家人期待壓力", q: "考了一張自認已經盡力的考卷，拿給爸媽看卻被回：「怎麼才考這樣？粗心對不對？」", opts: [{ text: "心裡瞬間委屈又火大，覺得怎麼做都達不到標準", tags: { family: 3, fatigue: 2 } }, { text: "開始懷疑自己是不是真的很笨、怎麼努力都沒用", tags: { self_doubt: 3, family: 2 } }, { text: "雖然有點失落，但心裡肯定自己這段時間的付出", tags: { resilience: 2 } }]},
-      { cat: "未來工作想像", q: "聽到大學畢業的哥哥姊姊抱怨工作難找、經常加班，讓你對未來出社會充滿恐懼。", opts: [{ text: "想到以後也要過這種生活，現在就覺得好絕望", tags: { future: 3, fatigue: 2 } }, { text: "更不敢放鬆讀書了，深怕自己以後連工作都找不到", tags: { future: 2, anxiety: 3 } }, { text: "把別人的經驗當參考，相信自己能找到適合的步調", tags: { resilience: 2 } }]},
+      // 【一、家長期望】（12題）
+      { cat: "家長期望", q: "考了一張自己已經盡力、但沒有滿分的考卷，拿給爸媽看卻被問：「怎麼粗心扣了這幾分？」", opts: [
+        { text: "覺得自己怎麼做都不夠完美，自責到把考卷揉掉", tags: { parental: 2, perfectionism: 3, self_denial: 1 } },
+        { text: "心裡超委屈，覺得在家裡沒有人真正懂我的努力", tags: { parental: 3, loneliness_inner: 2 } },
+        { text: "雖然有點失落，但在心裡肯定自己這段時間的付出", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "父母總是幫你規劃好未來要念什麼大學跟科系，但那根本不是你想要的。", opts: [
+        { text: "不敢拒絕怕他們失望，卻對未來感到一片迷茫", tags: { parental: 3, uncertainty: 2 } },
+        { text: "表面敷衍答應，關上房門覺得只有自己一個人孤軍奮戰", tags: { parental: 2, loneliness_inner: 3 } },
+        { text: "試著收集資料，找機會溫和地跟父母分享自己的想法", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "過年或家庭聚餐時，親戚又開始問：「表哥考上頂大，你現在在班上排第幾名啊？」", opts: [
+        { text: "覺得自己處處不如人，在餐桌上恨不得原地消失", tags: { parental: 2, comparison: 3, self_denial: 2 } },
+        { text: "立刻戴上耳機躲回房間，覺得大人世界好煩", tags: { parental: 2, loneliness_inner: 2 } },
+        { text: "禮貌微笑回「還在努力中」，心裡知道人生是自己的", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "長輩常嘆氣說：「我們省吃儉用供你補習，你千萬不要讓我們丟臉。」", opts: [
+        { text: "壓力大到喘不過氣，深怕只要考差一次就會毀了一切", tags: { parental: 3, perfectionism: 2, uncertainty: 2 } },
+        { text: "覺得自己是個沉重的負擔，懷疑自己存在的價值", tags: { parental: 2, self_denial: 3 } },
+        { text: "明白長輩的辛苦，但練習不把大人的情緒全部背在身上", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "週末才剛拿起手機想休息十分鐘，爸媽走進來就唸：「整天只知道玩，書讀完了沒？」", opts: [
+        { text: "瞬間火大把房門關上，覺得在家裡連呼吸都被監控", tags: { parental: 3, loneliness_inner: 2 } },
+        { text: "立刻產生強烈的罪惡感，覺得自己休息一下就是廢物", tags: { parental: 2, self_denial: 3 } },
+        { text: "平靜告訴他們「我剛讀完一章，休息十分鐘就繼續」", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "看到別人的爸媽都很開明、像朋友一樣聊天，再看看自己家裡總是只談成績。", opts: [
+        { text: "羨慕到心酸，忍不住一直拿別人的家庭跟自己家比較", tags: { parental: 2, comparison: 3, loneliness_inner: 2 } },
+        { text: "覺得一定是自己不夠優秀，爸媽才不會對我溫柔", tags: { parental: 2, self_denial: 3 } },
+        { text: "找信任的同儕或師長傾訴，在朋友中建立溫暖的支持網", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "爸媽最近因為工作或家務事經常吵架冷戰，家裡的氣氛低壓到讓人不敢出聲。", opts: [
+        { text: "躲在房間裡覺得好孤單，不知道這個家以後會變怎樣", tags: { parental: 3, loneliness_inner: 2, uncertainty: 2 } },
+        { text: "逼自己表現得更乖、更完美，看能不能讓爸媽不要吵架", tags: { parental: 2, perfectionism: 3 } },
+        { text: "提醒自己大人的爭執不是我的錯，適時出門透透氣", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "你想參加自己很喜歡的社團或活動，但父母覺得「那對升學沒幫助」而一口回絕。", opts: [
+        { text: "覺得自己喜歡的事物全被否定，對未來失去期待", tags: { parental: 3, self_denial: 2, uncertainty: 1 } },
+        { text: "看著其他同學都能自由參加，心裡充滿羨慕與不平衡", tags: { parental: 2, comparison: 3 } },
+        { text: "跟父母約定好維持一定成績，爭取折衷參與的機會", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "長輩常說：「現在不好好讀書，以後出社會只能領底薪過苦日子。」", opts: [
+        { text: "聽完對未來充滿恐懼，覺得自己只要一步走錯就完蛋了", tags: { parental: 2, uncertainty: 3, perfectionism: 1 } },
+        { text: "覺得自己現在成績普通，以後一定沒出息", tags: { parental: 2, self_denial: 3 } },
+        { text: "把話聽過就算，專注培養自己真正感興趣的能力", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "家裡有表現很優秀的兄弟姊妹，爸媽常有意無意說：「你多跟哥哥/姊姊學學。」", opts: [
+        { text: "永遠活在對方的陰影下，覺得自己不管怎麼做都是次等品", tags: { parental: 3, comparison: 3, self_denial: 2 } },
+        { text: "拼命逼自己每件事都要做到第一，想證明自己不輸他", tags: { parental: 2, perfectionism: 3 } },
+        { text: "肯定自己和手足有不同的特質，走出自己的路", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "當你在學校遇到挫折想跟父母傾訴時，他們卻立刻開始檢討你哪裡沒做好。", opts: [
+        { text: "從此把心門鎖起來，決定再也不跟家裡說任何心事", tags: { parental: 3, loneliness_inner: 3 } },
+        { text: "覺得連最親的家人都不挺我，一定是我自己太糟糕了", tags: { parental: 2, self_denial: 3 } },
+        { text: "改找懂你的好朋友或輔導老師聊聊，獲得真正的情緒同理", tags: { resilience: 2 } }
+      ]},
+      { cat: "家長期望", q: "大家總覺得你是個懂事、聽話的孩子，讓你完全不敢在家裡表現出脆弱或疲倦。", opts: [
+        { text: "為了維持好孩子的完美形象，每天都戴著面具撐得好累", tags: { parental: 3, perfectionism: 3 } },
+        { text: "夜深人靜時覺得沒有人認識真正的我，心裡空空的", tags: { parental: 2, loneliness_inner: 3 } },
+        { text: "練習偶爾卸下重擔，誠實說出「我今天真的有點累」", tags: { resilience: 2 } }
+      ]},
 
-      { cat: "人際與同儕關係", q: "走在教室走廊上，看到班上幾個同學聚在一起突然大笑，你直覺懷疑他們是不是在笑你。", opts: [{ text: "立刻低頭加快腳步走過去，心跳加速手心冒汗", tags: { loneliness: 3, anxiety: 2 } }, { text: "整天都在回想自己剛才是不是說錯話、做錯事得罪人", tags: { loneliness: 2, self_doubt: 2 } }, { text: "告訴自己別過度解讀，他們可能只是在聊好笑的梗", tags: { resilience: 2 } }]},
-      { cat: "人際與孤單感", q: "看著班上大家都一團一團的，自己雖然有人聊天，卻好像沒有真正能說心事的摯友。", opts: [{ text: "覺得自己很孤單，像個隨時會被遺忘的邊緣人", tags: { loneliness: 3, self_doubt: 2 } }, { text: "為了不落單，勉強自己迎合不習慣的話題跟小圈圈", tags: { loneliness: 2, mask: 2 } }, { text: "珍惜日常的善意互動，也在社團或興趣中尋找知音", tags: { resilience: 2 } }]},
-      { cat: "同儕衝突焦慮", q: "跟平常走得很近的好朋友發生誤會，對方今天一整天在學校都對你冷淡不理。", opts: [{ text: "焦慮到上課完全聽不進去，腦袋一直胡思亂想", tags: { loneliness: 3, anxiety: 2 } }, { text: "拉不下臉開口，乾脆假裝不在乎、跟著冷戰到底", tags: { loneliness: 2, escape: 2 } }, { text: "放學前傳個訊息或寫張小紙條，主動釋出善意破冰", tags: { resilience: 2 } }]},
-      { cat: "怕被同學排擠", q: "分組報告時大家瞬間找好隊友，你站在原地發現自己沒被任何人主動邀請。", opts: [{ text: "覺得超級丟臉，尷尬到想直接原地消失", tags: { loneliness: 3, self_doubt: 2 } }, { text: "裝作不在意地低頭翻課本，等老師隨機分配", tags: { loneliness: 2, mask: 2 } }, { text: "深呼吸，主動走到還缺人的組別問：「我可以加入嗎？」", tags: { resilience: 2 } }]},
-      { cat: "人際討好壓力", q: "為了怕跟同學關係不好，別人拜託你幫忙或約你去不想去的局，你總是不敢拒絕。", opts: [{ text: "心裡覺得好累好委屈，但又超怕拒絕會被討厭", tags: { loneliness: 2, fatigue: 3 } }, { text: "表面笑嘻嘻配合大家，回家後卻覺得自己很虛偽", tags: { mask: 3, self_doubt: 2 } }, { text: "練習溫和但堅定地說出自己的狀況，立下健康界線", tags: { resilience: 2 } }]},
-      { cat: "同儕眼光焦慮", q: "聽到班上有人在背後小聲討論某個同學的缺點，你很害怕哪天自己也變成被議論的對象。", opts: [{ text: "在班上變得過度小心翼翼，深怕自己哪裡表現不好", tags: { anxiety: 3, loneliness: 2 } }, { text: "為了合群跟著乾笑附和，但心裡其實很不舒服", tags: { mask: 2, self_doubt: 2 } }, { text: "不跟著傳八卦，把精力放在真誠對待身邊的朋友", tags: { resilience: 2 } }]},
-      { cat: "人際敏感焦慮", q: "在班級或朋友 LINE 群組問了一句話，結果過了半小時都沒人回，話題直接冷掉。", opts: [{ text: "覺得自己講話很冷場、很丟臉，立刻把訊息收回", tags: { loneliness: 2, self_doubt: 2 } }, { text: "心裡很受傷，覺得大家是不是都不喜歡我", tags: { loneliness: 3, anxiety: 2 } }, { text: "貼個輕鬆的貼圖自嘲一下，知道大家可能只是在忙", tags: { resilience: 2 } }]},
-      { cat: "友情變動焦慮", q: "你發現平常跟你最好的朋友，最近下課常跑去找另一群同學聊天，沒有找你。", opts: [{ text: "覺得自己被取代、被拋棄了，躲在位子上悶悶不樂", tags: { loneliness: 3, self_doubt: 2 } }, { text: "故意表現得很冷漠，心裡卻一直在意得要命", tags: { mask: 2, loneliness: 2 } }, { text: "過去一起加入話題，或是給彼此一點彈性的交友空間", tags: { resilience: 2 } }]},
-      { cat: "團體合群壓力", q: "走在一中街或勤美遇到班上不太熟的風雲人物，迎面走過來快要對到眼了。", opts: [{ text: "立刻假裝低頭看手機，快步貼著牆邊走過去", tags: { loneliness: 2, escape: 2 } }, { text: "硬擠出超僵硬的笑容打招呼，走過去後還在擔心表現怪不怪", tags: { mask: 2, anxiety: 2 } }, { text: "自然地點個頭微笑致意，輕鬆走過去", tags: { resilience: 2 } }]},
-      { cat: "害怕得罪同學", q: "分組作業遇到完全不做事的同學，但因為怕破壞關係，你不知道該怎麼辦。", opts: [{ text: "不敢講，最後自己熬夜把所有人的份全部做完，累到崩潰", tags: { fatigue: 3, mask: 2 } }, { text: "一邊做一邊在心裡狂罵，對人際合作徹底失望", tags: { fatigue: 2, loneliness: 2 } }, { text: "在群組明確列出每個人負責的小項目與截止時間", tags: { resilience: 2 } }]},
+      // 【二、未來課業】（12題）
+      { cat: "未來課業", q: "想到未來要選大學科系或出社會找工作，卻完全不知道自己對什麼有興趣。", opts: [
+        { text: "對未來充滿強烈的不確定感，越想越心慌睡不著", tags: { academic: 3, uncertainty: 3 } },
+        { text: "看身邊同學好像都有明確目標，覺得自己好廢好落後", tags: { academic: 2, comparison: 2, self_denial: 2 } },
+        { text: "從自己最不排斥的科目開始探索，允許自己邊走邊看", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "老師提醒「學習歷程檔案」跟備審資料截止日快到了，打開電腦卻一片空白。", opts: [
+        { text: "想要做到十全十美卻不知從何下手，結果焦慮到一直拖延", tags: { academic: 2, perfectionism: 3, uncertainty: 1 } },
+        { text: "覺得別人的經歷都超豐富，自己的檔案拿出去只會被笑", tags: { academic: 2, comparison: 3, self_denial: 2 } },
+        { text: "先把這學期做過的報告和活動照片整理成一個資料夾再說", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "模擬考成績公佈了，排名比上次退步了好幾名，離目標學校有一大段距離。", opts: [
+        { text: "完全無法接受退步，氣自己為什麼沒有做到最好", tags: { academic: 3, perfectionism: 3 } },
+        { text: "覺得自己根本不是讀書的料，怎麼努力都考不上好大學", tags: { academic: 3, self_denial: 3, uncertainty: 1 } },
+        { text: "先找出這次失分最多的觀念，一題一題補救回來", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "看到新聞報導說現在物價房價高漲、AI 又會取代許多未來的工作機會。", opts: [
+        { text: "對未來感到極度不安，擔心自己以後出社會養不起自己", tags: { academic: 3, uncertainty: 3 } },
+        { text: "覺得自己沒有特別突出的才華，以後一定會被社會淘汰", tags: { academic: 2, self_denial: 3, comparison: 1 } },
+        { text: "多嘗試不同領域，培養 AI 取代不了的溝通與創造力", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "晚上九點從水利大樓補習班下課，看著滿街的學生，突然不知道自己每天忙成這樣是為了什麼。", opts: [
+        { text: "走在人群中卻覺得無比孤單，對未來看不見一點方向", tags: { academic: 2, loneliness_inner: 2, uncertainty: 3 } },
+        { text: "擔心別人回家還在繼續讀，自己要是鬆懈就會被追過去", tags: { academic: 2, comparison: 3, perfectionism: 1 } },
+        { text: "買杯喜歡的熱飲犒賞自己，回家好好睡一覺明天再說", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "坐在圖書館自修室，看到對面同學桌上疊滿了超厚的參考書，筆一直寫個不停。", opts: [
+        { text: "頓時覺得自己讀太少，陷入強烈的同儕比較與焦慮中", tags: { academic: 2, comparison: 3 } },
+        { text: "規定自己今天沒把這整本講義寫完就絕對不准回家", tags: { academic: 2, perfectionism: 3 } },
+        { text: "專注在自己的讀書進度表上，按照自己的節奏前進", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "明明書桌前還有一堆作業跟複習進度，但坐下來就是全身無力、腦袋一片空白。", opts: [
+        { text: "放空發呆了兩小時進度是零，罵自己為什麼這麼沒用", tags: { academic: 2, self_denial: 3 } },
+        { text: "想到明天的考試跟未知的成績，胃就開始隱隱作痛", tags: { academic: 3, uncertainty: 2, perfectionism: 1 } },
+        { text: "告訴自己「只看 10 分鐘就好」，從最簡單的一頁開始動筆", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "發下數學考卷，旁邊的學霸隨口嘆氣說：「這次題目好簡單，我竟然粗心錯一題。」而你才剛及格。", opts: [
+        { text: "瞬間把考卷反蓋起來，覺得自己跟他比起來簡直是個笑話", tags: { academic: 2, comparison: 3, self_denial: 2 } },
+        { text: "心裡超悶超孤單，覺得沒人能體會怎麼讀都考不好的痛苦", tags: { academic: 2, loneliness_inner: 3 } },
+        { text: "深呼吸不去比較，鼓起勇氣請教他剛剛卡住的那一題怎麼解", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "已經凌晨一點半，明早六點半要起床上學，但你還在書桌前焦慮明天的小考。", opts: [
+        { text: "堅持一定要把每個細節都背到一字不漏才肯去睡", tags: { academic: 3, perfectionism: 3 } },
+        { text: "覺得就算熬夜背完明天可能還是考不好，心裡充滿無力感", tags: { academic: 2, uncertainty: 2, self_denial: 2 } },
+        { text: "把書闔上設好鬧鐘去睡覺，讓大腦有充足精神應付明天", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "課堂上老師突然抽籤點人上台解題或報告，剛好叫到你的名字。", opts: [
+        { text: "超怕在全班面前講錯出糗，緊張到腦袋空白、聲音發抖", tags: { academic: 2, perfectionism: 2, self_denial: 2 } },
+        { text: "下台後一直想著剛剛表現不如別人，懊惱了一整天", tags: { academic: 2, comparison: 3 } },
+        { text: "上台前先深吸一口氣，把自己會的部分穩穩講完就好", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "週末本來排了滿滿的讀書計畫表，結果不小心睡太晚，計畫進度大落後。", opts: [
+        { text: "因為完美計畫被打破而直接崩潰，覺得這整個週末都毀了", tags: { academic: 2, perfectionism: 3, self_denial: 2 } },
+        { text: "想到別人週末都在衝刺，自己卻在浪費時間就恐慌不已", tags: { academic: 2, comparison: 3, uncertainty: 1 } },
+        { text: "接納身體需要補眠的事實，彈性調整只做最重要的兩項", tags: { resilience: 2 } }
+      ]},
+      { cat: "未來課業", q: "聽到高三學長姐討論學測分科與大學面試，覺得離自己越來越近。", opts: [
+        { text: "對未來充滿未知與恐懼，很怕自己到時候什麼都沒準備好", tags: { academic: 3, uncertainty: 3 } },
+        { text: "覺得別人都很有把握，只有自己還在原地踏步", tags: { academic: 2, comparison: 2, loneliness_inner: 2 } },
+        { text: "把大目標拆解成每個月的小目標，一步一腳印慢慢累積", tags: { resilience: 2 } }
+      ]},
 
-      { cat: "社群比較與FOMO", q: "週末滑 IG，發現班上幾個同學去審計新村跟 LaLaport 逛街打卡，卻沒有人約你。", opts: [{ text: "立刻關掉 IG，覺得自己被排擠、心裡超失落", tags: { loneliness: 3, fomo: 2 } }, { text: "故意發一篇全黑限動或傷感歌詞，看有沒有人關心", tags: { mask: 2, fomo: 2 } }, { text: "放下手機，去聽歌或做自己喜歡的事轉換心情", tags: { resilience: 2 } }]},
-      { cat: "社群認同焦慮", q: "發了一篇用心排版的限時動態或 Threads，過了一小時卻沒什麼人按讚回覆。", opts: [{ text: "覺得很沒面子，默默把貼文刪掉當作沒發過", tags: { fomo: 2, self_doubt: 2 } }, { text: "每隔五分鐘就打開手機刷觀看名單，心情跌到谷底", tags: { fomo: 3, anxiety: 2 } }, { text: "提醒自己發文只是記錄生活，不用被愛心數綁架", tags: { resilience: 2 } }]},
-      { cat: "同儕消費壓力", q: "朋友約週末去吃一間不便宜的餐廳，但你這個月的零用錢已經快見底了。", opts: [{ text: "找藉口說家裡有事不去，心裡覺得很自卑孤單", tags: { loneliness: 2, escape: 2 } }, { text: "怕不去會跟大家脫節，硬著頭皮去，接下來兩週餓肚子", tags: { fomo: 3, anxiety: 2 } }, { text: "坦白說最近預算有限，提議改吃平價美食或喝飲料聊天", tags: { resilience: 2 } }]},
-      { cat: "社群比較地獄", q: "看到網路上同齡的人長得好看、會玩社團成績又好，再看看自己覺得落差好大。", opts: [{ text: "覺得自己的人生又魯又無聊，自卑感瞬間爆棚", tags: { fomo: 3, self_doubt: 3 } }, { text: "越看越焦慮，卻還是停不下來一直滑別人的動態", tags: { fomo: 3, fatigue: 2 } }, { text: "明白社群只會呈現最光鮮亮麗的一面，專注走自己的路", tags: { resilience: 2 } }]},
-      { cat: "流行話題焦慮", q: "班上最近都在瘋某個新流行梗或動漫，但你剛好完全沒看過、插不上話。", opts: [{ text: "怕被當成怪人，硬是熬夜去惡補自己根本沒興趣的東西", tags: { fomo: 3, fatigue: 2 } }, { text: "在旁邊假裝聽得懂跟著陪笑，心裡覺得好孤單", tags: { mask: 2, loneliness: 2 } }, { text: "大方問同學：「這最近超紅耶，在演什麼啊？」", tags: { resilience: 2 } }]},
+      // 【三、社群媒體】（12題）
+      { cat: "社群媒體", q: "週末晚上滑 IG，發現班上幾個同學去審計新村跟 LaLaport 逛街打卡，卻沒有人約你。", opts: [
+        { text: "看著螢幕覺得全世界都在熱鬧，只有自己被遺忘在角落", tags: { social_media: 3, loneliness_inner: 3 } },
+        { text: "開始懷疑是不是自己個性太無聊、不討喜，大家才不約我", tags: { social_media: 2, self_denial: 3 } },
+        { text: "暫時關掉 IG，去聽首喜歡的歌或做讓自己開心的事", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "發了一篇精心挑選照片、排版超久的限時動態或 Threads，過了一小時卻沒幾個人按愛心。", opts: [
+        { text: "每隔五分鐘就刷一次觀看名單，覺得沒人按讚超丟臉直接刪掉", tags: { social_media: 3, perfectionism: 2, self_denial: 2 } },
+        { text: "看到別人隨便發個廢文都破百讚，心裡越比越失落", tags: { social_media: 3, comparison: 3 } },
+        { text: "提醒自己發文只是記錄生活，價值不需要靠愛心數來定義", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "傳了訊息給很在乎的朋友，看到對方明明剛發了 IG 限動，卻過了半天都還沒回你訊息。", opts: [
+        { text: "內心小劇場狂演，一直擔心是不是自己說錯話惹對方討厭", tags: { social_media: 3, uncertainty: 2, self_denial: 2 } },
+        { text: "覺得自己在對方心裡一點都不重要，孤獨感瞬間湧上來", tags: { social_media: 2, loneliness_inner: 3 } },
+        { text: "把手機放一邊去忙自己的事，給彼此回訊息的彈性空間", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "滑短影音看到網路上同齡的人長得好看、會跳舞、成績好又常出國玩。", opts: [
+        { text: "陷入無止盡的比較地獄，覺得自己的人生又魯又無聊", tags: { social_media: 3, comparison: 3, self_denial: 2 } },
+        { text: "越滑越空虛，對自己未來能成為什麼樣的人感到很迷茫", tags: { social_media: 2, uncertainty: 3 } },
+        { text: "明白網路只會剪輯最光鮮亮麗的瞬間，回到真實生活走自己的路", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "在班級或社團 LINE 群組鼓起勇氣問了一句話，結果過了半小時都沒人回，話題直接停在你那句。", opts: [
+        { text: "覺得自己講話超冷場、超尷尬，立刻把訊息收回假裝沒發生過", tags: { social_media: 2, perfectionism: 2, self_denial: 2 } },
+        { text: "心裡悶悶的，覺得在群體裡好像沒有人會在意我的聲音", tags: { social_media: 2, loneliness_inner: 3 } },
+        { text: "補貼一張可愛輕鬆的貼圖化解，知道大家可能只是剛好在忙", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "為了讓自己的 IG 版面看起來很完美、很有質感，每次發文前都要修圖調色超過半小時。", opts: [
+        { text: "只要有一點點不滿意就不敢發，被完美主義綁架得好累", tags: { social_media: 3, perfectionism: 3 } },
+        { text: "很怕發出來如果不夠好看，會被追蹤的人在心裡偷偷扣分", tags: { social_media: 2, comparison: 2, uncertainty: 2 } },
+        { text: "練習保留一點真實自然的生活感，不再過度追求完美版面", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "半夜一點躺在床上無意識地一直滑 Reels 和 TikTok，明明眼睛超酸卻捨不得關掉螢幕。", opts: [
+        { text: "關掉螢幕面對黑暗時覺得好孤單，只好一直滑影片填補空虛", tags: { social_media: 3, loneliness_inner: 3 } },
+        { text: "滑完看到時間已經兩點半，開始瘋狂唾棄自己毫無自制力", tags: { social_media: 2, self_denial: 3 } },
+        { text: "把手機放到書桌充電，閉上眼睛聽著輕音樂準備入睡", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "看到網路上大家都在討論最新的流行梗或短片，你卻剛好完全沒看過。", opts: [
+        { text: "超怕隔天去學校跟不上話題會被當成邊緣人，硬是熬夜惡補", tags: { social_media: 3, loneliness_inner: 2, uncertainty: 2 } },
+        { text: "覺得自己好像跟大家活在不同世界，格格不入", tags: { social_media: 2, comparison: 2, self_denial: 1 } },
+        { text: "隔天大方問朋友「這最近超紅耶，到底是什麼梗？」", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "看到朋友在限動發了一句沒有指名道姓的抱怨文：「有些人真的很不會看臉色。」", opts: [
+        { text: "心跳漏一拍，立刻對號入座懷疑他是不是在罵我", tags: { social_media: 3, uncertainty: 3, self_denial: 2 } },
+        { text: "整晚都在回想自己做錯了什麼，卻又不敢私訊問他", tags: { social_media: 2, perfectionism: 2, loneliness_inner: 1 } },
+        { text: "告訴自己別過度腦補，直接留個關心訊息或平常心看待", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "看到別人在社群上曬出超多朋友送的生日卡片跟澎湃禮物。", opts: [
+        { text: "忍不住拿來跟自己的生日比較，覺得自己人緣好差", tags: { social_media: 3, comparison: 3, loneliness_inner: 2 } },
+        { text: "開始擔心自己生日時如果沒人發限動祝福會超沒面子", tags: { social_media: 2, uncertainty: 2, self_denial: 2 } },
+        { text: "珍惜身邊那幾個會真心陪我吃飯聊天的知心好友", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "在網路上看到匿名的校園靠北版或八卦討論串，裡面充滿尖酸刻薄的留言。", opts: [
+        { text: "看完覺得人心好可怕，很怕哪天自己也不小心變成被公審的對象", tags: { social_media: 3, uncertainty: 3 } },
+        { text: "不敢在網路上發表任何真實想法，怕講錯一個字就被罵", tags: { social_media: 2, perfectionism: 2, loneliness_inner: 2 } },
+        { text: "直接關閉並遠離充滿負能量的匿名版，保護自己的心情", tags: { resilience: 2 } }
+      ]},
+      { cat: "社群媒體", q: "手機突然沒電或網路斷線一整天，完全無法看任何社群動態。", opts: [
+        { text: "整個人坐立難安，超怕漏掉重要訊息或跟朋友群組脫節", tags: { social_media: 3, uncertainty: 3, loneliness_inner: 2 } },
+        { text: "沒有手機可以滑，突然覺得自己不知道該幹嘛、心裡好空", tags: { social_media: 2, self_denial: 2 } },
+        { text: "剛好趁這個機會抬頭看看風景，享受難得的清靜", tags: { resilience: 2 } }
+      ]},
 
-      { cat: "報復性熬夜", q: "已經凌晨一點半，明早六點半要起床上學，但你躺在床上還是捨不得放下手機睡覺。", opts: [{ text: "覺得白天時間都被課業綁架，只有半夜滑手機才像活著", tags: { fatigue: 3, escape: 2 } }, { text: "放下手機卻滿腦子擔心明天的事，翻來覆去睡不著", tags: { fatigue: 3, anxiety: 2 } }, { text: "把手機放遠充電，閉上眼睛做幾次深呼吸準備入睡", tags: { resilience: 2 } }]},
-      { cat: "拖延與無力感", q: "明明桌上還有一堆作業跟複習進度，但坐在書桌前就是全身無力、腦袋一片空白。", opts: [{ text: "一直放空發呆或滑短影音，兩小時過去進度是零，超有罪惡感", tags: { escape: 3, fatigue: 2 } }, { text: "看著書本焦慮到胃痛，覺得自己快要被壓力壓垮了", tags: { fatigue: 3, anxiety: 2 } }, { text: "告訴自己「只讀 10 分鐘就好」，從最簡單的一頁開始", tags: { resilience: 2 } }]},
-      { cat: "情緒耗竭", q: "面對接連不斷的小考、段考、補習跟人際相處，覺得自己的電力已經徹底歸零。", opts: [{ text: "每天早上醒來都覺得好沉重，好想直接請假大睡三天", tags: { fatigue: 3, escape: 2 } }, { text: "變得很容易煩躁易怒，家人隨便問一句就想發脾氣", tags: { fatigue: 2, family: 2 } }, { text: "允許自己今天放慢步調，找信任的人說說心裡的累", tags: { resilience: 2 } }]},
-      { cat: "假日罪惡感", q: "週末本來打算要好好讀書追進度，結果不小心睡太晚又發呆了一整天。", opts: [{ text: "到了週日晚上陷入極度自責，覺得自己真是個廢物", tags: { self_doubt: 3, fatigue: 2 } }, { text: "覺得反正這週末都毀了，乾脆直接放棄熬夜到底", tags: { escape: 3, fatigue: 2 } }, { text: "接納身體需要休息的事實，睡前花 20 分鐘整理明天書包就好", tags: { resilience: 2 } }]},
-      { cat: "家庭氣氛壓力", q: "爸媽最近因為工作或家務事經常吵架冷戰，家裡的氣氛低壓到讓人喘不過氣。", opts: [{ text: "躲在自己房間連走路都不敢出聲，心情跟著跌到谷底", tags: { family: 3, fatigue: 2 } }, { text: "完全不想待在家，放學故意在外面晃到很晚才回去", tags: { family: 2, escape: 2 } }, { text: "提醒自己大人的情緒不是我的錯，找朋友或師長傾訴支持", tags: { resilience: 2 } }]},
-      { cat: "上台與表現焦慮", q: "課堂上老師突然抽籤點人上台發表，剛好叫到你的名字。", opts: [{ text: "腦袋瞬間空白、聲音發抖，下台後還在懊惱自己表現很蠢", tags: { anxiety: 3, self_doubt: 2 } }, { text: "緊張到心跳快衝出喉嚨，隨便講兩句只想趕快逃回座位", tags: { anxiety: 2, escape: 2 } }, { text: "上台前先深吸一口氣，看著講稿穩穩把重點講完", tags: { resilience: 2 } }]},
-      { cat: "犯錯與自責", q: "不小心在社團或班級事務上出了一個小包，雖然沒人罵你，但大家都知道了。", opts: [{ text: "恨不得找個地洞鑽進去，覺得大家一定都覺得我很雷", tags: { self_doubt: 3, loneliness: 2 } }, { text: "第一時間想找理由掩飾過去，害怕被別人責怪", tags: { escape: 2, mask: 2 } }, { text: "誠懇道歉並主動把後續補救做好，當作一次學習", tags: { resilience: 2 } }]},
-      { cat: "存在與意義迷惘", q: "晚上十點自己走在回家的路上，突然覺得每天都在重複一樣的行程，心裡空空的。", opts: [{ text: "陷入深深的無力感，覺得生活好像沒有什麼值得期待的事", tags: { fatigue: 3, future: 2 } }, { text: "把耳機音樂開到最大聲，不讓自己去想那些煩人的問題", tags: { escape: 2, fatigue: 2 } }, { text: "抬頭看看夜空，在心裡為自己今天的堅持說聲辛苦了", tags: { resilience: 2 } }]},
-      { cat: "他人期待與自我", q: "大家總覺得你應該是個懂事、樂觀或成績穩定的人，讓你不敢表現出脆弱的一面。", opts: [{ text: "習慣把所有難過都自己吞下去，覺得沒人能真正懂我", tags: { mask: 3, loneliness: 2 } }, { text: "很怕哪天撐不住崩潰，會讓身邊的人對我失望", tags: { family: 2, anxiety: 2 } }, { text: "練習在安全的朋友或帶領者面前，誠實說出「我今天有點累」", tags: { resilience: 2 } }]},
+      // 【四、外表自我形象】（12題）
+      { cat: "外表自我形象", q: "天氣超熱跟朋友去勤美吃冰拍照，朋友隨口問：「你怎麼連現在都一直戴著口罩？」", opts: [
+        { text: "馬上說自己感冒死都不肯脫，超怕拿下口罩後別人覺得我長得不好看", tags: { appearance: 3, uncertainty: 2, self_denial: 2 } },
+        { text: "勉強拉下來拍照，但立刻用手或冰棒死死擋住下半張臉", tags: { appearance: 3, perfectionism: 2 } },
+        { text: "自然地拿下來透透氣，把焦點放在跟朋友開心的互動上", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "學校活動日開放穿便服，看到大家都打扮得很潮，打開衣櫃卻覺得自己穿什麼都很土。", opts: [
+        { text: "站在鏡子前換了十幾套還是超不滿意，覺得自己身材跟穿搭都好糟", tags: { appearance: 3, perfectionism: 2, self_denial: 3 } },
+        { text: "一整天都縮在教室角落，不斷拿別人的穿搭跟自己比較", tags: { appearance: 2, comparison: 3, loneliness_inner: 1 } },
+        { text: "挑一套乾淨舒適的衣服，帶著自然的笑容出門", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "早起照鏡子發現臉上冒了一顆超明顯的大痘痘，或是頭髮怎麼整理都亂翹。", opts: [
+        { text: "覺得今天整張臉都毀了，一整天在學校都不敢抬頭跟人對視", tags: { appearance: 3, perfectionism: 3, self_denial: 2 } },
+        { text: "走在路上總覺得大家都在盯著我的缺點看，心裡超不安", tags: { appearance: 3, uncertainty: 2 } },
+        { text: "貼個痘痘貼或順一下頭髮就好，知道大家其實沒那麼在意", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "體育課測驗跑步或打球滿身大汗、氣喘吁吁時，經過走廊的別班同學剛好往這邊看。", opts: [
+        { text: "覺得自己流汗狼狽的樣子醜斃了，恨不得立刻躲進廁所", tags: { appearance: 3, self_denial: 3 } },
+        { text: "羨慕那些連運動完看起來都很清爽好看的同學", tags: { appearance: 2, comparison: 3 } },
+        { text: "拿毛巾擦擦汗喝口水，享受運動完暢快的感覺", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "朋友用原相機拍了一張團體大合照，直接未修圖傳到班級群組裡。", opts: [
+        { text: "第一時間把照片放大只看自己，覺得自己臉大又不上相、超崩潰", tags: { appearance: 3, perfectionism: 3, self_denial: 2 } },
+        { text: "看照片裡旁邊的同學都好上鏡，對比之下自己更自卑了", tags: { appearance: 2, comparison: 3 } },
+        { text: "看著照片裡大家開懷大笑的瞬間，覺得是很好的紀念", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "走在一中街逛街，迎面走來一群穿搭超亮眼的同齡學生，剛好跟你對到眼。", opts: [
+        { text: "立刻心虛地撇開視線，覺得他們一定在心裡嘲笑我的外表", tags: { appearance: 3, comparison: 2, self_denial: 3 } },
+        { text: "渾身不自在，開始懷疑自己今天出門的樣子是不是很怪", tags: { appearance: 2, uncertainty: 3 } },
+        { text: "神態自若地繼續逛自己的街，欣賞不同的穿搭風格", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "今天鼓起勇氣換了一個新髮型或背了新配件去學校，同學看到問：「你今天怎麼換風格了？」", opts: [
+        { text: "心裡立刻慌張起來，懷疑他是不是覺得這樣很奇怪、不好看", tags: { appearance: 3, uncertainty: 3, self_denial: 1 } },
+        { text: "後悔得要命，覺得自己還是不要隨便嘗試改變比較安全", tags: { appearance: 2, perfectionism: 2 } },
+        { text: "開心地笑著回答：「對啊，想說換個新造型試試看！」", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "站在全身鏡前面看著自己的身高、體態或五官。", opts: [
+        { text: "眼裡只看得到自己不滿意的缺點，越看越討厭自己的外表", tags: { appearance: 3, perfectionism: 2, self_denial: 3 } },
+        { text: "總是想著「如果我能長得像某某某那樣就好了」", tags: { appearance: 2, comparison: 3 } },
+        { text: "接納自己獨一無二的模樣，把重心放在健康與自信的氣質", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "看到班上大家都買了最新款的潮鞋或名牌小包，自己背的卻是普通的舊書包。", opts: [
+        { text: "覺得自己全身上下都很寒酸，走在他們旁邊覺得矮人一截", tags: { appearance: 2, comparison: 3, self_denial: 2 } },
+        { text: "很怕因為沒有潮流行頭，在班上會被別人看不起或孤立", tags: { appearance: 2, loneliness_inner: 2, uncertainty: 2 } },
+        { text: "覺得東西乾淨耐用最重要，不盲目跟風消費", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "覺得自己長相普通、成績普通、也沒有特別亮眼的才華，在人群中就像個透明人。", opts: [
+        { text: "陷入深深的自我否定，覺得自己全身上下沒有一點值得被喜歡的地方", tags: { appearance: 2, self_denial: 3, loneliness_inner: 2 } },
+        { text: "看著班上閃閃發光的風雲人物，覺得自己永遠比不上人家", tags: { appearance: 2, comparison: 3 } },
+        { text: "看見自己溫柔、守信或認真的內在特質，知道自己很珍貴", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "跟不太熟的同學或新朋友面對面講話時，對方剛好盯著你的臉看。", opts: [
+        { text: "緊張到眼神閃躲，超怕對方發現我臉上的瑕疵或不完美", tags: { appearance: 3, perfectionism: 2, uncertainty: 2 } },
+        { text: "心裡覺得自己長得很抱歉，越講話越沒自信", tags: { appearance: 3, self_denial: 3 } },
+        { text: "把注意力放在聊天的內容上，真誠地看著對方交流", tags: { resilience: 2 } }
+      ]},
+      { cat: "外表自我形象", q: "夜深人靜時，腦海裡突然浮現「我是不是永遠都不夠好看、不夠優秀」的念頭。", opts: [
+        { text: "把自己的缺點放大檢視，覺得沒有人會真正喜歡這樣的我", tags: { appearance: 2, self_denial: 3, loneliness_inner: 2 } },
+        { text: "對自己嚴苛到極點，覺得只要不夠完美就不配獲得自信", tags: { appearance: 2, perfectionism: 3 } },
+        { text: "溫柔地抱抱自己，告訴自己「我本來就不需要完美才值得被愛」", tags: { resilience: 2 } }
+      ]},
 
-      { cat: "自我形象焦慮", q: "天氣很熱跟大家一起吃飯拍照，朋友隨口問：「你怎麼連現在都一直戴著口罩？」", opts: [{ text: "馬上說自己有點感冒，死都不肯把口罩拿下來", tags: { appearance: 3, mask: 2 } }, { text: "勉強拉下來一下，但拍照時立刻用手或飲料擋住半張臉", tags: { appearance: 2, self_doubt: 2 } }, { text: "自然地拿下來透透氣，把焦點放在跟朋友開心的互動上", tags: { resilience: 2 } }]},
-      { cat: "外表與穿搭自信", q: "學校活動日開放穿便服，看到大家都穿得很潮，打開衣櫃卻覺得自己穿什麼都很怪。", opts: [{ text: "站在鏡子前換了十幾分鐘還是超自卑，甚至不太想去學校", tags: { appearance: 3, escape: 2 } }, { text: "穿上最不起眼的深色衣服，整天縮在角落降低存在感", tags: { appearance: 2, self_doubt: 2 } }, { text: "挑一套乾淨舒適的衣服，帶著自信的笑容出門", tags: { resilience: 2 } }]},
-      { cat: "自我價值懷疑", q: "覺得自己長相普通、成績普通、也沒有特別突出的才華，在群體裡很不亮眼。", opts: [{ text: "覺得自己一無是處，對未來和人際關係都很沒自信", tags: { self_doubt: 3, appearance: 1 } }, { text: "很渴望被大家看見與肯定，卻又害怕主動表現會出糗", tags: { self_doubt: 2, loneliness: 2 } }, { text: "欣賞自己溫柔或認真的特質，知道每個人都有獨特的價值", tags: { resilience: 2 } }]},
-      { cat: "深夜自我對話", q: "夜深人靜躺在床上時，腦海裡突然浮現「我是不是永遠都不夠好」的念頭。", opts: [{ text: "陷入長長的自我否定，把以前做錯的事全部翻出來懊悔", tags: { self_doubt: 3, fatigue: 2 } }, { text: "覺得心裡好孤單好重，卻不知道能跟誰說", tags: { loneliness: 3, anxiety: 2 } }, { text: "在心裡做個簡短禱告或深呼吸，告訴自己「我已經很棒了」", tags: { resilience: 2 } }]}
+      // 【五、人際關係】（12題）
+      { cat: "人際關係", q: "走在教室走廊上，看到班上幾個同學聚在一起突然大笑，剛好有人往你這邊看了一眼。", opts: [
+        { text: "心跳瞬間加速，直覺認定他們一定是在嘲笑我", tags: { interpersonal: 3, uncertainty: 2, self_denial: 2 } },
+        { text: "整天都在回想自己是不是哪裡做錯事得罪人，覺得好孤立無援", tags: { interpersonal: 2, loneliness_inner: 3, perfectionism: 1 } },
+        { text: "告訴自己別過度解讀，他們可能只是在聊好笑的話題", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "老師臨時宣布要分組做報告，大家瞬間轉頭找好隊友，你站在原地發現沒人主動找你。", opts: [
+        { text: "覺得自己像個沒人要的邊緣人，孤獨與丟臉感瞬間淹沒自己", tags: { interpersonal: 3, loneliness_inner: 3, self_denial: 2 } },
+        { text: "裝作不在意地低頭翻課本，心裡卻超羨慕那些秒組隊的人", tags: { interpersonal: 2, comparison: 3 } },
+        { text: "深呼吸，主動走到還缺人的組別問：「我可以跟你們一組嗎？」", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "跟平常走得很近的好朋友發生一點小誤會，對方今天一整天在學校都對你冷淡不理。", opts: [
+        { text: "焦慮到上課完全聽不進去，對這段友情的未來充滿不確定感", tags: { interpersonal: 3, uncertainty: 3 } },
+        { text: "瘋狂責怪自己為什麼當時要講那句話，覺得都是我的錯", tags: { interpersonal: 2, self_denial: 3, perfectionism: 1 } },
+        { text: "放學前傳個訊息或寫張小紙條，主動釋出善意把話說開", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "為了怕跟同學關係不好，別人拜託你幫忙或約你去不想去的局，你總是不敢拒絕。", opts: [
+        { text: "逼自己當一個零缺點的好人，卻在勉強配合中累到快崩潰", tags: { interpersonal: 3, perfectionism: 3 } },
+        { text: "表面笑嘻嘻討好大家，回家後卻覺得沒有人懂我真正的感受", tags: { interpersonal: 2, loneliness_inner: 3, self_denial: 1 } },
+        { text: "練習溫和但堅定地說出自己的狀況，立下健康的界線", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "你發現平常跟你最好的朋友，最近下課常跑去找另一群同學聊天，沒有找你一起。", opts: [
+        { text: "覺得自己被取代、被拋棄了，一個人坐在位子上覺得好孤單", tags: { interpersonal: 3, loneliness_inner: 3 } },
+        { text: "忍不住拿自己跟那群新同學比較，覺得一定是自己不夠有趣", tags: { interpersonal: 2, comparison: 3, self_denial: 2 } },
+        { text: "自然地過去一起聊，或是給彼此一點彈性的交友空間", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "聽到班上有人在背後小聲議論某個同學的缺點，你很害怕哪天自己也變成被講的對象。", opts: [
+        { text: "在班上變得過度小心翼翼，深怕自己哪句話沒講好就被討厭", tags: { interpersonal: 3, perfectionism: 2, uncertainty: 3 } },
+        { text: "為了合群跟著乾笑附和，事後卻超討厭這麼虛偽的自己", tags: { interpersonal: 2, self_denial: 3 } },
+        { text: "不參與背後八卦，把精力放在真誠對待身邊的朋友", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "看著班上大家都一團一團的很熱絡，自己雖然有人講話，卻好像沒有真正能談心的摯友。", opts: [
+        { text: "身處在熱鬧的教室裡，心裡卻感受到強烈的孤獨與疏離感", tags: { interpersonal: 3, loneliness_inner: 3 } },
+        { text: "看著別人都有死黨形影不離，懷疑自己是不是有社交障礙", tags: { interpersonal: 2, comparison: 2, self_denial: 2 } },
+        { text: "珍惜日常溫暖的點頭之交，同時在興趣中慢慢尋找知音", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "分組作業遇到擺爛不做事的組員，但因為怕講出來會破壞同學關係，你不知道該怎麼辦。", opts: [
+        { text: "怕起衝突又要求完美，最後自己半夜含淚把所有人的份全部做完", tags: { interpersonal: 3, perfectionism: 3, loneliness_inner: 1 } },
+        { text: "覺得自己就是好欺負的軟柿子，連捍衛權利都不敢", tags: { interpersonal: 2, self_denial: 3 } },
+        { text: "在群組禮貌但明確地列出每個人負責的小項目與繳交時間", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "不小心在社團或班級事務上出了一個小包，雖然大家沒罵你，但氣氛有點微妙。", opts: [
+        { text: "無法原諒自己的失誤，覺得大家心裡一定都覺得我是個大雷包", tags: { interpersonal: 2, perfectionism: 3, self_denial: 3 } },
+        { text: "接下來好幾天都不敢主動跟大家講話，怕別人還記著這件事", tags: { interpersonal: 3, uncertainty: 2, loneliness_inner: 2 } },
+        { text: "誠懇道歉並主動把後續補救做好，當作一次成長的經驗", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "下課時間想去上廁所或買福利社，但平常一起走的朋友剛好不在座位上。", opts: [
+        { text: "覺得自己一個人走出去超孤單、超像邊緣人，寧可憋著不去", tags: { interpersonal: 3, loneliness_inner: 3, comparison: 1 } },
+        { text: "擔心別人看到我獨來獨往，會覺得我人緣很差", tags: { interpersonal: 2, uncertainty: 2, self_denial: 2 } },
+        { text: "自在地自己走去買東西，享受一個人的輕鬆步調", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "剛升上新班級或來到一個新團體，大家看起來都已經認識彼此了。", opts: [
+        { text: "對陌生的環境充滿不確定感，縮在角落不敢主動開口", tags: { interpersonal: 3, uncertainty: 3, loneliness_inner: 2 } },
+        { text: "看到別人都超會社交破冰，覺得內向的自己好沒用", tags: { interpersonal: 2, comparison: 3, self_denial: 2 } },
+        { text: "先從對鄰座同學微笑打招呼開始，給自己時間慢慢適應", tags: { resilience: 2 } }
+      ]},
+      { cat: "人際關係", q: "跟朋友聊天時，你分享了一件自己很在乎的事，對方卻敷衍地「喔」了一聲就轉移話題。", opts: [
+        { text: "瞬間覺得心灰意冷，決定以後把所有心事都自己吞下去", tags: { interpersonal: 3, loneliness_inner: 3 } },
+        { text: "覺得一定是自己講話太無聊、不重要，才沒人想聽", tags: { interpersonal: 2, self_denial: 3 } },
+        { text: "知道每個人關注的點不同，改找真正能傾聽的夥伴分享", tags: { resilience: 2 } }
+      ]}
     ];
 
     // ==========================================
-    // 5. 全域狀態變數
+    // 6. 全域狀態變數
     // ==========================================
     let myName = "";
     let isJesus = false;
@@ -834,29 +1128,48 @@
     let adminDisplayQ = 0;
     let hasShownResult = false;
     
-    // 防偷跑關鍵：記錄玩家加入等候室當下的時間與場次 ID
     let joinedAtRoundId = null;
     let isListeningFirebase = false;
 
-    let scores = { academic: 0, fomo: 0, appearance: 0, loneliness: 0, fatigue: 0, resilience: 0, future: 0, family: 0, self_doubt: 0, escape: 0, mask: 0, anxiety: 0 };
+    // 全新 10 大指標計分物件
+    function getInitialScores() {
+      return {
+        // 第一部分：五大思緒與壓力來源
+        parental: 0,      // 家長期望
+        academic: 0,      // 未來課業
+        social_media: 0,  // 社群媒體
+        appearance: 0,    // 外表自我形象
+        interpersonal: 0, // 人際關係
+        // 第二部分：五大內心比重
+        perfectionism: 0,    // 完美主義
+        loneliness_inner: 0, // 孤獨
+        uncertainty: 0,      // 不確定性
+        comparison: 0,       // 與人比較
+        self_denial: 0,      // 自我否定
+        // 正向韌性
+        resilience: 0
+      };
+    }
+
+    let scores = getInitialScores();
     
     let balloonPopped = 0;
     let balloonCombo = 0;
     let lastPopTime = 0;
     let isMiracleActive = false;
-    let poppedByCat = { "課業與未來": 0, "家庭期待": 0, "人際社交": 0, "社群比較": 0, "身心耗竭": 0 };
+    let poppedByCat = { "家長期望": 0, "未來課業": 0, "社群媒體": 0, "外表自我形象": 0, "人際關係": 0 };
     let poppedByWord = {};
 
     // ==========================================
-    // 6. LocalStorage 斷線防呆與初始化
+    // 7. LocalStorage 斷線防呆與初始化
     // ==========================================
     function saveLocalData() {
       if (isJesus) return;
-      localStorage.setItem('anxietyGameData_v7', JSON.stringify({
+      localStorage.setItem('anxietyGameData_v8', JSON.stringify({
         myName, scores, currentQ, balloonPopped, poppedByCat, poppedByWord, activeQuestions, isSoloMode, joinedAtRoundId
       }));
     }
-    function clearLocalData() { localStorage.removeItem('anxietyGameData_v7'); }
+    function clearLocalData() { localStorage.removeItem('anxietyGameData_v8'); }
     
     function logout() {
       clearTimeout(timer);
@@ -878,12 +1191,12 @@
       return window.location.origin + window.location.pathname;
     }
 
-    // 監聽主控台設定的題數、每題秒數(預設7秒)與氣球秒數
+    // 監聽主控台設定的題數(1~60)、每題秒數(預設7秒)與氣球秒數
     function listenToGameSettings() {
       db.ref('gameSettings').on('value', snap => {
         const val = snap.val();
         if (val) {
-          targetQuestionCount = Math.min(40, Math.max(1, parseInt(val.qCount) || 15));
+          targetQuestionCount = Math.min(60, Math.max(1, parseInt(val.qCount) || 15));
           targetQuestionSeconds = Math.min(30, Math.max(3, parseInt(val.qSec) || 7));
           targetBalloonSeconds = Math.min(120, Math.max(5, parseInt(val.bSec) || 15));
           
@@ -899,7 +1212,7 @@
     }
 
     function saveGameSettings() {
-      const qVal = Math.min(40, Math.max(1, parseInt(document.getElementById('cfg-q-count').value) || 15));
+      const qVal = Math.min(60, Math.max(1, parseInt(document.getElementById('cfg-q-count').value) || 15));
       const sVal = Math.min(30, Math.max(3, parseInt(document.getElementById('cfg-q-sec').value) || 7));
       const bVal = Math.min(120, Math.max(5, parseInt(document.getElementById('cfg-b-sec').value) || 15));
       targetQuestionCount = qVal;
@@ -923,13 +1236,13 @@
       document.getElementById('share-url-text').innerText = currentFullUrl;
       document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(currentFullUrl)}`;
 
-      const saved = localStorage.getItem('anxietyGameData_v7');
+      const saved = localStorage.getItem('anxietyGameData_v8');
       if (saved) {
         try {
           const data = JSON.parse(saved);
           if (data.myName && data.isSoloMode === isSoloMode) {
             myName = data.myName;
-            scores = data.scores || scores;
+            scores = { ...getInitialScores(), ...(data.scores || {}) };
             currentQ = data.currentQ || 0;
             balloonPopped = data.balloonPopped || 0;
             poppedByCat = data.poppedByCat || poppedByCat;
@@ -938,7 +1251,7 @@
             if (data.activeQuestions && data.activeQuestions.length > 0) {
               activeQuestions = data.activeQuestions;
             }
-            document.getElementById('top-bar-left').style.display = 'block';
+            document.getElementById('btn-header-logout').style.display = 'inline-block';
 
             if (isSoloMode) {
               if (currentQ < activeQuestions.length) {
@@ -959,7 +1272,7 @@
     };
 
     // ==========================================
-    // 7. 分享彈窗與 52 經文庫彈窗
+    // 8. 分享彈窗與 52 經文庫彈窗
     // ==========================================
     function openQrModal() { document.getElementById('qr-modal').style.display = 'flex'; }
     function closeQrModal(e) { if (e.target.id === 'qr-modal') document.getElementById('qr-modal').style.display = 'none'; }
@@ -989,7 +1302,7 @@
     }
 
     // ==========================================
-    // 8. 登入與分流控制 (防偷跑機制)
+    // 9. 登入與分流控制 (防偷跑機制)
     // ==========================================
     function switchScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1001,12 +1314,11 @@
       if (!myName) return alert("請先寫下你的名字或暱稱！");
       initAudio();
       playClickSound();
-      document.getElementById('top-bar-left').style.display = 'block';
+      document.getElementById('btn-header-logout').style.display = 'inline-block';
       
       if (myName.toLowerCase() === "jesus") {
         isJesus = true; 
         isSoloMode = false;
-        // 主控台一登入，自動將資料庫殘留的舊遊戲階段重設為 waiting，徹底防止新玩家誤觸舊場次！
         db.ref('gameState').set({ currentStage: 'waiting', roundId: Date.now(), miracle: null });
         switchScreen('screen-admin');
         listenToFirebase();
@@ -1020,10 +1332,8 @@
         startQuizAuto();
       } else {
         document.getElementById('waiting-my-name').innerText = myName;
-        // 先讀取目前資料庫的 roundId 作為基準，確保只有主控台「之後新按下的開始」才會觸發遊戲！
         db.ref('gameState').once('value', snap => {
           const st = snap.val() || {};
-          // 若主控台還沒重置、資料庫殘留舊的 quiz/balloon/result，記錄舊 roundId 並忽略它，乖乖待在等候室
           joinedAtRoundId = st.roundId || 0;
           currentQ = 0;
           activeQuestions = [];
@@ -1035,10 +1345,6 @@
           listenToFirebase();
         });
       }
-    }
-
-    function setStage(stage) {
-      db.ref('gameState').update({ currentStage: stage, roundId: Date.now() });
     }
 
     function listenToFirebase() {
@@ -1084,7 +1390,6 @@
         }
       });
 
-      // 監聽主控台發出的階段指令 (搭配 roundId 防止舊資料偷跑)
       db.ref('gameState').on('value', snap => {
         if (isSoloMode) return;
         const stateObj = snap.val();
@@ -1099,7 +1404,6 @@
           return;
         }
 
-        // 如果狀態是 waiting，無條件回到等候室並重置準備
         if (stage === 'waiting') {
           clearTimeout(timer);
           clearInterval(secInterval);
@@ -1113,12 +1417,10 @@
           return;
         }
 
-        // 關鍵防偷跑：如果收到的 roundId 跟玩家剛進等候室時看到的舊 roundId 一樣，代表那是上一場殘留的狀態，直接忽略！
         if (joinedAtRoundId !== null && incomingRoundId <= joinedAtRoundId) {
           return;
         }
 
-        // 確認是主控台最新按下的指令，更新 roundId 並執行對應階段
         joinedAtRoundId = incomingRoundId;
         saveLocalData();
 
@@ -1135,7 +1437,7 @@
     }
 
     // ==========================================
-    // 9. Jesus 主控台功能
+    // 10. Jesus 主控台功能
     // ==========================================
     function kickPlayer(targetName) {
       if (confirm(`確定要移出「${targetName}」嗎？`)) {
@@ -1155,7 +1457,6 @@
       document.getElementById('btn-miracle').style.display = 'none';
       document.getElementById('admin-q-title').innerText = `快問快答進行中：第 1 / ${targetQuestionCount} 題 (每${targetQuestionSeconds}秒自動推進)`;
       
-      // 發送全新 roundId，讓等候室所有玩家同步開始！
       db.ref('gameState').set({
         currentStage: 'quiz',
         roundId: Date.now(),
@@ -1219,11 +1520,11 @@
     }
 
     // ==========================================
-    // 10. 快問快答邏輯 (預設每題 7 秒同步推進)
+    // 11. 快問快答邏輯 (從 60 題庫隨機抽題，預設每題 7 秒同步推進)
     // ==========================================
     function startQuizAuto() {
       if (activeQuestions.length !== targetQuestionCount) {
-        scores = { academic: 0, fomo: 0, appearance: 0, loneliness: 0, fatigue: 0, resilience: 0, future: 0, family: 0, self_doubt: 0, escape: 0, mask: 0, anxiety: 0 };
+        scores = getInitialScores();
         let shuffled = [...masterQuestions].sort(() => 0.5 - Math.random());
         activeQuestions = shuffled.slice(0, targetQuestionCount);
         currentQ = 0;
@@ -1338,7 +1639,7 @@
     }
 
     // ==========================================
-    // 11. 戳氣球發洩 (氣球數量大幅增加：每 105ms 產生一顆，字體加大)
+    // 12. 戳氣球發洩
     // ==========================================
     let balloonInterval;
     let balloonCountdownInterval;
@@ -1355,7 +1656,7 @@
       switchScreen('screen-balloon');
       balloonPopped = 0; 
       balloonCombo = 0;
-      poppedByCat = { "課業與未來": 0, "家庭期待": 0, "人際社交": 0, "社群比較": 0, "身心耗竭": 0 };
+      poppedByCat = { "家長期望": 0, "未來課業": 0, "社群媒體": 0, "外表自我形象": 0, "人際關係": 0 };
       poppedByWord = {};
       
       let timeLeft = targetBalloonSeconds;
@@ -1382,14 +1683,13 @@
         if (timeLeft <= 0) clearInterval(balloonCountdownInterval);
       }, 1000);
       
-      // 每 105ms 生成一顆大氣球，畫面滿滿泡泡超好按！
       clearInterval(balloonInterval);
       balloonInterval = setInterval(() => {
         let item = balloonCatalog[Math.floor(Math.random() * balloonCatalog.length)];
         let b = document.createElement('div');
         b.className = 'balloon' + (isMiracleActive ? ' blessed' : '');
         b.innerHTML = `<span class="balloon-cat-tag">${item.cat}</span><span>${item.word}</span>`;
-        b.style.left = (Math.random() * 76 + 2) + '%'; 
+        b.style.left = (Math.random() * 74 + 2) + '%'; 
         b.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.88) 0%, ${item.color} 45%, ${item.color} 100%)`;
         
         let duration = isMiracleActive ? (Math.random() * 2 + 4.2) : (Math.random() * 1.8 + 2.4);
@@ -1442,9 +1742,8 @@
         });
 
         setTimeout(() => { if (b.parentNode) b.remove(); }, duration * 1000);
-      }, 105); 
+      }, 100); 
       
-      // 氣球時間結束後，直接自動進入 4 秒深呼吸與結算報告
       balloonEndTimeout = setTimeout(() => {
         clearInterval(balloonInterval);
         clearInterval(balloonCountdownInterval);
@@ -1478,7 +1777,7 @@
     }
 
     // ==========================================
-    // 12. 4 秒深呼吸過場動畫
+    // 13. 4 秒深呼吸過場動畫
     // ==========================================
     let isBreathing = false;
     function startBreathe() {
@@ -1495,26 +1794,20 @@
     }
 
     // ==========================================
-    // 13. 結算手札報告
+    // 14. 結算手札報告 (精準對應 5 大壓力來源 + 5 大內心比重)
     // ==========================================
     let currentTopCat = 'academic';
     let radarChartInstance = null;
 
-    function getConsolidatedScores() {
-      return {
-        academic: scores.academic + scores.future + scores.family,
-        fomo: scores.fomo + scores.mask,
-        appearance: scores.appearance,
-        loneliness: scores.loneliness + scores.self_doubt,
-        fatigue: scores.fatigue + scores.escape + scores.anxiety
-      };
-    }
-
     function getRemedies() {
-      const cScores = getConsolidatedScores();
-      const cats = ['academic', 'fomo', 'appearance', 'loneliness', 'fatigue'];
-      let maxCat = cats[0], maxScore = cScores[maxCat];
-      cats.forEach(c => { if (cScores[c] > maxScore) { maxScore = cScores[c]; maxCat = c; } });
+      const cats = ['parental', 'academic', 'social_media', 'appearance', 'interpersonal'];
+      let maxCat = cats[0], maxScore = scores[maxCat] || 0;
+      cats.forEach(c => {
+        if ((scores[c] || 0) > maxScore) {
+          maxScore = scores[c];
+          maxCat = c;
+        }
+      });
       currentTopCat = maxCat;
       const v = bibleVerses[maxCat], a = microActions[maxCat];
       return {
@@ -1531,13 +1824,14 @@
       document.getElementById('verse-text').innerText = v[Math.floor(Math.random() * v.length)];
     }
 
+    // 第二部分：完美主義、孤獨、不確定性、與人比較、自我否定
     function renderSecondaryEmotions() {
       const raw = [
-        { name: "疲倦無力感", val: scores.fatigue + 1, color: "#5c8a72" },
-        { name: "孤單怕被遺落", val: scores.loneliness + scores.fomo + 1, color: "#4a7c9b" },
-        { name: "自我懷疑與否定", val: scores.self_doubt + 1, color: "#b85d6f" },
-        { name: "壓抑偽裝與逃避", val: scores.escape + scores.mask + 1, color: "#c5a059" },
-        { name: "緊繃煩躁與不安", val: scores.anxiety + scores.family + 1, color: "#7a6f9b" }
+        { name: "完美主義", val: (scores.perfectionism || 0) + 1, color: "#4a7c9b" },
+        { name: "孤獨", val: (scores.loneliness_inner || 0) + 1, color: "#7a6f9b" },
+        { name: "不確定性", val: (scores.uncertainty || 0) + 1, color: "#c5a059" },
+        { name: "與人比較", val: (scores.comparison || 0) + 1, color: "#5c8a72" },
+        { name: "自我否定", val: (scores.self_denial || 0) + 1, color: "#b85d6f" }
       ];
       const total = raw.reduce((sum, item) => sum + item.val, 0) || 1;
       let html = "";
@@ -1584,7 +1878,7 @@
 
         db.ref('players').on('value', snap => {
           let totalBalloonsAll = 0;
-          let globalCats = { "課業與未來": 0, "家庭期待": 0, "人際社交": 0, "社群比較": 0, "身心耗竭": 0 };
+          let globalCats = { "家長期望": 0, "未來課業": 0, "社群媒體": 0, "外表自我形象": 0, "人際關係": 0 };
           let playerRows = "";
 
           snap.forEach(p => {
@@ -1627,7 +1921,7 @@
         document.getElementById('admin-report-view').style.display = 'none';
         
         const remedies = getRemedies();
-        document.getElementById('top-anxiety-badge').innerText = `${remedies.topName}`;
+        document.getElementById('top-anxiety-badge').innerText = `主要來源：${remedies.topName}`;
         document.getElementById('verse-text').innerText = remedies.verse;
         document.getElementById('action-text').innerText = remedies.action;
 
@@ -1635,44 +1929,57 @@
         renderSecondaryEmotions();
         renderPlayerBalloonBreakdown();
 
-        const cScores = getConsolidatedScores();
-        
         db.ref('players/' + myName).update({
           topCategory: remedies.topName,
-          scores: cScores,
+          scores: scores,
           balloons: balloonPopped,
           poppedByCat: poppedByCat
         });
 
+        // 向下相容原本 GAS 欄位並同時附帶新指標
         fetch(GAS_WEBHOOK_URL, {
           method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
             nickname: myName,
-            academic: cScores.academic,
-            fomo: cScores.fomo,
-            appearance: cScores.appearance,
-            loneliness: cScores.loneliness,
-            fatigue: cScores.fatigue,
+            academic: scores.academic,
+            fomo: scores.social_media,
+            appearance: scores.appearance,
+            loneliness: scores.interpersonal,
+            fatigue: scores.parental,
             resilience: scores.resilience,
-            balloons_popped: balloonPopped
+            balloons_popped: balloonPopped,
+            parental: scores.parental,
+            social_media: scores.social_media,
+            interpersonal: scores.interpersonal,
+            perfectionism: scores.perfectionism,
+            loneliness_inner: scores.loneliness_inner,
+            uncertainty: scores.uncertainty,
+            comparison: scores.comparison,
+            self_denial: scores.self_denial
           })
         }).catch(() => {});
       }
       clearLocalData();
     }
 
+    // 第一部分：家長期望、未來課業、社群媒體、外表自我形象、人際關係
     function drawChart() {
-      const cScores = getConsolidatedScores();
       const ctx = document.getElementById('radarChart').getContext('2d');
       if (radarChartInstance) radarChartInstance.destroy();
       
       radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
-          labels: ['未來/課業/家長期望', '社群比較與偽裝', '外表與自我形象', '人際與怕被孤立', '身心耗竭與拖延'],
+          labels: ['家長期望', '未來課業', '社群媒體', '外表自我形象', '人際關係'],
           datasets: [{
-            label: '思緒比重',
-            data: [cScores.academic, cScores.fomo, cScores.appearance, cScores.loneliness, cScores.fatigue],
+            label: '思緒與壓力來源',
+            data: [
+              scores.parental || 0,
+              scores.academic || 0,
+              scores.social_media || 0,
+              scores.appearance || 0,
+              scores.interpersonal || 0
+            ],
             backgroundColor: 'rgba(74, 124, 155, 0.25)',
             borderColor: '#4a7c9b',
             pointBackgroundColor: '#c5a059',
@@ -1683,9 +1990,9 @@
           scales: { 
             r: { 
               beginAtZero: true, 
-              suggestedMax: 10, 
+              suggestedMax: 8, 
               ticks: { display: false },
-              pointLabels: { font: { size: 12, weight: 'bold' }, color: '#242c33' }
+              pointLabels: { font: { size: 13, weight: 'bold' }, color: '#242c33' }
             } 
           },
           plugins: { legend: { display: false } }
