@@ -217,17 +217,29 @@
     .q-review-title { font-weight: 900; font-size: 0.96rem; color: var(--text-main); margin-bottom: 8px; line-height: 1.45; font-family: 'Noto Serif TC', serif; }
     .q-opt-stat-row {
       position: relative; background: #f5f2eb; border-radius: 8px;
-      padding: 7px 10px; margin: 5px 0; font-size: 0.84rem; font-weight: 700;
-      display: flex; justify-content: space-between; align-items: center; overflow: hidden;
-      border: 1px solid #e5e0d5;
+      padding: 8px 10px; margin: 6px 0; font-size: 0.85rem; font-weight: 700;
+      display: flex; flex-direction: column; overflow: hidden;
+      border: 1.5px solid #e5e0d5;
     }
     .q-opt-stat-row.top-choice { border-color: var(--moon-blue); background: #eef5f9; }
     .q-opt-bar {
       position: absolute; top: 0; left: 0; height: 100%;
-      background: rgba(74, 124, 155, 0.16); z-index: 0; transition: width 0.3s ease;
+      background: rgba(74, 124, 155, 0.18); z-index: 0; transition: width 0.3s ease;
     }
-    .q-opt-text { position: relative; z-index: 1; flex: 1; padding-right: 8px; color: var(--text-main); line-height: 1.35; }
-    .q-opt-count { position: relative; z-index: 1; font-weight: 900; color: var(--moon-blue); white-space: nowrap; font-size: 0.85rem; }
+    .q-opt-main-line {
+      position: relative; z-index: 1; width: 100%;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    }
+    .q-opt-text { flex: 1; color: var(--text-main); line-height: 1.4; }
+    .q-opt-count {
+      font-weight: 900; color: #ffffff; background: var(--moon-blue);
+      padding: 2px 9px; border-radius: 999px; white-space: nowrap; font-size: 0.8rem;
+    }
+    .q-opt-stat-row.top-choice .q-opt-count { background: var(--sage-green); }
+    .q-opt-voters {
+      position: relative; z-index: 1; font-size: 0.76rem; color: var(--text-sub);
+      margin-top: 4px; font-weight: 500; line-height: 1.35;
+    }
 
     /* 4秒深呼吸過場 */
     #screen-breathe { background: radial-gradient(circle at center, #eef5f9 0%, #dde8f0 100%); }
@@ -543,7 +555,7 @@
         <button class="btn-logout" onclick="logout()">🚪 登出 / 換個名字</button>
       </div>
 
-      <!-- 👑 Jesus 主控台專屬全場統計報告 (新增本回合所有題目與選項統計) -->
+      <!-- 👑 Jesus 主控台專屬全場統計報告 -->
       <div id="admin-report-view" style="display:none;">
         <div class="receipt-section" style="background:#f5f8fa; border-color:#c9dce8; text-align:center;">
           <h3 style="color:var(--moon-blue); margin:5px 0; font-family:'Noto Serif TC',serif;">👑 全場旅人釋放總結算</h3>
@@ -551,11 +563,11 @@
           <div style="font-size:2.4rem; color:var(--rose-muted); font-weight:900; margin:4px 0;"><span id="admin-total-balloons">0</span> <span style="font-size:1rem;">顆</span></div>
         </div>
 
-        <!-- 新增：這回合所有回答的問題與選項票數統計 -->
+        <!-- 修復後：直接根據題目本體顯示完整票數與投給該選項的旅人名單 -->
         <div class="receipt-section" style="background:#faf6ec; border-color:#e2d1a8;">
           <h4 style="color:#7c5e26;">📋 本回合所有題目與選項作答統計</h4>
-          <div style="font-size:0.8rem; color:var(--text-sub); margin-bottom:8px;">顯示本回合抽出的所有問題，以及全場旅人在各選項的選擇人數與佔比：</div>
-          <div id="admin-questions-breakdown" style="max-height:360px; overflow-y:auto; padding-right:4px;">
+          <div style="font-size:0.8rem; color:var(--text-sub); margin-bottom:8px;">顯示本回合抽出的問題、各選項得票數、百分比與作答旅人：</div>
+          <div id="admin-questions-breakdown" style="max-height:420px; overflow-y:auto; padding-right:4px;">
             載入題目與選項統計中...
           </div>
         </div>
@@ -1129,15 +1141,19 @@
       ]}
     ];
 
+    // 為每道題目預先標記原始題庫索引 masterIdx (0 ~ 59)，確保跨裝置計票 100% 對齊
+    masterQuestions.forEach((q, idx) => { q.masterIdx = idx; });
+
     // ==========================================
     // 6. 全域狀態變數
     // ==========================================
     let myName = "";
     let isJesus = false;
     let activeQuestions = []; 
-    let sharedRoundQIndices = null; // 主控台抽出的共用題號陣列
-    let allPlayersSnapshot = {};    // 儲存全場旅人即時作答明細供主控台統計
-    let myChoices = {};             // 紀錄該名玩家每一題選的選項 index
+    let sharedRoundQIndices = null;
+    let allPlayersSnapshot = {};
+    let globalQuestionVotes = {}; // 直接以題目 masterIdx 儲存的全場選項票數與投票人
+    let myChoices = {};
     let currentQ = 0; 
     let hasAnsweredThisQ = false;
     let totalPlayers = 0;
@@ -1179,11 +1195,11 @@
     // ==========================================
     function saveLocalData() {
       if (isJesus) return;
-      localStorage.setItem('anxietyGameData_v9', JSON.stringify({
+      localStorage.setItem('anxietyGameData_v10', JSON.stringify({
         myName, scores, myChoices, currentQ, balloonPopped, poppedByCat, poppedByWord, activeQuestions, isSoloMode, joinedAtRoundId
       }));
     }
-    function clearLocalData() { localStorage.removeItem('anxietyGameData_v9'); }
+    function clearLocalData() { localStorage.removeItem('anxietyGameData_v10'); }
     
     function logout() {
       clearTimeout(timer);
@@ -1249,7 +1265,7 @@
       document.getElementById('share-url-text').innerText = currentFullUrl;
       document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(currentFullUrl)}`;
 
-      const saved = localStorage.getItem('anxietyGameData_v9');
+      const saved = localStorage.getItem('anxietyGameData_v10');
       if (saved) {
         try {
           const data = JSON.parse(saved);
@@ -1340,18 +1356,25 @@
       }
 
       if (isSoloMode) {
-        // 單人模式：自己抽題並把自己的題號陣列存上 Firebase，讓主控台也能查閱
         scores = getInitialScores();
         myChoices = {};
-        let indices = masterQuestions.map((_, idx) => idx).sort(() => 0.5 - Math.random()).slice(0, targetQuestionCount);
-        activeQuestions = indices.map(i => masterQuestions[i]);
-        db.ref('players/' + myName).set({
-          status: 'solo', answeredQ: 0, balloons: 0, poppedByCat: poppedByCat, qIndices: indices, choices: {}
+        // 若主控台已經抽過共用題組，單人模式也優先採用同一組題目，方便主控台統一統計票數
+        db.ref('roundQuestionIndices').once('value', snap => {
+          let indices = snap.val();
+          if (!Array.isArray(indices) || indices.length === 0) {
+            indices = masterQuestions.map((_, idx) => idx).sort(() => 0.5 - Math.random()).slice(0, targetQuestionCount);
+            db.ref('roundQuestionIndices').set(indices);
+          }
+          sharedRoundQIndices = indices;
+          activeQuestions = indices.map(i => masterQuestions[i]).filter(Boolean);
+          db.ref('players/' + myName).set({
+            status: 'solo', answeredQ: 0, balloons: 0, poppedByCat: poppedByCat, qIndices: indices, choices: {}
+          });
+          currentQ = 0;
+          saveLocalData();
+          switchScreen('screen-quiz');
+          renderQuestion(0);
         });
-        currentQ = 0;
-        saveLocalData();
-        switchScreen('screen-quiz');
-        renderQuestion(0);
       } else {
         document.getElementById('waiting-my-name').innerText = myName;
         db.ref('gameState').once('value', snap => {
@@ -1382,6 +1405,17 @@
           if (isJesus) {
             activeQuestions = arr.map(i => masterQuestions[i]).filter(Boolean);
             renderAdminLiveQuestion();
+            renderAdminQuestionsBreakdown();
+          }
+        }
+      });
+
+      // 監聽全場直接累計的題目選項投票池 (確保票數 100% 即時顯示)
+      db.ref('questionVotes').on('value', snap => {
+        globalQuestionVotes = snap.val() || {};
+        if (isJesus) {
+          renderAdminLiveQuestion();
+          if (document.getElementById('screen-result').classList.contains('active')) {
             renderAdminQuestionsBreakdown();
           }
         }
@@ -1472,6 +1506,11 @@
           activeQuestions = [];
           myChoices = {};
           currentQ = 0;
+          // 若主控台把本回合題號直接放在 gameState.roundIndices，優先讀取
+          if (Array.isArray(stateObj.roundIndices) && stateObj.roundIndices.length > 0) {
+            sharedRoundQIndices = stateObj.roundIndices;
+            activeQuestions = stateObj.roundIndices.map(i => masterQuestions[i]).filter(Boolean);
+          }
           startQuizAuto();
         }
         else if (stage === 'balloon') startBalloon();
@@ -1481,7 +1520,7 @@
     }
 
     // ==========================================
-    // 10. Jesus 主控台功能与即時題目/選項統計
+    // 10. Jesus 主控台功能與雙重保底票數統計
     // ==========================================
     function kickPlayer(targetName) {
       if (confirm(`確定要移出「${targetName}」嗎？`)) {
@@ -1491,29 +1530,46 @@
       }
     }
 
-    // 計算特定題目在全場各選項的得票數
+    // 雙重保底計算特定題目在全場各選項的得票數與投票人名單
     function getOptionStatsForQuestion(qIdxInRound, masterIdx) {
-      let counts = [0, 0, 0];
-      let totalAns = 0;
-      for (let pName in allPlayersSnapshot) {
-        const p = allPlayersSnapshot[pName];
-        if (!p || !p.choices) continue;
-        // 若該玩家是團體模式，直接看 qIdxInRound；若是單人模式，比對其 qIndices
-        if (Array.isArray(p.qIndices)) {
-          const soloPos = p.qIndices.indexOf(masterIdx);
-          if (soloPos !== -1 && p.choices[soloPos] !== undefined && p.choices[soloPos] >= 0) {
-            counts[p.choices[soloPos]] = (counts[p.choices[soloPos]] || 0) + 1;
-            totalAns++;
-          }
-        } else {
-          const c = p.choices[qIdxInRound];
-          if (c !== undefined && c >= 0 && c <= 2) {
-            counts[c]++;
-            totalAns++;
+      let voterSets = [new Set(), new Set(), new Set()];
+
+      // 來源 1：直接讀取 questionVotes/{masterIdx}/{optIdx}/{playerName}
+      const qVotes = globalQuestionVotes[masterIdx] || globalQuestionVotes[String(masterIdx)];
+      if (qVotes) {
+        for (let optIdx = 0; optIdx <= 2; optIdx++) {
+          const optMap = qVotes[optIdx] || qVotes[String(optIdx)];
+          if (optMap && typeof optMap === 'object') {
+            Object.keys(optMap).forEach(pName => voterSets[optIdx].add(pName));
           }
         }
       }
-      return { counts, totalAns };
+
+      // 來源 2：同時掃描 players/{pName}/choices 作為雙重驗證
+      for (let pName in allPlayersSnapshot) {
+        const p = allPlayersSnapshot[pName];
+        if (!p || !p.choices) continue;
+        
+        // 檢查以 masterIdx 紀錄的選擇 (m_12: 0)
+        const byMaster = p.choices['m_' + masterIdx];
+        if (byMaster !== undefined && byMaster >= 0 && byMaster <= 2) {
+          voterSets[Number(byMaster)].add(pName);
+          continue;
+        }
+
+        // 檢查以題號順序紀錄的選擇 (q_0: 1 或 0: 1)
+        let c = p.choices['q_' + qIdxInRound];
+        if (c === undefined) c = p.choices[qIdxInRound];
+        if (c === undefined) c = p.choices[String(qIdxInRound)];
+        if (c !== undefined && Number(c) >= 0 && Number(c) <= 2) {
+          voterSets[Number(c)].add(pName);
+        }
+      }
+
+      const counts = voterSets.map(s => s.size);
+      const voters = voterSets.map(s => Array.from(s));
+      const totalAns = counts[0] + counts[1] + counts[2];
+      return { counts, voters, totalAns };
     }
 
     // 主控台即時顯示「目前正在進行的題目與3個選項即時票數」
@@ -1528,21 +1584,25 @@
       box.style.display = 'block';
       const qIdx = Math.min(activeQuestions.length - 1, adminDisplayQ - 1);
       const qObj = activeQuestions[qIdx];
-      const masterIdx = sharedRoundQIndices ? sharedRoundQIndices[qIdx] : qIdx;
       if (!qObj) return;
+      const masterIdx = (qObj.masterIdx !== undefined) ? qObj.masterIdx : (sharedRoundQIndices ? sharedRoundQIndices[qIdx] : qIdx);
 
-      const { counts, totalAns } = getOptionStatsForQuestion(qIdx, masterIdx);
+      const { counts, voters, totalAns } = getOptionStatsForQuestion(qIdx, masterIdx);
       let maxVote = Math.max(...counts);
 
       let optsHtml = qObj.opts.map((opt, idx) => {
         const cnt = counts[idx] || 0;
         const pct = totalAns > 0 ? Math.round((cnt / totalAns) * 100) : 0;
         const isTop = (cnt > 0 && cnt === maxVote);
+        const voterNames = voters[idx].length > 0 ? `<div class="q-opt-voters">👤 選擇旅人：${voters[idx].join('、')}</div>` : '';
         return `
           <div class="q-opt-stat-row ${isTop ? 'top-choice' : ''}">
             <div class="q-opt-bar" style="width:${pct}%;"></div>
-            <span class="q-opt-text">${idx + 1}. ${opt.text}</span>
-            <span class="q-opt-count">${cnt} 人 (${pct}%)</span>
+            <div class="q-opt-main-line">
+              <span class="q-opt-text">選項 ${idx + 1}：${opt.text}</span>
+              <span class="q-opt-count">${cnt} 票 (${pct}%)</span>
+            </div>
+            ${voterNames}
           </div>
         `;
       }).join('');
@@ -1555,14 +1615,20 @@
       `;
     }
 
-    // 主控台結算報告：完整列出本回合所有題目與每個選項的選擇人數
+    // 主控台結算報告：完整列出本回合所有題目與每個選項的選擇人數與名單
     function renderAdminQuestionsBreakdown() {
       const container = document.getElementById('admin-questions-breakdown');
       if (!container) return;
 
-      // 若主控台還沒按過開始，但場上有單人模式玩家，可自動抓取最新一位單人玩家的題組顯示
-      let indicesToShow = sharedRoundQIndices;
-      if (!indicesToShow || indicesToShow.length === 0) {
+      let indicesToShow = sharedRoundQIndices ? [...sharedRoundQIndices] : [];
+      
+      // 若還有其他單人玩家回答過其他題目，也自動納入列表不漏任何一票
+      const votedMasterKeys = Object.keys(globalQuestionVotes).map(k => parseInt(k)).filter(k => !isNaN(k));
+      votedMasterKeys.forEach(k => {
+        if (!indicesToShow.includes(k)) indicesToShow.push(k);
+      });
+
+      if (indicesToShow.length === 0) {
         for (let pName in allPlayersSnapshot) {
           if (Array.isArray(allPlayersSnapshot[pName].qIndices)) {
             indicesToShow = allPlayersSnapshot[pName].qIndices;
@@ -1580,18 +1646,22 @@
       indicesToShow.forEach((masterIdx, qIdx) => {
         const qObj = masterQuestions[masterIdx];
         if (!qObj) return;
-        const { counts, totalAns } = getOptionStatsForQuestion(qIdx, masterIdx);
+        const { counts, voters, totalAns } = getOptionStatsForQuestion(qIdx, masterIdx);
         let maxVote = Math.max(...counts);
 
         let optsHtml = qObj.opts.map((opt, optIdx) => {
           const cnt = counts[optIdx] || 0;
           const pct = totalAns > 0 ? Math.round((cnt / totalAns) * 100) : 0;
           const isTop = (cnt > 0 && cnt === maxVote);
+          const voterNames = voters[optIdx].length > 0 ? `<div class="q-opt-voters">👤 選擇旅人：${voters[optIdx].join('、')}</div>` : '';
           return `
             <div class="q-opt-stat-row ${isTop ? 'top-choice' : ''}">
               <div class="q-opt-bar" style="width:${pct}%;"></div>
-              <span class="q-opt-text">選項 ${optIdx + 1}：${opt.text}</span>
-              <span class="q-opt-count">${cnt} 票 (${pct}%)</span>
+              <div class="q-opt-main-line">
+                <span class="q-opt-text">選項 ${optIdx + 1}：${opt.text}</span>
+                <span class="q-opt-count">${cnt} 票 (${pct}%)</span>
+              </div>
+              ${voterNames}
             </div>
           `;
         }).join('');
@@ -1607,7 +1677,7 @@
       container.innerHTML = html;
     }
 
-    function adminStartQuiz() {
+    async function adminStartQuiz() {
       saveGameSettings();
       clearInterval(adminAutoTimer);
       clearTimeout(adminBalloonAutoTimer);
@@ -1617,24 +1687,32 @@
       document.getElementById('btn-miracle').style.display = 'none';
       document.getElementById('admin-q-title').innerText = `快問快答進行中：第 1 / ${targetQuestionCount} 題 (每${targetQuestionSeconds}秒自動推進)`;
       
-      // 由主控台統一抽出本回合題號陣列並寫入 Firebase，讓全場題目一致且主控台可完整顯示！
+      // 1. 抽出本回合共用題號陣列
       let indices = masterQuestions.map((_, idx) => idx).sort(() => 0.5 - Math.random()).slice(0, targetQuestionCount);
       sharedRoundQIndices = indices;
       activeQuestions = indices.map(i => masterQuestions[i]);
-      db.ref('roundQuestionIndices').set(indices);
 
-      // 清空場上玩家上一輪的作答選項紀錄
-      db.ref('players').once('value', snap => {
-        snap.forEach(p => {
-          db.ref('players/' + p.key).update({ answeredQ: 0, choices: null });
-        });
+      // 2. 先完成清空舊票數與寫入新題號，再發送開始訊號 (徹底解決非同步把玩家第1題答案洗掉的Bug)
+      await db.ref('questionVotes').remove();
+      await db.ref('roundQuestionIndices').set(indices);
+
+      const pSnap = await db.ref('players').once('value');
+      const updates = {};
+      pSnap.forEach(p => {
+        updates[`${p.key}/answeredQ`] = 0;
+        updates[`${p.key}/choices`] = null;
       });
+      if (Object.keys(updates).length > 0) {
+        await db.ref('players').update(updates);
+      }
 
       renderAdminLiveQuestion();
 
-      db.ref('gameState').set({
+      // 3. 發送開始訊號並附上本回合題號陣列
+      await db.ref('gameState').set({
         currentStage: 'quiz',
         roundId: Date.now(),
+        roundIndices: indices,
         miracle: null
       });
 
@@ -1659,14 +1737,14 @@
       document.getElementById('admin-live-balloons').style.display = 'block';
       document.getElementById('btn-miracle').style.display = 'block';
       
-      db.ref('gameState').set({
+      db.ref('gameState').update({
         currentStage: 'balloon',
         roundId: Date.now(),
         miracle: null
       });
 
       adminBalloonAutoTimer = setTimeout(() => {
-        db.ref('gameState').set({
+        db.ref('gameState').update({
           currentStage: 'breathe',
           roundId: Date.now(),
           miracle: null
@@ -1687,6 +1765,7 @@
       document.getElementById('admin-live-q-box').style.display = 'none';
       db.ref('gameState').set({ currentStage: 'waiting', roundId: Date.now(), miracle: null });
       db.ref('balloonWordsGlobal').remove();
+      db.ref('questionVotes').remove();
       db.ref('players').once('value', snap => {
         snap.forEach(p => {
           db.ref('players/' + p.key).update({ answeredQ: 0, balloons: 0, poppedByCat: null, topCategory: null, choices: null });
@@ -1705,11 +1784,13 @@
         const arr = snap.val();
         scores = getInitialScores();
         myChoices = {};
-        if (Array.isArray(arr) && arr.length > 0 && !isSoloMode) {
+        if (Array.isArray(arr) && arr.length > 0) {
+          sharedRoundQIndices = arr;
           activeQuestions = arr.map(i => masterQuestions[i]).filter(Boolean);
         } else if (activeQuestions.length !== targetQuestionCount) {
-          let shuffled = [...masterQuestions].sort(() => 0.5 - Math.random());
-          activeQuestions = shuffled.slice(0, targetQuestionCount);
+          let indices = masterQuestions.map((_, idx) => idx).sort(() => 0.5 - Math.random()).slice(0, targetQuestionCount);
+          sharedRoundQIndices = indices;
+          activeQuestions = indices.map(i => masterQuestions[i]);
         }
         currentQ = 0;
         saveLocalData();
@@ -1809,11 +1890,24 @@
       if (btn) btn.classList.add('selected-opt');
 
       if (optIndex !== -1 && activeQuestions[currentQ]) {
-        myChoices[currentQ] = optIndex;
+        const qObj = activeQuestions[currentQ];
+        const mIdx = (qObj.masterIdx !== undefined) ? qObj.masterIdx : currentQ;
+
+        // 同時以題號順序與題庫原始 ID 雙重記錄
+        myChoices['q_' + currentQ] = optIndex;
+        myChoices['m_' + mIdx] = optIndex;
+
         if (!isJesus && myName) {
-          db.ref(`players/${myName}/choices/${currentQ}`).set(optIndex);
+          // 1. 寫入玩家個人 choices 節點
+          db.ref(`players/${myName}/choices`).update({
+            ['q_' + currentQ]: optIndex,
+            ['m_' + mIdx]: optIndex
+          });
+          // 2. 直接寫入全局題目投票池 questionVotes/{masterIdx}/{optIndex}/{myName} = true
+          db.ref(`questionVotes/${mIdx}/${optIndex}/${myName}`).set(true);
         }
-        const tags = activeQuestions[currentQ].opts[optIndex].tags;
+
+        const tags = qObj.opts[optIndex].tags;
         for (let key in tags) {
           if (scores[key] !== undefined) scores[key] += tags[key];
         }
@@ -1982,7 +2076,7 @@
     }
 
     // ==========================================
-    // 14. 結算手札報告 (含主控台本回合題目與選項統計)
+    // 14. 結算手札報告
     // ==========================================
     let currentTopCat = 'academic';
     let radarChartInstance = null;
