@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>慮易on燃 - 拋開煩惱大作戰！</title>
-  <!-- 引入 Firebase -->
+  <title>慮易on燃 - 心靈旅途手札</title>
+  <!-- 引入字體與套件 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <!-- 引入 Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #fff1f2 0%, #e0f2fe 50%, #fef9c3 100%);
-      --primary: #ff6b8b;
-      --primary-dark: #f43f5e;
-      --secondary: #38bdf8;
-      --accent: #a855f7;
-      --mint: #10b981;
-      --gold: #f59e0b;
-      --card-bg: rgba(255, 255, 255, 0.92);
-      --text-main: #1e293b;
-      --text-sub: #64748b;
+      /* 蒼月草與羊皮紙奇幻溫潤色調 */
+      --bg-gradient: linear-gradient(160deg, #f5f2eb 0%, #e6eef2 55%, #eef2eb 100%);
+      --parchment: rgba(252, 250, 245, 0.94);
+      --moon-blue: #4a7c9b;
+      --moon-light: #7da8c4;
+      --sage-green: #5c8a72;
+      --gold-accent: #c5a059;
+      --gold-light: #e6d3a7;
+      --rose-muted: #b85d6f;
+      --text-main: #2c353d;
+      --text-sub: #606f7b;
+      --border-line: #dcd6c8;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,354 +32,378 @@
       margin: 0; padding: 0;
       background: var(--bg-gradient);
       color: var(--text-main);
-      font-family: 'PingFang TC', 'Helvetica Neue', 'Microsoft JhengHei', sans-serif;
+      font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
       overflow: hidden; width: 100vw; height: 100vh;
     }
 
-    /* 活潑彩色漂浮氣泡背景 */
-    .bg-bubbles {
+    /* 漂浮魔法微光與蒼月草花瓣背景 */
+    .bg-mana {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none; z-index: 0; overflow: hidden;
     }
-    .bg-bubble {
-      position: absolute; bottom: -120px; border-radius: 50%;
-      opacity: 0.4; animation: floatBubble linear infinite;
+    .mana-orb {
+      position: absolute; bottom: -80px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(125,168,196,0.35) 60%, transparent 100%);
+      box-shadow: 0 0 18px rgba(197, 160, 89, 0.3);
+      animation: floatMana linear infinite;
     }
-    @keyframes floatBubble {
-      0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-55vh) translateX(20px) scale(1.08); }
-      100% { transform: translateY(-115vh) translateX(-15px) scale(0.95); }
+    @keyframes floatMana {
+      0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
+      20% { opacity: 0.65; }
+      80% { opacity: 0.65; }
+      100% { transform: translateY(-110vh) translateX(25px) scale(1.15); opacity: 0; }
     }
 
-    /* 頂部導覽列 */
+    /* 頂部工具列 */
     .top-bar {
-      position: fixed; top: 12px; right: 15px; z-index: 100;
+      position: fixed; top: 14px; right: 16px; z-index: 100;
       display: flex; gap: 8px;
     }
     .btn-top {
-      background: #ffffff; color: #334155; border: 2px solid #e2e8f0;
-      padding: 7px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 800;
-      cursor: pointer; width: auto; box-shadow: 0 4px 0 #e2e8f0;
+      background: var(--parchment); color: var(--text-main);
+      border: 1.5px solid var(--gold-accent);
+      padding: 7px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; width: auto; box-shadow: 0 3px 10px rgba(44, 53, 61, 0.08);
+      font-family: 'Noto Serif TC', serif;
     }
-    .btn-top:active { transform: translateY(2px); box-shadow: 0 2px 0 #e2e8f0; }
 
     .screen {
       display: none; position: relative; z-index: 1;
       width: 100vw; height: 100vh; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 20px; overflow-y: auto; animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      padding: 20px; overflow-y: auto; animation: gentleFade 0.45s ease-out;
     }
     .active { display: flex; }
 
-    @keyframes popIn {
-      from { opacity: 0; transform: translateY(16px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+    @keyframes gentleFade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .hero-card {
-      background: var(--card-bg); border: 3px solid #ffffff;
-      border-radius: 28px; padding: 28px 22px; width: 100%; max-width: 400px;
-      text-align: center; box-shadow: 0 15px 35px rgba(244, 63, 94, 0.12), 0 4px 0 #fecdd3;
-      backdrop-filter: blur(10px);
+    /* 奇幻旅途手札卡片 */
+    .story-card {
+      background: var(--parchment);
+      border: 2px solid var(--gold-accent);
+      outline: 1px solid var(--gold-light);
+      outline-offset: -7px;
+      border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 400px;
+      text-align: center;
+      box-shadow: 0 12px 32px rgba(44, 53, 61, 0.1), 0 2px 6px rgba(197, 160, 89, 0.15);
+      backdrop-filter: blur(8px);
     }
 
     h1 { 
-      font-size: 2.35rem; text-align: center; margin: 0 0 8px 0; 
-      background: linear-gradient(135deg, #f43f5e, #a855f7, #0ea5e9);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      letter-spacing: 1.5px; font-weight: 900;
+      font-family: 'Noto Serif TC', serif;
+      font-size: 2.25rem; text-align: center; margin: 0 0 10px 0; 
+      color: var(--text-main);
+      letter-spacing: 3px; font-weight: 900;
+      position: relative; display: inline-block;
+    }
+    h1::after {
+      content: "✦ ─── ✦ ─── ✦";
+      display: block; font-size: 0.75rem; color: var(--gold-accent);
+      letter-spacing: 4px; margin-top: 4px; font-weight: normal;
     }
     
-    p.subtitle { color: var(--text-sub); text-align: center; font-size: 0.95rem; margin: 0 0 20px 0; font-weight: 600; line-height: 1.5; }
-
-    .mode-pill {
-      display: inline-block; padding: 5px 14px; border-radius: 999px;
-      font-size: 0.8rem; font-weight: 800; margin-bottom: 12px;
-      background: #fef3c7; color: #d97706; border: 2px solid #fde68a;
-    }
+    p.subtitle { color: var(--text-sub); text-align: center; font-size: 0.94rem; margin: 8px 0 22px 0; line-height: 1.6; }
 
     input { 
-      width: 100%; padding: 15px 18px; border-radius: 18px; 
-      border: 2.5px solid #cbd5e1; background: #ffffff;
-      color: var(--text-main); font-size: 1.15rem; font-weight: bold; text-align: center; margin-bottom: 16px;
+      width: 100%; padding: 14px 18px; border-radius: 12px; 
+      border: 1.5px solid var(--border-line); background: #ffffff;
+      color: var(--text-main); font-size: 1.08rem; font-weight: 600; text-align: center; margin-bottom: 16px;
       outline: none; transition: 0.25s;
     }
-    input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(255, 107, 139, 0.2); }
+    input:focus { border-color: var(--moon-blue); box-shadow: 0 0 0 3px rgba(74, 124, 155, 0.18); }
 
     button { 
-      width: 100%; padding: 15px; border-radius: 18px; border: none; 
-      font-size: 1.1rem; font-weight: 900; cursor: pointer;
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
-      box-shadow: 0 6px 0 rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.08);
+      width: 100%; padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); 
+      font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(44, 53, 61, 0.12);
+      font-family: 'Noto Serif TC', 'Noto Sans TC', sans-serif;
+      letter-spacing: 1px;
     }
-    button:active { transform: translateY(3px) scale(0.98); box-shadow: 0 2px 0 rgba(0,0,0,0.12); }
+    button:active { transform: translateY(2px); box-shadow: 0 2px 6px rgba(44, 53, 61, 0.1); }
 
-    .btn-primary { background: linear-gradient(135deg, #ff6b8b, #ff8e53); color: #fff; }
-    .btn-secondary { background: linear-gradient(135deg, #38bdf8, #818cf8); color: #fff; margin-top: 10px; }
-    .btn-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; margin-top: 10px; }
+    .btn-primary { background: linear-gradient(135deg, #4a7c9b, #5c8a72); color: #fff; }
+    .btn-secondary { background: linear-gradient(135deg, #6b7c93, #4a7c9b); color: #fff; margin-top: 10px; }
+    .btn-gold { background: linear-gradient(135deg, #c5a059, #a8833e); color: #fff; margin-top: 10px; }
     
     .btn-option { 
-      width: 100%; max-width: 500px; background: #ffffff; 
-      color: var(--text-main); margin: 8px 0; border: 2.5px solid #e2e8f0; 
-      font-size: 1.05rem; font-weight: 700; text-align: left; padding: 16px 20px; border-radius: 18px;
-      box-shadow: 0 5px 0 #cbd5e1; transition: 0.15s; line-height: 1.45;
+      width: 100%; max-width: 500px; background: var(--parchment); 
+      color: var(--text-main); margin: 8px 0; border: 1.5px solid var(--border-line); 
+      font-size: 1rem; font-weight: 500; text-align: left; padding: 15px 18px; border-radius: 14px;
+      box-shadow: 0 3px 10px rgba(44, 53, 61, 0.05); transition: 0.2s; line-height: 1.5;
+      font-family: 'Noto Sans TC', sans-serif; letter-spacing: 0.3px;
     }
     .btn-option:hover, .btn-option:active { 
-      border-color: var(--primary); background: #fff1f2; 
-      box-shadow: 0 3px 0 #fda4af;
+      border-color: var(--moon-blue); background: #f0f6fa; 
+      transform: translateY(-1px);
     }
     .btn-option.selected-opt {
-      border-color: var(--mint); background: #d1fae5; color: #065f46;
-      box-shadow: 0 4px 0 #10b981;
+      border-color: var(--sage-green); background: #e8f3ee; color: #234735;
+      font-weight: 700; box-shadow: 0 0 12px rgba(92, 138, 114, 0.25);
     }
 
     /* 快問快答進度與計時 */
-    .quiz-header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.95rem; font-weight: 800; color: #475569; }
-    #timer-bar { width: 100%; max-width: 500px; height: 11px; background: rgba(255,255,255,0.85); border-radius: 999px; margin-bottom: 18px; overflow: hidden; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    #timer-progress { width: 100%; height: 100%; background: linear-gradient(90deg, #10b981, #38bdf8, #ff6b8b); transition: width 0.1s linear; }
+    .quiz-header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; font-weight: 700; color: var(--text-sub); font-family: 'Noto Serif TC', serif; }
+    #timer-bar { width: 100%; max-width: 500px; height: 8px; background: rgba(220,214,200,0.6); border-radius: 999px; margin-bottom: 16px; overflow: hidden; }
+    #timer-progress { width: 100%; height: 100%; background: linear-gradient(90deg, var(--sage-green), var(--moon-blue), var(--gold-accent)); transition: width 0.1s linear; }
     
     .question-box { 
       width: 100%; max-width: 500px; flex: 1; display: flex; flex-direction: column; 
       justify-content: flex-start; max-height: 80vh; position: relative; 
     }
     .question-card {
-      background: #ffffff; border: 3px solid #f1f5f9;
-      border-radius: 22px; padding: 20px; margin-bottom: 12px;
-      box-shadow: 0 10px 25px rgba(148, 163, 184, 0.16), 0 4px 0 #e2e8f0;
+      background: var(--parchment); border: 1.5px solid var(--gold-accent);
+      border-radius: 18px; padding: 22px; margin-bottom: 12px;
+      box-shadow: 0 8px 24px rgba(44, 53, 61, 0.07);
     }
     .question-tag {
-      display: inline-block; background: #f3e8ff; color: #7e22ce;
-      padding: 4px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 800; margin-bottom: 10px;
+      display: inline-block; background: #e6eef2; color: var(--moon-blue);
+      border: 1px solid #c2d6e3; padding: 3px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; margin-bottom: 10px;
     }
-    .question-text { font-size: 1.22rem; line-height: 1.55; margin: 0; color: #0f172a; font-weight: 800; }
+    .question-text { font-size: 1.18rem; line-height: 1.6; margin: 0; color: var(--text-main); font-weight: 700; font-family: 'Noto Serif TC', serif; }
     
     #quiz-waiting-overlay { 
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-      background: rgba(255, 255, 255, 0.95); border-radius: 22px; flex-direction: column; 
-      align-items: center; justify-content: center; z-index: 10; font-size: 1.3rem; 
-      color: var(--mint); font-weight: 900; text-align: center; backdrop-filter: blur(6px);
-      padding: 24px; border: 3px solid #a7f3d0;
+      background: rgba(252, 250, 245, 0.96); border-radius: 18px; flex-direction: column; 
+      align-items: center; justify-content: center; z-index: 10; font-size: 1.25rem; 
+      color: var(--sage-green); font-weight: 700; text-align: center;
+      padding: 24px; border: 1.5px solid var(--gold-accent);
+      font-family: 'Noto Serif TC', serif;
     }
 
     /* 主控台樣式 */
-    .admin-container { width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
-    .admin-dashboard { background: #ffffff; padding: 16px; border-radius: 20px; width: 100%; text-align: center; margin: 10px 0; border: 2px solid #e2e8f0; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
-    .progress-text { font-size: 1.4rem; font-weight: 900; color: var(--mint); margin: 6px 0; }
-    .player-list-box { width: 100%; background: rgba(255,255,255,0.9); border: 2px solid #e2e8f0; border-radius: 16px; padding: 12px; margin: 10px 0; max-height: 150px; overflow-y: auto; }
-    .player-chip { display: inline-flex; align-items: center; background: #f1f5f9; color: #1e293b; padding: 5px 12px; border-radius: 999px; font-size: 0.82rem; font-weight: bold; margin: 4px; border: 1px solid #cbd5e1; }
-    .player-chip span.kick-btn { color: #f43f5e; margin-left: 6px; cursor: pointer; font-weight: 900; }
+    .admin-container { width: 100%; max-width: 490px; max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
+    .admin-dashboard { background: var(--parchment); padding: 16px; border-radius: 16px; width: 100%; text-align: center; margin: 8px 0; border: 1.5px solid var(--gold-accent); }
+    .progress-text { font-size: 1.3rem; font-weight: 900; color: var(--sage-green); margin: 6px 0; }
+    .player-list-box { width: 100%; background: var(--parchment); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 12px; margin: 8px 0; max-height: 135px; overflow-y: auto; }
+    .player-chip { display: inline-flex; align-items: center; background: #fff; color: var(--text-main); padding: 4px 11px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin: 3px; border: 1px solid var(--border-line); }
+    .player-chip span.kick-btn { color: var(--rose-muted); margin-left: 6px; cursor: pointer; font-weight: 900; }
+    .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 8px; text-align: left; }
+    .config-item label { display: block; font-size: 0.8rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
+    .config-item input { margin-bottom: 0; padding: 9px; font-size: 1rem; border-radius: 8px; }
 
-    /* 4秒深呼吸療癒過場 */
-    #screen-breathe { background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 50%, #fce7f3 100%); }
+    /* 4秒深呼吸過場 (蒼月草微風感) */
+    #screen-breathe { background: radial-gradient(circle at center, #eef5f9 0%, #dde8f0 100%); }
     .breathe-circle { 
-      width: 190px; height: 190px; border-radius: 50%; 
-      background: radial-gradient(circle, #ffffff 10%, #bae6fd 65%, #e9d5ff 100%); 
-      color: #0369a1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      font-size: 1.45rem; font-weight: 900; animation: breatheAnim 4s ease-in-out forwards; 
-      box-shadow: 0 0 60px rgba(56, 189, 248, 0.5), inset 0 0 25px #ffffff; text-align: center;
-      border: 4px solid #ffffff;
+      width: 185px; height: 185px; border-radius: 50%; 
+      background: radial-gradient(circle, #ffffff 15%, rgba(125,168,196,0.45) 70%, transparent 100%); 
+      color: var(--moon-blue); display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      font-size: 1.4rem; font-weight: 700; animation: breatheAnim 4s ease-in-out forwards; 
+      box-shadow: 0 0 50px rgba(74, 124, 155, 0.35); text-align: center;
+      border: 2px solid rgba(255,255,255,0.85); font-family: 'Noto Serif TC', serif;
     }
     @keyframes breatheAnim {
-      0% { transform: scale(0.5); opacity: 0; }
-      45% { transform: scale(1.45); opacity: 1; }
-      75% { transform: scale(1.45); opacity: 1; }
-      100% { transform: scale(0.6); opacity: 0; }
+      0% { transform: scale(0.55); opacity: 0; }
+      45% { transform: scale(1.4); opacity: 1; }
+      75% { transform: scale(1.4); opacity: 1; }
+      100% { transform: scale(0.65); opacity: 0; }
     }
 
-    /* 戳氣球發洩畫面 */
+    /* 戳氣球畫面 */
     #screen-balloon { padding: 10px; justify-content: flex-start; overflow: hidden; user-select: none; }
     .balloon-hud {
       z-index: 20; text-align: center; pointer-events: none; margin-top: 8px;
-      background: rgba(255,255,255,0.88); padding: 10px 22px; border-radius: 24px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06); backdrop-filter: blur(8px); border: 2px solid #fff;
+      background: var(--parchment); padding: 10px 22px; border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(44,53,61,0.08); border: 1.5px solid var(--gold-accent);
     }
     #balloon-area { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: 5; touch-action: none; }
     
     .balloon { 
       position: absolute; bottom: -130px; width: 84px; height: 100px; 
-      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; 
+      border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%; 
       display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      font-size: 0.85rem; font-weight: 900; color: #ffffff; text-align: center;
+      font-size: 0.84rem; font-weight: 700; color: #ffffff; text-align: center;
       cursor: pointer; user-select: none; 
-      box-shadow: inset -8px -8px 0px rgba(0,0,0,0.15), inset 8px 8px 14px rgba(255,255,255,0.6), 0 8px 18px rgba(0,0,0,0.12);
-      animation: floatUp linear forwards; padding: 6px; line-height: 1.2;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+      box-shadow: inset -6px -8px 12px rgba(0,0,0,0.18), inset 6px 6px 12px rgba(255,255,255,0.5), 0 6px 16px rgba(44,53,61,0.15);
+      animation: floatUp linear forwards; padding: 6px; line-height: 1.25;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
     }
     .balloon.blessed {
-      width: 110px !important; height: 128px !important; font-size: 1rem !important;
-      box-shadow: 0 0 30px #fbbf24, inset 0 0 18px #fff !important;
-      border: 3px solid #fff;
+      width: 110px !important; height: 128px !important; font-size: 0.98rem !important;
+      box-shadow: 0 0 28px var(--gold-accent), inset 0 0 18px #fff !important;
+      border: 2px solid #fff;
     }
-    .balloon::after { content: ""; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); width: 2px; height: 14px; background: rgba(100,116,139,0.5); }
-    .balloon-cat-tag { font-size: 0.65rem; background: rgba(255,255,255,0.3); padding: 1px 6px; border-radius: 8px; margin-bottom: 3px; }
+    .balloon::after { content: ""; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); width: 1.5px; height: 14px; background: rgba(197, 160, 89, 0.7); }
+    .balloon-cat-tag { font-size: 0.63rem; background: rgba(0,0,0,0.22); padding: 1px 6px; border-radius: 8px; margin-bottom: 3px; }
 
     @keyframes floatUp {
-      0% { transform: translateY(0) rotate(-3deg); }
-      25% { transform: translateY(-30vh) rotate(4deg) translateX(10px); }
-      50% { transform: translateY(-60vh) rotate(-4deg) translateX(-10px); }
-      75% { transform: translateY(-90vh) rotate(3deg) translateX(6px); }
+      0% { transform: translateY(0) rotate(-2deg); }
+      25% { transform: translateY(-30vh) rotate(3deg) translateX(8px); }
+      50% { transform: translateY(-60vh) rotate(-3deg) translateX(-8px); }
+      75% { transform: translateY(-90vh) rotate(2deg) translateX(5px); }
       100% { transform: translateY(-125vh) rotate(0deg); }
     }
 
-    /* 氣球粒子爆破與連擊特效 */
-    .pop-effect { position: fixed; font-weight: 900; color: #f43f5e; font-size: 1.25rem; pointer-events: none; z-index: 30; animation: popAnim 0.45s ease-out forwards; text-shadow: 0 2px 8px rgba(255,255,255,0.9); }
-    @keyframes popAnim { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.6) translateY(-35px); opacity: 0; } }
+    /* 氣球化為花瓣與微光粒子特效 */
+    .pop-effect { position: fixed; font-weight: 700; color: var(--moon-blue); font-size: 1.1rem; pointer-events: none; z-index: 30; animation: popAnim 0.5s ease-out forwards; text-shadow: 0 0 8px #ffffff; font-family: 'Noto Serif TC', serif; }
+    @keyframes popAnim { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.4) translateY(-30px); opacity: 0; } }
     
-    .pop-particle { position: fixed; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; z-index: 29; animation: particleFly 0.45s ease-out forwards; }
+    .pop-particle { position: fixed; width: 8px; height: 8px; border-radius: 50% 0 50% 50%; pointer-events: none; z-index: 29; animation: particleFly 0.55s ease-out forwards; }
     @keyframes particleFly {
-      0% { transform: translate(0, 0) scale(1); opacity: 1; }
-      100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) rotate(120deg) scale(0); opacity: 0; }
     }
 
-    /* 結算收據樣式 */
+    /* 結算手札收據樣式 */
     .receipt { 
-      background: #ffffff; color: #0f172a; padding: 22px; border-radius: 26px; 
-      width: 100%; max-width: 430px; max-height: 90vh; overflow-y: auto; 
-      box-shadow: 0 18px 40px rgba(244, 63, 94, 0.15); text-align: left; position: relative;
-      border: 3px solid #fff;
+      background: var(--parchment); color: var(--text-main); padding: 24px 20px; border-radius: 20px; 
+      width: 100%; max-width: 435px; max-height: 90vh; overflow-y: auto; 
+      box-shadow: 0 16px 36px rgba(44, 53, 61, 0.14); text-align: left; position: relative;
+      border: 2px solid var(--gold-accent);
     }
-    .receipt h2 { text-align: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 10px; color: #1e293b; margin: 0 0 10px 0; font-size: 1.45rem; }
-    .receipt-section { background: #f8fafc; border: 2px solid #f1f5f9; border-radius: 16px; padding: 12px 14px; margin: 12px 0; }
-    .receipt-section h4 { margin: 0 0 8px 0; color: #334155; font-size: 0.95rem; display: flex; align-items: center; justify-content: space-between; }
+    .receipt h2 { font-family: 'Noto Serif TC', serif; text-align: center; border-bottom: 1.5px dashed var(--gold-accent); padding-bottom: 10px; color: var(--text-main); margin: 0 0 10px 0; font-size: 1.45rem; letter-spacing: 2px; }
+    .receipt-section { background: rgba(255,255,255,0.75); border: 1px solid var(--border-line); border-radius: 14px; padding: 13px 15px; margin: 12px 0; }
+    .receipt-section h4 { font-family: 'Noto Serif TC', serif; margin: 0 0 8px 0; color: var(--text-main); font-size: 0.95rem; display: flex; align-items: center; justify-content: space-between; }
     
     /* 副情緒占比條 */
-    .emotion-bar-row { margin: 7px 0; font-size: 0.85rem; }
-    .emotion-bar-label { display: flex; justify-content: space-between; margin-bottom: 3px; font-weight: 800; color: #475569; }
-    .emotion-bar-bg { width: 100%; height: 9px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .emotion-bar-row { margin: 8px 0; font-size: 0.84rem; }
+    .emotion-bar-label { display: flex; justify-content: space-between; margin-bottom: 3px; font-weight: 600; color: var(--text-sub); }
+    .emotion-bar-bg { width: 100%; height: 8px; background: #e6e2d8; border-radius: 999px; overflow: hidden; }
     .emotion-bar-fill { height: 100%; border-radius: 999px; transition: width 0.8s ease-out; }
 
     /* 氣球統計小標籤 */
     .balloon-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
-    .balloon-stat-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 6px 10px; font-size: 0.82rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-    .balloon-stat-count { font-weight: 900; color: #f43f5e; font-size: 0.95rem; }
+    .balloon-stat-item { background: #fff; border: 1px solid var(--border-line); border-radius: 8px; padding: 6px 10px; font-size: 0.82rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .balloon-stat-count { font-weight: 800; color: var(--moon-blue); font-size: 0.92rem; }
 
     /* 彈出視窗 */
     .modal-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(15, 23, 42, 0.55); z-index: 200; align-items: center; justify-content: center; padding: 20px;
-      backdrop-filter: blur(6px);
+      background: rgba(44, 53, 61, 0.55); z-index: 200; align-items: center; justify-content: center; padding: 20px;
+      backdrop-filter: blur(5px);
     }
     .modal-box {
-      background: #ffffff; border: 3px solid #f1f5f9; color: #1e293b;
-      padding: 22px; border-radius: 24px; width: 100%; max-width: 410px; max-height: 85vh;
-      overflow-y: auto; text-align: center; box-shadow: 0 20px 45px rgba(0,0,0,0.2);
+      background: var(--parchment); border: 2px solid var(--gold-accent); color: var(--text-main);
+      padding: 22px; border-radius: 20px; width: 100%; max-width: 400px; max-height: 85vh;
+      overflow-y: auto; text-align: center; box-shadow: 0 20px 45px rgba(0,0,0,0.22);
     }
-    .url-tab-group { display: flex; gap: 6px; margin-bottom: 12px; }
-    .url-tab { flex: 1; padding: 9px; font-size: 0.85rem; border-radius: 12px; background: #f1f5f9; color: #475569; box-shadow: none; }
-    .url-tab.active-tab { background: #ff6b8b; color: #fff; }
-    .verse-list-item { text-align: left; font-size: 0.85rem; padding: 8px 0; border-bottom: 1px solid #e2e8f0; line-height: 1.45; color: #334155; }
+    .verse-list-item { text-align: left; font-size: 0.85rem; padding: 8px 0; border-bottom: 1px solid var(--border-line); line-height: 1.5; color: var(--text-main); }
   </style>
 </head>
 <body>
 
-  <!-- 活潑漂浮泡泡背景 -->
-  <div class="bg-bubbles">
-    <div class="bg-bubble" style="width:90px; height:90px; left:8%; background:#fda4af; animation-duration:18s;"></div>
-    <div class="bg-bubble" style="width:60px; height:60px; left:28%; background:#7dd3fc; animation-duration:14s; animation-delay:2s;"></div>
-    <div class="bg-bubble" style="width:110px; height:110px; left:65%; background:#fde047; animation-duration:22s; animation-delay:1s;"></div>
-    <div class="bg-bubble" style="width:75px; height:75px; left:82%; background:#d8b4fe; animation-duration:16s; animation-delay:4s;"></div>
-    <div class="bg-bubble" style="width:50px; height:50px; left:48%; background:#6ee7b7; animation-duration:12s; animation-delay:3s;"></div>
+  <!-- 蒼月草微光粒子背景 -->
+  <div class="bg-mana">
+    <div class="mana-orb" style="width:70px; height:70px; left:10%; animation-duration:18s;"></div>
+    <div class="mana-orb" style="width:45px; height:45px; left:28%; animation-duration:14s; animation-delay:3s;"></div>
+    <div class="mana-orb" style="width:85px; height:85px; left:62%; animation-duration:22s; animation-delay:1s;"></div>
+    <div class="mana-orb" style="width:55px; height:55px; left:80%; animation-duration:16s; animation-delay:5s;"></div>
+    <div class="mana-orb" style="width:40px; height:40px; left:45%; animation-duration:13s; animation-delay:2s;"></div>
   </div>
 
-  <!-- 右上角連結工具 -->
+  <!-- 右上角單純分享按鈕 (不顯示任何雙模式字眼) -->
   <div class="top-bar">
-    <button class="btn-top" onclick="openQrModal()">🔗 連結 / QR</button>
+    <button class="btn-top" onclick="openQrModal()">✦ 分享連結</button>
   </div>
 
-  <!-- QR Code 雙網址分享彈窗 (支援切換「個人隨時玩網址」與「團康控場版網址」) -->
+  <!-- 單純的分享彈窗 (玩家完全看不到多人/單人切換痕跡) -->
   <div id="qr-modal" class="modal-overlay" onclick="closeQrModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 style="margin-top:0; color:#f43f5e;">📱 分享《慮易on燃》遊戲連結</h3>
-      <div class="url-tab-group">
-        <button id="tab-solo-url" class="url-tab active-tab" onclick="switchShareUrlMode('solo')">🌟 個人隨時玩網址</button>
-        <button id="tab-group-url" class="url-tab" onclick="switchShareUrlMode('group')">👥 團體控場版網址</button>
-      </div>
-      <div id="share-mode-desc" style="font-size:0.82rem; color:#64748b; margin-bottom:8px;">個人版：不用等主控台，玩家自己按開始、自己按打氣球！</div>
-      <img id="qr-img" src="" alt="QR Code" style="width:190px; height:190px; border-radius:16px; border:2px solid #e2e8f0; padding:8px; margin:8px auto; display:block;">
-      <p id="share-url-text" style="font-size:0.78rem; word-break:break-all; color:#475569; background:#f8fafc; padding:8px; border-radius:10px; border:1px solid #e2e8f0;"></p>
-      <button class="btn-primary" style="margin-bottom:8px; padding:12px;" onclick="copyGameUrl()">📋 複製上方網址</button>
-      <button id="btn-switch-now" class="btn-secondary" style="margin-bottom:8px; padding:11px; font-size:0.9rem;" onclick="goToSelectedModeNow()">🚀 直接切換成此模式遊玩</button>
-      <button style="background:#f1f5f9; color:#475569; padding:10px; box-shadow:none;" onclick="document.getElementById('qr-modal').style.display='none'">關閉視窗</button>
+      <h3 style="margin-top:0; font-family:'Noto Serif TC',serif; color:var(--moon-blue);">✦ 邀請進入《慮易on燃》</h3>
+      <img id="qr-img" src="" alt="QR Code" style="width:190px; height:190px; border-radius:12px; border:1.5px solid var(--gold-accent); padding:8px; margin:10px auto; display:block; background:#fff;">
+      <p id="share-url-text" style="font-size:0.78rem; word-break:break-all; color:var(--text-sub); background:#fff; padding:8px; border-radius:8px; border:1px solid var(--border-line);"></p>
+      <button class="btn-primary" style="margin-bottom:8px; padding:12px;" onclick="copyCurrentUrl()">複製遊戲連結</button>
+      <button style="background:#e6e2d8; color:var(--text-main); padding:10px; box-shadow:none;" onclick="document.getElementById('qr-modal').style.display='none'">關閉</button>
     </div>
   </div>
 
   <!-- 52 句聖經經文庫彈窗 -->
   <div id="bible-modal" class="modal-overlay" onclick="document.getElementById('bible-modal').style.display='none'">
     <div class="modal-box" style="max-width:460px;" onclick="event.stopPropagation()">
-      <h3 style="margin-top:0; color:#9333ea;">📖 52 句心靈能量經文庫</h3>
+      <h3 style="margin-top:0; font-family:'Noto Serif TC',serif; color:var(--moon-blue);">📖 旅途中的 52 句平安心語</h3>
       <div id="all-verses-container"></div>
-      <button class="btn-primary" style="margin-top:15px; padding:12px;" onclick="document.getElementById('bible-modal').style.display='none'">關閉經文庫</button>
+      <button class="btn-primary" style="margin-top:15px; padding:12px;" onclick="document.getElementById('bible-modal').style.display='none'">闔上手札</button>
     </div>
   </div>
 
-  <!-- 1. 登入畫面 -->
+  <!-- 1. 登入畫面 (完全移除個人版/團體版提示字眼) -->
   <div id="screen-login" class="screen active">
-    <div class="hero-card">
-      <div id="login-mode-pill" class="mode-pill">✨ 拋開煩惱大作戰</div>
+    <div class="story-card">
       <h1>慮易on燃</h1>
-      <p class="subtitle">15 題直覺快問快答 × 15 秒戳破壓力氣球<br>把心裡的悶氣通通變成繽紛泡泡破掉吧！</p>
-      <input type="text" id="nickname" placeholder="輸入你的暱稱..." autocomplete="off">
-      <button id="btn-login-start" class="btn-primary" onclick="joinGame()">🚀 開始拋開煩惱！</button>
+      <p class="subtitle">在漫長的日常旅途中，傾聽內心的聲音<br>將悄然累積的思緒化作微風吹散</p>
+      <input type="text" id="nickname" placeholder="請寫下你的名字或暱稱..." autocomplete="off">
+      <button id="btn-login-start" class="btn-primary" onclick="joinGame()">踏上旅途</button>
     </div>
   </div>
 
-  <!-- 2. 團體版等候室 -->
+  <!-- 2. 等候室 (僅一般網址使用) -->
   <div id="screen-waiting" class="screen">
-    <div class="hero-card">
-      <h1>🎈 準備出發囉！</h1>
-      <p class="subtitle">等待帶領者按下開始，大家一起同步出發！</p>
-      <div style="background:#f8fafc; border:2px solid #e2e8f0; padding:18px; border-radius:20px; margin-bottom:18px;">
-        <div style="font-size:0.85rem; color:#64748b; font-weight:bold;">你的暱稱</div>
-        <div id="waiting-my-name" style="font-size:1.6rem; font-weight:900; color:#f43f5e; margin:4px 0 12px 0;">-</div>
-        <div id="player-count" style="font-size: 1.1rem; color: var(--mint); font-weight: 900;">目前夥伴人數: 0</div>
+    <div class="story-card">
+      <h1>旅途準備中</h1>
+      <p class="subtitle">請稍候片刻，旅程即將展開...</p>
+      <div style="background:#ffffff; border:1.5px solid var(--border-line); padding:18px; border-radius:14px; margin-bottom:18px;">
+        <div style="font-size:0.82rem; color:var(--text-sub);">旅人名字</div>
+        <div id="waiting-my-name" style="font-size:1.5rem; font-weight:900; color:var(--moon-blue); margin:6px 0; font-family:'Noto Serif TC',serif;">-</div>
       </div>
-      <button style="background:#f1f5f9; color:#475569; font-size:0.95rem; padding:12px; box-shadow:none;" onclick="logout()">🔄 換個暱稱</button>
+      <button style="background:#e6e2d8; color:var(--text-main); font-size:0.92rem; padding:11px; box-shadow:none;" onclick="logout()">更改名字</button>
     </div>
   </div>
 
-  <!-- 3. Jesus 主控台 -->
-  <div id="screen-admin" class="screen" style="justify-content:flex-start; padding-top:50px;">
+  <!-- 3. Jesus 主控台 (新增題數與氣球秒數調整，以及雙網址複製工具) -->
+  <div id="screen-admin" class="screen" style="justify-content:flex-start; padding-top:45px;">
     <div class="admin-container">
-      <h1 style="font-size:1.85rem;">👑 活動帶領主控台</h1>
-      <p id="admin-player-count" style="color:var(--mint); font-weight:900; margin:4px 0;">目前連線人數: 0</p>
+      <h1 style="font-size:1.75rem;">👑 旅途引導主控台</h1>
+      <p id="admin-player-count" style="color:var(--sage-green); font-weight:700; margin:4px 0;">目前連線人數: 0</p>
       
+      <!-- 參數調整面板 (可自由設定題數與打氣球秒數) -->
+      <div class="admin-dashboard">
+        <div style="font-size:0.9rem; font-weight:700; color:var(--moon-blue); font-family:'Noto Serif TC',serif;">⚙️ 遊戲參數設定 (修改後即時套用)</div>
+        <div class="config-grid">
+          <div class="config-item">
+            <label>快問快答題數 (1~40題)</label>
+            <input type="number" id="cfg-q-count" min="1" max="40" value="15" onchange="saveGameSettings()">
+          </div>
+          <div class="config-item">
+            <label>戳氣球時間 (5~120秒)</label>
+            <input type="number" id="cfg-b-sec" min="5" max="120" value="15" onchange="saveGameSettings()">
+          </div>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          <button style="font-size:0.78rem; padding:8px; background:#e6eef2; color:var(--moon-blue); box-shadow:none;" onclick="copyAdminModeUrl('group')">📋 複製團康控場網址</button>
+          <button style="font-size:0.78rem; padding:8px; background:#e8f3ee; color:var(--sage-green); box-shadow:none;" onclick="copyAdminModeUrl('solo')">📋 複製單人獨立網址</button>
+        </div>
+      </div>
+
       <div class="player-list-box">
-        <div style="font-size:0.8rem; color:#64748b; font-weight:bold; margin-bottom:5px;">場上夥伴名單 (點擊 ✕ 可移出)：</div>
-        <div id="admin-player-list">尚無玩家加入...</div>
+        <div style="font-size:0.78rem; color:var(--text-sub); font-weight:700; margin-bottom:5px;">場上名單 (點擊 ✕ 可移出)：</div>
+        <div id="admin-player-list">尚無旅人加入...</div>
       </div>
 
-      <div id="admin-dashboard" class="admin-dashboard">
-        <div id="admin-q-title" style="font-size:1.05rem; font-weight:800; color:#1e293b;">目前階段: 等候開始</div>
-        <div id="admin-progress-text" class="progress-text">已完成題數人數: 0 / 0</div>
-        <div id="admin-live-balloons" style="font-size:1rem; color:#d97706; font-weight:bold; margin-bottom:4px; display:none;">🎈 全場即時擊破氣球：<span id="admin-live-balloon-num" style="font-size:1.4rem; font-weight:900;">0</span> 顆</div>
+      <div class="admin-dashboard">
+        <div id="admin-q-title" style="font-size:1rem; font-weight:700; color:var(--text-main);">目前階段: 等候開始</div>
+        <div id="admin-progress-text" class="progress-text">已完成人數: 0 / 0</div>
+        <div id="admin-live-balloons" style="font-size:0.95rem; color:var(--gold-accent); font-weight:700; margin-bottom:4px; display:none;">🎈 全場即時擊破氣球：<span id="admin-live-balloon-num" style="font-size:1.35rem; font-weight:900;">0</span> 顆</div>
       </div>
 
-      <button class="btn-primary" onclick="adminStartQuiz()" style="margin-bottom:8px;">1. 開始 15 題快問快答 (每題5秒自動跳題)</button>
-      <button class="btn-secondary" onclick="adminStartBalloon()">2. 啟動 15 秒戳氣球 (結束後自動深呼吸結算)</button>
-      <button class="btn-gold" id="btn-miracle" onclick="triggerMiracle()" style="display:none;">✨ 賜下平安祝福 (全場氣球變大慢速！)</button>
-      <button style="background:#e2e8f0; color:#334155; margin-top:18px; padding:12px; box-shadow:none;" onclick="adminResetGame()">🔄 重置全場遊戲狀態</button>
+      <button class="btn-primary" id="btn-admin-start-quiz" onclick="adminStartQuiz()" style="margin-bottom:8px;">1. 開始快問快答 (每題5秒自動推進)</button>
+      <button class="btn-secondary" id="btn-admin-start-balloon" onclick="adminStartBalloon()">2. 啟動戳氣球 (結束後自動深呼吸結算)</button>
+      <button class="btn-gold" id="btn-miracle" onclick="triggerMiracle()" style="display:none;">✨ 降下蒼月草祝福 (氣球變大慢速！)</button>
+      <button style="background:#dcd6c8; color:var(--text-main); margin-top:16px; padding:11px; box-shadow:none;" onclick="adminResetGame()">🔄 重置全場遊戲狀態</button>
     </div>
   </div>
 
   <!-- 4. 快問快答 -->
   <div id="screen-quiz" class="screen">
     <div class="quiz-header">
-      <span id="quiz-progress-label">Question 1 / 15</span>
-      <span id="quiz-timer-sec" style="color:#f43f5e;">⏱️ 5.0s</span>
+      <span id="quiz-progress-label">第 1 / 15 題</span>
+      <span id="quiz-timer-sec" style="color:var(--moon-blue);">⏱️ 5.0s</span>
     </div>
     <div id="timer-bar"><div id="timer-progress"></div></div>
     <div class="question-box">
       <div class="question-card">
-        <span id="question-cat-badge" class="question-tag">日常小劇場</span>
+        <span id="question-cat-badge" class="question-tag">日常思緒</span>
         <div id="question-text" class="question-text">載入題目中...</div>
       </div>
       <div id="options-container"></div>
       
-      <!-- 答題完畢或個人模式啟動氣球過場遮罩 -->
+      <!-- 答題完畢或啟動氣球過場遮罩 -->
       <div id="quiz-waiting-overlay">
-        <div id="quiz-overlay-title" style="font-size:1.45rem;">✅ 直覺選擇完成！</div>
-        <div id="quiz-overlay-sub" style="font-size:0.95rem; color:#64748b; margin:10px 0 18px 0; font-weight:bold; line-height:1.5;">5 秒倒數結束後將自動跳下一題...</div>
-        <button id="btn-solo-start-balloon" class="btn-primary" style="display:none; max-width:280px;" onclick="startBalloon()">🎈 準備好了！開始狂戳氣球 (15秒)！</button>
+        <div id="quiz-overlay-title" style="font-size:1.4rem;">✦ 已記下你的心聲</div>
+        <div id="quiz-overlay-sub" style="font-size:0.92rem; color:var(--text-sub); margin:10px 0 18px 0; font-family:'Noto Sans TC',sans-serif; font-weight:500; line-height:1.55;">片刻後將繼續前行...</div>
+        <button id="btn-solo-start-balloon" class="btn-primary" style="display:none; max-width:270px;" onclick="startBalloon()">🎈 開始擊破思緒氣球</button>
       </div>
     </div>
   </div>
@@ -385,13 +411,13 @@
   <!-- 5. 戳氣球發洩 -->
   <div id="screen-balloon" class="screen">
     <div class="balloon-hud">
-      <h1 style="font-size:1.75rem; margin-bottom:2px;">💥 戳破煩惱泡泡！</h1>
-      <p style="margin:0; font-size:0.85rem; color:#64748b; font-weight:bold;">用手指點擊或滑過氣球，把煩惱通通啵掉！</p>
-      <div style="display:flex; align-items:center; justify-content:center; gap:20px; margin-top:4px; font-weight:900;">
-        <div>已擊破：<span id="balloon-score" style="font-size:2rem; color:var(--mint);">0</span></div>
-        <div>倒數：<span id="balloon-timer" style="font-size:1.7rem; color:#f43f5e;">15</span>s</div>
+      <h1 style="font-size:1.6rem; margin-bottom:2px;">✦ 拂去思緒氣球</h1>
+      <p style="margin:0; font-size:0.82rem; color:var(--text-sub);">輕觸或滑過氣球，將累積的壓力化作花瓣消散</p>
+      <div style="display:flex; align-items:center; justify-content:center; gap:20px; margin-top:5px; font-weight:700; font-family:'Noto Serif TC',serif;">
+        <div>已拂去：<span id="balloon-score" style="font-size:1.85rem; color:var(--sage-green);">0</span></div>
+        <div>剩餘：<span id="balloon-timer" style="font-size:1.65rem; color:var(--rose-muted);">15</span> 秒</div>
       </div>
-      <div id="combo-badge" style="font-size:1rem; color:#d97706; font-weight:900; height:22px;"></div>
+      <div id="combo-badge" style="font-size:0.95rem; color:var(--gold-accent); font-weight:700; height:20px;"></div>
     </div>
     <div id="balloon-area"></div>
   </div>
@@ -400,63 +426,63 @@
   <div id="screen-breathe" class="screen">
     <div class="breathe-circle">
       <div>深呼吸...</div>
-      <div style="font-size:0.85rem; font-weight:bold; margin-top:6px; color:#475569;">把煩惱輕輕吐出去 ✨</div>
+      <div style="font-size:0.82rem; font-weight:normal; margin-top:6px; color:var(--text-sub); font-family:'Noto Sans TC',sans-serif;">感受微風吹過心頭的平靜</div>
     </div>
   </div>
 
-  <!-- 7. 結算收據 (完全無任何上傳雲端字眼) -->
+  <!-- 7. 結算手札收據 -->
   <div id="screen-result" class="screen">
     <div class="receipt">
-      <h2>🌈 專屬心靈能量收據</h2>
-      <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#64748b; margin-bottom:8px; font-weight:bold;">
-        <span>玩家: <strong id="r-name" style="color:#f43f5e; font-size:0.95rem;"></strong></span>
+      <h2>📜 心靈旅途手札</h2>
+      <div style="display:flex; justify-content:space-between; font-size:0.84rem; color:var(--text-sub); margin-bottom:8px; font-weight:600;">
+        <span>旅人: <strong id="r-name" style="color:var(--moon-blue); font-size:0.95rem;"></strong></span>
         <span id="r-date"></span>
       </div>
       
-      <!-- 👤 一般玩家專屬報告 -->
+      <!-- 👤 玩家報告 -->
       <div id="player-report-view">
         <div class="receipt-section">
-          <h4><span>🎯 你的煩惱來源雷達圖</span><span id="top-anxiety-badge" style="color:#9333ea; font-size:0.8rem;"></span></h4>
+          <h4><span>🧭 思緒與壓力來源分佈</span><span id="top-anxiety-badge" style="color:var(--moon-blue); font-size:0.78rem; font-family:'Noto Sans TC',sans-serif;"></span></h4>
           <canvas id="radarChart" style="max-height:215px;"></canvas>
         </div>
 
         <div class="receipt-section">
-          <h4><span>📊 內心隱藏情緒能量占比</span></h4>
+          <h4><span>📊 內心伴隨情緒比重</span></h4>
           <div id="secondary-emotions-box"></div>
         </div>
 
-        <div class="receipt-section" style="background:#fff1f2; border-color:#fecdd3;">
+        <div class="receipt-section" style="background:#f5f8fa; border-color:#c9dce8;">
           <h4>
-            <span style="color:#be123c;">🎈 這回合你打破的煩惱氣球</span>
-            <span style="font-size:1.2rem; color:#f43f5e; font-weight:900;"><span id="player-total-popped">0</span> 顆</span>
+            <span style="color:var(--moon-blue);">🎈 本回拂去的壓力氣球</span>
+            <span style="font-size:1.15rem; color:var(--rose-muted); font-weight:900;"><span id="player-total-popped">0</span> 顆</span>
           </h4>
-          <div style="font-size:0.78rem; color:#881337; margin-bottom:6px; font-weight:bold;">被你親手擊破的煩惱明細：</div>
+          <div style="font-size:0.78rem; color:var(--text-sub); margin-bottom:6px;">各類被你親手釋放的壓力明細：</div>
           <div id="player-balloon-breakdown" class="balloon-stat-grid"></div>
         </div>
 
-        <div class="receipt-section" style="background:#ecfdf5; border-color:#a7f3d0;">
-          <h4 style="color:#047857;">🌱 給你的快樂充電微行動</h4>
-          <div id="action-text" style="font-size:0.92rem; color:#064e3b; line-height:1.5; font-weight:bold;">載入中...</div>
+        <div class="receipt-section" style="background:#f0f6f2; border-color:#bdd6c8;">
+          <h4 style="color:#2d5a43;">🌿 日常前行的微小建議</h4>
+          <div id="action-text" style="font-size:0.9rem; color:#234735; line-height:1.55;">載入中...</div>
         </div>
 
-        <div class="receipt-section" style="background:#fefce8; border-color:#fde047;">
-          <h4 style="color:#854d0e;">
-            <span>📖 給你的專屬祝福話語</span>
-            <button onclick="rerollVerse()" style="width:auto; padding:4px 12px; font-size:0.75rem; background:#f59e0b; color:#fff; border-radius:999px; box-shadow:none;">🎲 換一句</button>
+        <div class="receipt-section" style="background:#faf6ec; border-color:#e2d1a8;">
+          <h4 style="color:#7c5e26;">
+            <span>📖 旅途中的祝福話語</span>
+            <button onclick="rerollVerse()" style="width:auto; padding:4px 12px; font-size:0.75rem; background:var(--gold-accent); color:#fff; border-radius:999px; box-shadow:none;">換一句</button>
           </h4>
-          <div id="verse-text" style="font-size:0.92rem; color:#713f12; line-height:1.55; font-weight:800;">載入中...</div>
-          <button onclick="openBibleModal()" style="width:100%; margin-top:10px; padding:9px; font-size:0.8rem; background:#fef08a; color:#854d0e; border-radius:12px; box-shadow:none;">📚 展開看全部 52 句祝福話語</button>
+          <div id="verse-text" style="font-size:0.92rem; color:#4a3814; line-height:1.6; font-weight:700; font-family:'Noto Serif TC',serif;">載入中...</div>
+          <button onclick="openBibleModal()" style="width:100%; margin-top:10px; padding:9px; font-size:0.8rem; background:#efe5cc; color:#634a1b; border-radius:10px; box-shadow:none;">展開翻閱全部 52 句話語</button>
         </div>
 
-        <button class="btn-primary" style="margin-top:12px;" onclick="restartClean()">✨ 帶著滿滿能量出發！(再玩一次)</button>
+        <button class="btn-primary" style="margin-top:12px;" onclick="restartClean()">✦ 收起手札，再次啟程</button>
       </div>
 
       <!-- 👑 Jesus 主控台專屬全場統計報告 -->
       <div id="admin-report-view" style="display:none;">
-        <div class="receipt-section" style="background:#f5f3ff; border-color:#ddd6fe; text-align:center;">
-          <h3 style="color:#6d28d9; margin:5px 0;">👑 全場發洩與焦慮總結算</h3>
-          <div style="font-size:0.9rem; color:#475569; font-weight:bold;">本回合全場總共打破壓力氣球：</div>
-          <div style="font-size:2.6rem; color:#f43f5e; font-weight:900; margin:4px 0;"><span id="admin-total-balloons">0</span> <span style="font-size:1rem;">顆</span></div>
+        <div class="receipt-section" style="background:#f5f8fa; border-color:#c9dce8; text-align:center;">
+          <h3 style="color:var(--moon-blue); margin:5px 0; font-family:'Noto Serif TC',serif;">👑 全場旅人釋放總結算</h3>
+          <div style="font-size:0.88rem; color:var(--text-sub);">本回合全場總共拂去壓力氣球：</div>
+          <div style="font-size:2.4rem; color:var(--rose-muted); font-weight:900; margin:4px 0;"><span id="admin-total-balloons">0</span> <span style="font-size:1rem;">顆</span></div>
         </div>
 
         <div class="receipt-section">
@@ -466,15 +492,15 @@
 
         <div class="receipt-section">
           <h4>🔥 全場被打破最多的具體壓力字眼 TOP 8</h4>
-          <div id="admin-balloon-word-breakdown" style="font-size:0.85rem; color:#334155; line-height:1.7;"></div>
+          <div id="admin-balloon-word-breakdown" style="font-size:0.84rem; color:var(--text-main); line-height:1.7;"></div>
         </div>
 
         <div class="receipt-section">
-          <h4>👥 各玩家擊破氣球與最大焦慮明細</h4>
-          <div id="admin-player-summary-list" style="font-size:0.85rem; color:#334155; max-height:180px; overflow-y:auto;"></div>
+          <h4>👥 各旅人擊破氣球與主要思緒明細</h4>
+          <div id="admin-player-summary-list" style="font-size:0.84rem; color:var(--text-main); max-height:180px; overflow-y:auto;"></div>
         </div>
 
-        <button class="btn-primary" style="width:100%; margin-top:10px;" onclick="switchScreen('screen-admin')">🔙 返回主控台面板</button>
+        <button class="btn-primary" style="width:100%; margin-top:10px;" onclick="switchScreen('screen-admin')">返回主控台</button>
       </div>
 
     </div>
@@ -482,7 +508,7 @@
 
   <script>
     // ==========================================
-    // 1. Firebase 與 GAS 設定區 (團體版與個人版共用同一個後台)
+    // 1. Firebase 與 GAS 設定區
     // ==========================================
     const firebaseConfig = {
       apiKey: "AIzaSyCMg6wRRFGtS_i0_XyK65x1TGGom_4OhJ8",
@@ -499,13 +525,16 @@
     const db = firebase.database();
     const GAS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby5zQjffGtHQbviJFg-Cl0wNCSGjjFJaP9MqsoVkaL1TyLViNKgOR89qBvEpGCnl9I/exec";
 
-    // 自動判斷網址是否為「個人暢玩版 (?mode=solo)」
+    // 自動判斷網址是否為「獨立單人暢玩 (?mode=solo)」，外觀完全不顯示差異
     const urlParams = new URLSearchParams(window.location.search);
     let isSoloMode = (urlParams.get('mode') === 'solo');
-    let selectedShareMode = 'solo';
+
+    // 可由主控台動態調整的參數 (預設 15 題、15 秒)
+    let targetQuestionCount = 15;
+    let targetBalloonSeconds = 15;
 
     // ==========================================
-    // 2. Web Audio API 音效引擎 (活潑泡泡聲與輕快點擊聲)
+    // 2. Web Audio API 音效引擎 (溫潤泡泡聲與心跳聲)
     // ==========================================
     let audioCtx;
     let heartbeatTimeout;
@@ -521,13 +550,13 @@
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      const baseFreq = 540 + Math.random() * 240;
+      const baseFreq = 500 + Math.random() * 200;
       osc.frequency.setValueAtTime(baseFreq, t);
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.35, t + 0.08);
-      gain.gain.setValueAtTime(0.45, t);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.1, t + 0.085);
+      gain.gain.setValueAtTime(0.38, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.085);
       osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(t); osc.stop(t + 0.08);
+      osc.start(t); osc.stop(t + 0.085);
     }
 
     function playClickSound() {
@@ -536,9 +565,9 @@
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(480, t);
-      osc.frequency.exponentialRampToValueAtTime(760, t + 0.06);
-      gain.gain.setValueAtTime(0.25, t);
+      osc.frequency.setValueAtTime(440, t);
+      osc.frequency.exponentialRampToValueAtTime(660, t + 0.06);
+      gain.gain.setValueAtTime(0.2, t);
       gain.gain.exponentialRampToValueAtTime(0.01, t + 0.06);
       osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(t); osc.stop(t + 0.06);
@@ -550,10 +579,10 @@
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(60, t); 
-      osc.frequency.exponentialRampToValueAtTime(35, t + 0.1);
+      osc.frequency.setValueAtTime(55, t); 
+      osc.frequency.exponentialRampToValueAtTime(34, t + 0.1);
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.5, t + 0.02);
+      gain.gain.linearRampToValueAtTime(0.42, t + 0.02);
       gain.gain.linearRampToValueAtTime(0, t + 0.1);
       osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(t); osc.stop(t + 0.1);
@@ -568,7 +597,7 @@
         if (elapsed > duration) return;
         playSingleHeartbeat();
         let progress = elapsed / duration;
-        let currentBpm = 65 + (95 * progress); 
+        let currentBpm = 62 + (90 * progress); 
         heartbeatTimeout = setTimeout(nextBeat, 60000 / currentBpm);
       }
       nextBeat();
@@ -577,37 +606,37 @@
     function stopHeartbeat() { clearTimeout(heartbeatTimeout); }
 
     // ==========================================
-    // 3. 擴充版 24 種彩色壓力氣球資料庫
+    // 3. 24 種壓力氣球資料庫 (芙莉蓮溫潤奇幻色調)
     // ==========================================
     const balloonCatalog = [
-      { word: "段考炸裂", cat: "課業與未來", color: "#a855f7" },
-      { word: "模擬考排名", cat: "課業與未來", color: "#9333ea" },
-      { word: "學習歷程檔案", cat: "課業與未來", color: "#8b5cf6" },
-      { word: "怕考不上大學", cat: "課業與未來", color: "#a855f7" },
-      { word: "選錯科系", cat: "課業與未來", color: "#c084fc" },
-      { word: "未來找不到工作", cat: "課業與未來", color: "#9333ea" },
-      { word: "AI搶工作", cat: "課業與未來", color: "#7c3aed" },
-      { word: "備審生不出來", cat: "課業與未來", color: "#a855f7" },
+      { word: "段考炸裂", cat: "課業與未來", color: "#5b7c99" },
+      { word: "模擬考排名", cat: "課業與未來", color: "#4a7c9b" },
+      { word: "學習歷程檔案", cat: "課業與未來", color: "#6889a6" },
+      { word: "怕考不上大學", cat: "課業與未來", color: "#5b7c99" },
+      { word: "選錯科系", cat: "課業與未來", color: "#7395b0" },
+      { word: "未來找不到工作", cat: "課業與未來", color: "#4a7c9b" },
+      { word: "AI搶工作", cat: "課業與未來", color: "#54728c" },
+      { word: "備審生不出來", cat: "課業與未來", color: "#6889a6" },
 
-      { word: "家人沉重期待", cat: "家庭期待", color: "#f43f5e" },
-      { word: "親戚愛比較", cat: "家庭期待", color: "#fb7185" },
-      { word: "爸媽碎念", cat: "家庭期待", color: "#e11d48" },
-      { word: "家庭低氣壓", cat: "家庭期待", color: "#f43f5e" },
+      { word: "家人沉重期待", cat: "家庭期待", color: "#b85d6f" },
+      { word: "親戚愛比較", cat: "家庭期待", color: "#c46d7e" },
+      { word: "爸媽碎念", cat: "家庭期待", color: "#a85263" },
+      { word: "家庭低氣壓", cat: "家庭期待", color: "#b85d6f" },
 
-      { word: "怕被同學討厭", cat: "人際社交", color: "#0ea5e9" },
-      { word: "分組落單", cat: "人際社交", color: "#38bdf8" },
-      { word: "怕背後被議論", cat: "人際社交", color: "#0284c7" },
-      { word: "在班上像透明人", cat: "人際社交", color: "#0ea5e9" },
-      { word: "和朋友冷戰", cat: "人際社交", color: "#38bdf8" },
+      { word: "怕被同學討厭", cat: "人際社交", color: "#7a6f9b" },
+      { word: "分組落單", cat: "人際社交", color: "#887da8" },
+      { word: "怕背後被議論", cat: "人際社交", color: "#6c618c" },
+      { word: "在班上像透明人", cat: "人際社交", color: "#7a6f9b" },
+      { word: "和朋友冷戰", cat: "人際社交", color: "#887da8" },
 
-      { word: "訊息已讀不回", cat: "社群比較", color: "#ec4899" },
-      { word: "朋友聚會沒揪", cat: "社群比較", color: "#f472b6" },
-      { word: "同儕比較壓力", cat: "社群比較", color: "#db2777" },
-      { word: "零用錢見底", cat: "社群比較", color: "#ec4899" },
+      { word: "訊息已讀不回", cat: "社群比較", color: "#c59359" },
+      { word: "朋友聚會沒揪", cat: "社群比較", color: "#b8864c" },
+      { word: "同儕比較壓力", cat: "社群比較", color: "#c59359" },
+      { word: "零用錢見底", cat: "社群比較", color: "#b07d45" },
 
-      { word: "失眠睡不著", cat: "身心耗竭", color: "#10b981" },
-      { word: "每天燃燒殆盡", cat: "身心耗竭", color: "#34d399" },
-      { word: "拖延症自責", cat: "身心耗竭", color: "#059669" }
+      { word: "失眠睡不著", cat: "身心耗竭", color: "#5c8a72" },
+      { word: "每天燃燒殆盡", cat: "身心耗竭", color: "#68997f" },
+      { word: "拖延症自責", cat: "身心耗竭", color: "#4f7a63" }
     ];
 
     // ==========================================
@@ -688,29 +717,29 @@
 
     const microActions = {
       academic: [
-        "把桌面清空只留下一本書，先完成 10 分鐘能做完的小進度就好！",
-        "在紙上寫下 3 件這禮拜你已經做得不錯的小事，給自己一個大大的讚！",
-        "去洗把臉、喝杯冰水或溫水，告訴自己：「一次解決一件事，未來的路會慢慢清晰！」"
+        "把桌面清空只留下一本書，先完成 10 分鐘能做完的小進度就好。",
+        "在紙上寫下 3 件這禮拜你已經做得不錯的小事，肯定自己的步伐。",
+        "去洗把臉、喝杯溫水，告訴自己：「一次解決一件事，前方的路會慢慢清晰。」"
       ],
       fomo: [
-        "給自己 2 小時的「快樂排毒時間」，暫時把 IG 與通知關掉，享受自由！",
-        "主動跟身邊一位真實的朋友聊聊天、擊個掌，感受面對面的溫度！",
-        "去吃一樣自己超喜歡的小點心，不用拍照打卡，單純享受美味當下！"
+        "給自己 2 小時的「靜心時間」，暫時把社群通知關掉，享受片刻自由。",
+        "主動跟身邊一位真實的朋友聊聊天，感受面對面的溫度。",
+        "去吃一樣自己很喜歡的小點心，不用拍照打卡，單純享受當下的美好。"
       ],
       appearance: [
-        "看著鏡子裡的自己比個 YA 微笑 3 秒，謝謝身體今天陪你度過一整天！",
-        "明天選一件自己穿起來最舒服自在的衣服出門！",
-        "減少瀏覽會讓你產生外表比較的帳號，把注意力放回自己可愛的地方！"
+        "看著鏡子裡的自己微笑 3 秒，謝謝身體今天陪你走過一整天。",
+        "明天選一件自己穿起來最舒服自在的衣服出門。",
+        "減少瀏覽會讓你產生外表比較的帳號，把目光放回自己獨特的價值上。"
       ],
       loneliness: [
-        "今天主動對身邊的一位同學、家人或店員說聲「謝謝」或點頭微笑！",
-        "找一位你信任的朋友或夥伴，聊聊最近心裡的一件小事！",
-        "散步 10 分鐘聽首輕快的歌，享受與自己相處的放鬆時光！"
+        "今天主動對身邊的一位同學、家人或店員說聲「謝謝」或點頭微笑。",
+        "找一位你信任的朋友或夥伴，聊聊最近心裡的一件小事。",
+        "散步 10 分鐘聽首平靜的音樂，享受與自己相處的溫柔時光。"
       ],
       fatigue: [
-        "今晚提早 30 分鐘把手機放到床頭碰不到的地方，讓大腦好好充電！",
-        "閉上眼睛伸個大懶腰，做 3 次深呼吸，把緊繃的肩膀放下來！",
-        "允許自己今天有一段「完全不追進度」的快樂放空時間，不用感到罪惡！"
+        "今晚提早 30 分鐘把手機放到床頭碰不到的地方，讓身心好好歇息。",
+        "閉上眼睛做 3 次深長的腹式呼吸，把緊繃的肩膀慢慢放下來。",
+        "允許自己今天有一段「完全不追進度」的留白時間，不用感到罪惡。"
       ]
     };
 
@@ -788,15 +817,15 @@
     let poppedByWord = {};
 
     // ==========================================
-    // 6. LocalStorage 斷線防呆與雙網址初始化
+    // 6. LocalStorage 斷線防呆與初始化
     // ==========================================
     function saveLocalData() {
       if (isJesus) return;
-      localStorage.setItem('anxietyGameData_v5', JSON.stringify({
+      localStorage.setItem('anxietyGameData_v6', JSON.stringify({
         myName, scores, currentQ, balloonPopped, poppedByCat, poppedByWord, activeQuestions, isSoloMode
       }));
     }
-    function clearLocalData() { localStorage.removeItem('anxietyGameData_v5'); }
+    function clearLocalData() { localStorage.removeItem('anxietyGameData_v6'); }
     
     function logout() {
       if (myName && !isSoloMode) db.ref('players/' + myName).remove();
@@ -813,21 +842,47 @@
       return window.location.origin + window.location.pathname;
     }
 
-    function updateLoginModeUI() {
-      if (isSoloMode) {
-        document.getElementById('login-mode-pill').innerText = "🌟 個人隨時暢玩版";
-        document.getElementById('btn-login-start').innerText = "🚀 立即開始挑戰！";
-      } else {
-        document.getElementById('login-mode-pill').innerText = "👥 團體互動連線版";
-        document.getElementById('btn-login-start').innerText = "🚀 進入等候室！";
-      }
+    // 監聽主控台設定的題數與氣球秒數
+    function listenToGameSettings() {
+      db.ref('gameSettings').on('value', snap => {
+        const val = snap.val();
+        if (val) {
+          targetQuestionCount = Math.min(40, Math.max(1, parseInt(val.qCount) || 15));
+          targetBalloonSeconds = Math.min(120, Math.max(5, parseInt(val.bSec) || 15));
+          const qInput = document.getElementById('cfg-q-count');
+          const bInput = document.getElementById('cfg-b-sec');
+          if (qInput && document.activeElement !== qInput) qInput.value = targetQuestionCount;
+          if (bInput && document.activeElement !== bInput) bInput.value = targetBalloonSeconds;
+          updateAdminButtonLabels();
+        }
+      });
+    }
+
+    function saveGameSettings() {
+      const qVal = Math.min(40, Math.max(1, parseInt(document.getElementById('cfg-q-count').value) || 15));
+      const bVal = Math.min(120, Math.max(5, parseInt(document.getElementById('cfg-b-sec').value) || 15));
+      targetQuestionCount = qVal;
+      targetBalloonSeconds = bVal;
+      db.ref('gameSettings').set({ qCount: qVal, bSec: bVal });
+      updateAdminButtonLabels();
+    }
+
+    function updateAdminButtonLabels() {
+      const btnQ = document.getElementById('btn-admin-start-quiz');
+      const btnB = document.getElementById('btn-admin-start-balloon');
+      if (btnQ) btnQ.innerText = `1. 開始 ${targetQuestionCount} 題快問快答 (每題5秒自動推進)`;
+      if (btnB) btnB.innerText = `2. 啟動 ${targetBalloonSeconds} 秒戳氣球 (結束後自動深呼吸結算)`;
     }
 
     window.onload = function() {
-      updateLoginModeUI();
-      switchShareUrlMode(isSoloMode ? 'solo' : 'group');
+      listenToGameSettings();
 
-      const saved = localStorage.getItem('anxietyGameData_v5');
+      // 分享彈窗只單純顯示當前網址與 QR，不露出任何雙模式切換器
+      const currentFullUrl = window.location.href;
+      document.getElementById('share-url-text').innerText = currentFullUrl;
+      document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(currentFullUrl)}`;
+
+      const saved = localStorage.getItem('anxietyGameData_v6');
       if (saved) {
         try {
           const data = JSON.parse(saved);
@@ -838,11 +893,11 @@
             balloonPopped = data.balloonPopped || 0;
             poppedByCat = data.poppedByCat || poppedByCat;
             poppedByWord = data.poppedByWord || {};
-            if (data.activeQuestions && data.activeQuestions.length === 15) {
+            if (data.activeQuestions && data.activeQuestions.length > 0) {
               activeQuestions = data.activeQuestions;
             }
             if (isSoloMode) {
-              if (currentQ < 15) {
+              if (currentQ < activeQuestions.length) {
                 switchScreen('screen-quiz');
                 renderQuestion(currentQ);
               } else {
@@ -860,41 +915,28 @@
     };
 
     // ==========================================
-    // 7. 雙網址 QR Code 切換與 52 經文庫彈窗
+    // 7. 分享彈窗與 52 經文庫彈窗
     // ==========================================
-    function switchShareUrlMode(mode) {
-      selectedShareMode = mode;
-      const base = getBaseUrl();
-      const targetUrl = (mode === 'solo') ? `${base}?mode=solo` : base;
-      
-      document.getElementById('tab-solo-url').className = (mode === 'solo') ? 'url-tab active-tab' : 'url-tab';
-      document.getElementById('tab-group-url').className = (mode === 'group') ? 'url-tab active-tab' : 'url-tab';
-      document.getElementById('share-mode-desc').innerText = (mode === 'solo') 
-        ? "🌟 個人隨時玩網址：不用等主控台，玩家自己按開始、自己按打氣球！" 
-        : "👥 團體控場版網址：適合聚會活動，進等候室由主控台 (Jesus) 統一按開始！";
-      
-      document.getElementById('share-url-text').innerText = targetUrl;
-      document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(targetUrl)}`;
-    }
-
-    function goToSelectedModeNow() {
-      const base = getBaseUrl();
-      clearLocalData();
-      window.location.href = (selectedShareMode === 'solo') ? `${base}?mode=solo` : base;
-    }
-
     function openQrModal() { document.getElementById('qr-modal').style.display = 'flex'; }
     function closeQrModal(e) { if (e.target.id === 'qr-modal') document.getElementById('qr-modal').style.display = 'none'; }
-    function copyGameUrl() {
-      const txt = document.getElementById('share-url-text').innerText;
-      navigator.clipboard.writeText(txt).then(() => alert("✅ 網址已複製好囉！"));
+    function copyCurrentUrl() {
+      navigator.clipboard.writeText(window.location.href).then(() => alert("已複製連結！"));
+    }
+
+    // 主控台專用：複製團康網址或單人獨立網址
+    function copyAdminModeUrl(mode) {
+      const base = getBaseUrl();
+      const url = (mode === 'solo') ? `${base}?mode=solo` : base;
+      navigator.clipboard.writeText(url).then(() => {
+        alert(mode === 'solo' ? "已複製「單人獨立遊玩網址」！" : "已複製「團康控場網址」！");
+      });
     }
 
     function openBibleModal() {
       const container = document.getElementById('all-verses-container');
       let html = "";
       for (let cat in bibleVerses) {
-        html += `<h4 style="color:#f43f5e; margin:14px 0 6px 0; text-align:left;">✦ ${categoryNames[cat]}</h4>`;
+        html += `<h4 style="color:var(--moon-blue); margin:14px 0 6px 0; text-align:left; font-family:'Noto Serif TC',serif;">✦ ${categoryNames[cat]}</h4>`;
         bibleVerses[cat].forEach((v, i) => {
           html += `<div class="verse-list-item">${i+1}. ${v}</div>`;
         });
@@ -904,7 +946,7 @@
     }
 
     // ==========================================
-    // 8. 登入與分流控制 (團體版 vs 個人隨時玩版)
+    // 8. 登入與分流控制
     // ==========================================
     function switchScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -913,11 +955,10 @@
 
     function joinGame() {
       myName = document.getElementById('nickname').value.trim();
-      if (!myName) return alert("請先輸入你的暱稱喔！");
+      if (!myName) return alert("請先寫下你的名字或暱稱！");
       initAudio();
       playClickSound();
       
-      // 任何模式下輸入 Jesus 都可進入主控台查看全場數據
       if (myName.toLowerCase() === "jesus") {
         isJesus = true; 
         isSoloMode = false;
@@ -927,13 +968,12 @@
       }
 
       if (isSoloMode) {
-        // 🌟 個人模式：不用進等候室，直接開始第 1 題！
+        // 單人網址：直接開始題目，不顯示任何等候室或團隊跡象
         db.ref('players/' + myName).set({
           status: 'solo', answeredQ: 0, balloons: 0, poppedByCat: poppedByCat
         });
         startQuizAuto();
       } else {
-        // 👥 團體模式：進等候室等待主控台
         document.getElementById('waiting-my-name').innerText = myName;
         db.ref('players/' + myName).set({
           status: 'active', answeredQ: 0, balloons: 0, poppedByCat: poppedByCat
@@ -949,12 +989,10 @@
     function listenToFirebase() {
       db.ref('players').on('value', snap => {
         totalPlayers = snap.numChildren();
-        document.getElementById('player-count').innerText = `目前夥伴人數: ${totalPlayers}`;
         document.getElementById('admin-player-count').innerText = `目前總參與人數: ${totalPlayers}`;
         
         if (!isJesus && !isSoloMode && myName && !snap.hasChild(myName)) {
           clearLocalData();
-          alert("請重新輸入暱稱加入房間喔！");
           location.reload();
           return;
         }
@@ -967,13 +1005,13 @@
             const val = p.val();
             const pName = p.key;
             const qDone = val.answeredQ || 0;
-            if (qDone >= 15) finishedCount++;
+            if (qDone >= targetQuestionCount) finishedCount++;
             liveBalloons += (val.balloons || 0);
-            const statusBadge = qDone >= 15 ? "✅15/15" : `📝${qDone}/15`;
+            const statusBadge = qDone >= targetQuestionCount ? `✅${targetQuestionCount}/${targetQuestionCount}` : `📝${qDone}/${targetQuestionCount}`;
             listHtml += `<div class="player-chip">${statusBadge} ${pName} (${val.balloons || 0}🎈)<span class="kick-btn" onclick="kickPlayer('${pName}')">✕</span></div>`;
           });
-          document.getElementById('admin-player-list').innerHTML = listHtml || "尚無玩家加入...";
-          document.getElementById('admin-progress-text').innerText = `已完成 15 題人數: ${finishedCount} / ${totalPlayers}`;
+          document.getElementById('admin-player-list').innerHTML = listHtml || "尚無旅人加入...";
+          document.getElementById('admin-progress-text').innerText = `已完成 ${targetQuestionCount} 題人數: ${finishedCount} / ${totalPlayers}`;
           document.getElementById('admin-live-balloon-num').innerText = liveBalloons;
         }
       });
@@ -987,7 +1025,7 @@
       });
 
       db.ref('gameState/currentStage').on('value', snap => {
-        if (isSoloMode) return; // 個人版完全不受主控台階段廣播影響
+        if (isSoloMode) return;
         const stage = snap.val();
         if (!stage || stage === currentStageLocal) return;
         currentStageLocal = stage;
@@ -1018,50 +1056,52 @@
     }
 
     // ==========================================
-    // 9. Jesus 主控台功能
+    // 9. Jesus 主控台功能 (支援動態題數與動態氣球秒數)
     // ==========================================
     function kickPlayer(targetName) {
-      if (confirm(`確定要移出玩家「${targetName}」嗎？`)) {
-        if (confirm(`【二次確認】真的要將「${targetName}」移出房間嗎？`)) {
+      if (confirm(`確定要移出「${targetName}」嗎？`)) {
+        if (confirm(`【二次確認】確定將「${targetName}」移出嗎？`)) {
           db.ref('players/' + targetName).remove();
         }
       }
     }
 
     function adminStartQuiz() {
+      saveGameSettings();
       clearInterval(adminAutoTimer);
       clearTimeout(adminBalloonAutoTimer);
       hasShownResult = false;
       adminDisplayQ = 1;
       document.getElementById('admin-live-balloons').style.display = 'none';
       document.getElementById('btn-miracle').style.display = 'none';
-      document.getElementById('admin-q-title').innerText = `自動快問快答進行中：第 1 / 15 題 (每5秒自動跳題)`;
+      document.getElementById('admin-q-title').innerText = `快問快答進行中：第 1 / ${targetQuestionCount} 題 (每5秒自動推進)`;
       
       db.ref('gameState/currentStage').set('quiz');
 
       adminAutoTimer = setInterval(() => {
         adminDisplayQ++;
-        if (adminDisplayQ <= 15) {
-          document.getElementById('admin-q-title').innerText = `自動快問快答進行中：第 ${adminDisplayQ} / 15 題 (每5秒自動跳題)`;
+        if (adminDisplayQ <= targetQuestionCount) {
+          document.getElementById('admin-q-title').innerText = `快問快答進行中：第 ${adminDisplayQ} / ${targetQuestionCount} 題 (每5秒自動推進)`;
         } else {
           clearInterval(adminAutoTimer);
-          document.getElementById('admin-q-title').innerText = `🎉 15 題時間到！請點擊按鈕 2 啟動戳氣球！`;
+          document.getElementById('admin-q-title').innerText = `✦ ${targetQuestionCount} 題時間到！請點擊按鈕 2 啟動戳氣球！`;
         }
       }, 5000);
     }
 
     function adminStartBalloon() {
+      saveGameSettings();
       clearInterval(adminAutoTimer);
       clearTimeout(adminBalloonAutoTimer);
       hasShownResult = false;
-      document.getElementById('admin-q-title').innerText = `目前階段: 15 秒戳氣球大發洩 (結束後自動深呼吸結算)`;
+      document.getElementById('admin-q-title').innerText = `目前階段: ${targetBalloonSeconds} 秒戳氣球 (結束後自動深呼吸結算)`;
       document.getElementById('admin-live-balloons').style.display = 'block';
       document.getElementById('btn-miracle').style.display = 'block';
       db.ref('gameState/currentStage').set('balloon');
 
       adminBalloonAutoTimer = setTimeout(() => {
         db.ref('gameState/currentStage').set('breathe');
-      }, 15000);
+      }, targetBalloonSeconds * 1000);
     }
 
     function triggerMiracle() {
@@ -1086,13 +1126,13 @@
     }
 
     // ==========================================
-    // 10. 快問快答邏輯 (支援團體同步 5 秒跳題 & 個人自由流暢跳題)
+    // 10. 快問快答邏輯
     // ==========================================
     function startQuizAuto() {
-      if (activeQuestions.length !== 15) {
+      if (activeQuestions.length !== targetQuestionCount) {
         scores = { academic: 0, fomo: 0, appearance: 0, loneliness: 0, fatigue: 0, resilience: 0, future: 0, family: 0, self_doubt: 0, escape: 0, mask: 0, anxiety: 0 };
         let shuffled = [...masterQuestions].sort(() => 0.5 - Math.random());
-        activeQuestions = shuffled.slice(0, 15);
+        activeQuestions = shuffled.slice(0, targetQuestionCount);
         currentQ = 0;
         saveLocalData();
       }
@@ -1103,8 +1143,9 @@
     function showSoloBalloonPrompt() {
       switchScreen('screen-quiz');
       document.getElementById('quiz-waiting-overlay').style.display = 'flex';
-      document.getElementById('quiz-overlay-title').innerText = "🎉 15 題快問快答完成！";
-      document.getElementById('quiz-overlay-sub').innerText = "接下來有 15 秒的時間，畫面上會飄出好多煩惱氣球，用手指把它們全部戳破吧！";
+      document.getElementById('quiz-overlay-title').innerText = "✦ 思緒整理完成";
+      document.getElementById('quiz-overlay-sub').innerText = `接下來有 ${targetBalloonSeconds} 秒的時間，請用手指輕觸或滑過畫面上的壓力氣球，將它們一一拂去吧。`;
+      document.getElementById('btn-solo-start-balloon').innerText = `🎈 開始拂去氣球 (${targetBalloonSeconds}秒)`;
       document.getElementById('btn-solo-start-balloon').style.display = 'block';
       document.getElementById('quiz-timer-sec').innerText = "完成";
     }
@@ -1114,13 +1155,15 @@
       clearInterval(secInterval);
       stopHeartbeat();
 
-      if (qIndex >= 15) {
+      const totalQ = activeQuestions.length || targetQuestionCount;
+
+      if (qIndex >= totalQ) {
         if (isSoloMode) {
           showSoloBalloonPrompt();
         } else {
           document.getElementById('quiz-waiting-overlay').style.display = 'flex';
-          document.getElementById('quiz-overlay-title').innerText = "🎉 15 題快問快答完成！";
-          document.getElementById('quiz-overlay-sub').innerText = "準備好你的雙手，等待帶領者啟動「15 秒戳破煩惱氣球」...";
+          document.getElementById('quiz-overlay-title').innerText = "✦ 思緒整理完成";
+          document.getElementById('quiz-overlay-sub').innerText = "請稍候片刻，即將進入下一段旅程...";
           document.getElementById('btn-solo-start-balloon').style.display = 'none';
           document.getElementById('quiz-timer-sec').innerText = "完成";
         }
@@ -1134,8 +1177,8 @@
       startHeartbeat();
       
       const q = activeQuestions[qIndex];
-      document.getElementById('quiz-progress-label').innerText = `第 ${qIndex + 1} / 15 題`;
-      document.getElementById('question-cat-badge').innerText = q.cat || "日常小劇場";
+      document.getElementById('quiz-progress-label').innerText = `第 ${qIndex + 1} / ${totalQ} 題`;
+      document.getElementById('question-cat-badge').innerText = q.cat || "日常思緒";
       document.getElementById('question-text').innerText = q.q;
       
       let optsHtml = "";
@@ -1193,22 +1236,15 @@
       }
       saveLocalData();
 
-      if (isSoloMode) {
-        // 🌟 個人模式：點完答案後 0.25 秒立刻爽快跳下一題，不用乾等 5 秒！
-        clearTimeout(timer);
-        clearInterval(secInterval);
-        setTimeout(() => { goToNextQuestion(); }, 250);
-      } else {
-        // 👥 團體模式：顯示完成遮罩，維持全場每 5 秒同步跳下一題
-        document.getElementById('quiz-overlay-title').innerText = "✅ 直覺選擇完成！";
-        document.getElementById('quiz-overlay-sub').innerText = "5 秒倒數結束後將自動跳下一題...";
-        document.getElementById('btn-solo-start-balloon').style.display = 'none';
-        document.getElementById('quiz-waiting-overlay').style.display = 'flex';
-      }
+      // 無論是單人網址或團康網址，皆維持每 5 秒同步推進下一題
+      document.getElementById('quiz-overlay-title').innerText = "✦ 已記下你的心聲";
+      document.getElementById('quiz-overlay-sub').innerText = "倒數結束後將自動前往下一題...";
+      document.getElementById('btn-solo-start-balloon').style.display = 'none';
+      document.getElementById('quiz-waiting-overlay').style.display = 'flex';
     }
 
     // ==========================================
-    // 11. 15 秒狂戳氣球大發洩 (結束後自動進入 4 秒深呼吸與結算報告)
+    // 11. 戳氣球發洩 (支援主控台設定的動態秒數)
     // ==========================================
     let balloonInterval;
     let balloonCountdownInterval;
@@ -1228,8 +1264,9 @@
       poppedByCat = { "課業與未來": 0, "家庭期待": 0, "人際社交": 0, "社群比較": 0, "身心耗竭": 0 };
       poppedByWord = {};
       
+      let timeLeft = targetBalloonSeconds;
       document.getElementById('balloon-score').innerText = "0";
-      document.getElementById('balloon-timer').innerText = "15";
+      document.getElementById('balloon-timer').innerText = timeLeft;
       document.getElementById('combo-badge').innerText = "";
       const area = document.getElementById('balloon-area'); 
       area.innerHTML = "";
@@ -1244,7 +1281,6 @@
         }
       };
 
-      let timeLeft = 15;
       clearInterval(balloonCountdownInterval);
       balloonCountdownInterval = setInterval(() => {
         timeLeft--;
@@ -1259,7 +1295,7 @@
         b.className = 'balloon' + (isMiracleActive ? ' blessed' : '');
         b.innerHTML = `<span class="balloon-cat-tag">${item.cat}</span><span>${item.word}</span>`;
         b.style.left = (Math.random() * 80 + 2) + '%'; 
-        b.style.background = `radial-gradient(circle at 30% 30%, #ffffff 0%, ${item.color} 45%, ${item.color} 100%)`;
+        b.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85) 0%, ${item.color} 48%, ${item.color} 100%)`;
         
         let duration = isMiracleActive ? (Math.random() * 2 + 4.2) : (Math.random() * 1.8 + 2.3);
         b.style.animationDuration = duration + 's';
@@ -1276,7 +1312,7 @@
           else balloonCombo = 1;
           lastPopTime = now;
           if (balloonCombo >= 3) {
-            document.getElementById('combo-badge').innerText = `🔥 ${balloonCombo} COMBO 煩惱連環破！`;
+            document.getElementById('combo-badge').innerText = `✦ ${balloonCombo} 連擊釋放`;
           }
 
           let rect = b.getBoundingClientRect();
@@ -1313,41 +1349,41 @@
         setTimeout(() => { if (b.parentNode) b.remove(); }, duration * 1000);
       }, 165); 
       
-      // 15 秒一到，直接自動進入 4 秒深呼吸與結算報告！
+      // 氣球時間結束後，直接自動進入 4 秒深呼吸與結算報告
       balloonEndTimeout = setTimeout(() => {
         clearInterval(balloonInterval);
         clearInterval(balloonCountdownInterval);
         saveLocalData();
         startBreathe();
-      }, 15000);
+      }, targetBalloonSeconds * 1000);
     }
 
     function createPopParticles(x, y, color, word) {
       let popText = document.createElement('div');
       popText.className = 'pop-effect';
-      popText.innerText = `✨ 啵！${word} 退散`;
-      popText.style.left = (x - 50) + 'px';
+      popText.innerText = `✦ ${word} 消散`;
+      popText.style.left = (x - 45) + 'px';
       popText.style.top = (y - 15) + 'px';
       document.body.appendChild(popText);
-      setTimeout(() => popText.remove(), 450);
+      setTimeout(() => popText.remove(), 500);
 
       for (let i = 0; i < 6; i++) {
         let p = document.createElement('div');
         p.className = 'pop-particle';
         p.style.left = x + 'px';
         p.style.top = y + 'px';
-        p.style.background = i % 2 === 0 ? color : '#fbbf24';
+        p.style.background = i % 2 === 0 ? color : '#c5a059';
         let angle = (Math.PI * 2 * i) / 6;
-        let dist = 32 + Math.random() * 25;
+        let dist = 30 + Math.random() * 24;
         p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
         p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
         document.body.appendChild(p);
-        setTimeout(() => p.remove(), 450);
+        setTimeout(() => p.remove(), 550);
       }
     }
 
     // ==========================================
-    // 12. 4 秒深呼吸過場動畫 (結束後自動跳結算)
+    // 12. 4 秒深呼吸過場動畫
     // ==========================================
     let isBreathing = false;
     function startBreathe() {
@@ -1364,7 +1400,7 @@
     }
 
     // ==========================================
-    // 13. 結算報告 (靜默紀錄至同個 Firebase 與 GAS，不顯示任何雲端上傳字眼)
+    // 13. 結算手札報告 (靜默傳送至同一個 Firebase 與 GAS)
     // ==========================================
     let currentTopCat = 'academic';
     let radarChartInstance = null;
@@ -1402,11 +1438,11 @@
 
     function renderSecondaryEmotions() {
       const raw = [
-        { name: "疲倦無力感", val: scores.fatigue + 1, color: "#a855f7" },
-        { name: "孤單怕被遺落", val: scores.loneliness + scores.fomo + 1, color: "#0ea5e9" },
-        { name: "自我懷疑與否定", val: scores.self_doubt + 1, color: "#f43f5e" },
-        { name: "壓抑偽裝與逃避", val: scores.escape + scores.mask + 1, color: "#f59e0b" },
-        { name: "緊繃煩躁與不安", val: scores.anxiety + scores.family + 1, color: "#10b981" }
+        { name: "疲倦無力感", val: scores.fatigue + 1, color: "#5c8a72" },
+        { name: "孤單怕被遺落", val: scores.loneliness + scores.fomo + 1, color: "#4a7c9b" },
+        { name: "自我懷疑與否定", val: scores.self_doubt + 1, color: "#b85d6f" },
+        { name: "壓抑偽裝與逃避", val: scores.escape + scores.mask + 1, color: "#c5a059" },
+        { name: "緊繃煩躁與不安", val: scores.anxiety + scores.family + 1, color: "#7a6f9b" }
       ];
       const total = raw.reduce((sum, item) => sum + item.val, 0) || 1;
       let html = "";
@@ -1465,9 +1501,9 @@
                 globalCats[c] += (val.poppedByCat[c] || 0);
               }
             }
-            playerRows += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #e2e8f0;">
+            playerRows += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-line);">
               <span><strong>${p.key}</strong> (${val.topCategory || '已完成'})</span>
-              <span style="color:#f43f5e; font-weight:bold;">打破 ${bCount} 顆 🎈</span>
+              <span style="color:var(--rose-muted); font-weight:bold;">拂去 ${bCount} 顆 🎈</span>
             </div>`;
           });
 
@@ -1478,7 +1514,7 @@
             catHtml += `<div class="balloon-stat-item"><span>${c}</span><span class="balloon-stat-count">${globalCats[c]} 顆</span></div>`;
           }
           document.getElementById('admin-balloon-cat-breakdown').innerHTML = catHtml;
-          document.getElementById('admin-player-summary-list').innerHTML = playerRows || "尚無玩家資料";
+          document.getElementById('admin-player-summary-list').innerHTML = playerRows || "尚無旅人資料";
         });
 
         db.ref('balloonWordsGlobal').on('value', snap => {
@@ -1486,7 +1522,7 @@
           snap.forEach(w => { wordsArr.push({ word: w.key, count: w.val() }); });
           wordsArr.sort((a, b) => b.count - a.count);
           let topWordsHtml = wordsArr.slice(0, 8).map((item, idx) => 
-            `<span style="display:inline-block; background:#fff; border:1px solid #cbd5e1; border-radius:12px; padding:3px 10px; margin:3px; font-weight:bold;">#${idx+1} ${item.word} (${item.count}顆)</span>`
+            `<span style="display:inline-block; background:#fff; border:1px solid var(--border-line); border-radius:10px; padding:3px 10px; margin:3px; font-weight:600;">#${idx+1} ${item.word} (${item.count}顆)</span>`
           ).join('');
           document.getElementById('admin-balloon-word-breakdown').innerHTML = topWordsHtml || "尚無氣球紀錄";
         });
@@ -1506,7 +1542,7 @@
 
         const cScores = getConsolidatedScores();
         
-        // 靜默寫入同一個 Firebase 節點與 GAS，畫面不顯示任何提示
+        // 背景靜默寫入 Firebase 與 GAS，不顯示任何文字提示
         db.ref('players/' + myName).update({
           topCategory: remedies.topName,
           scores: cScores,
@@ -1541,12 +1577,12 @@
         data: {
           labels: ['未來/課業/家長期望', '社群比較與偽裝', '外表與自我形象', '人際與怕被孤立', '身心耗竭與拖延'],
           datasets: [{
-            label: '煩惱指數',
+            label: '思緒比重',
             data: [cScores.academic, cScores.fomo, cScores.appearance, cScores.loneliness, cScores.fatigue],
-            backgroundColor: 'rgba(255, 107, 139, 0.25)',
-            borderColor: '#ff6b8b',
-            pointBackgroundColor: '#a855f7',
-            borderWidth: 2.5
+            backgroundColor: 'rgba(74, 124, 155, 0.22)',
+            borderColor: '#4a7c9b',
+            pointBackgroundColor: '#c5a059',
+            borderWidth: 2
           }]
         },
         options: { 
