@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>慮易on燃</title>
+  <title>慮易on燃 - 心靈解壓縮</title>
   <!-- 引入 Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -61,12 +61,12 @@
       display: none; position: relative; z-index: 1;
       width: 100vw; height: 100vh; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 20px; overflow-y: auto; animation: fadeIn 0.4s ease-out;
+      padding: 20px; overflow-y: auto; animation: fadeIn 0.35s ease-out;
     }
     .active { display: flex; }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
@@ -110,6 +110,10 @@
       border-color: var(--secondary); background: rgba(88, 28, 135, 0.65); 
       box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
     }
+    .btn-option.selected-opt {
+      border-color: var(--success); background: rgba(20, 184, 166, 0.3);
+      box-shadow: 0 0 18px rgba(20, 184, 166, 0.45);
+    }
 
     /* 快問快答進度與計時 */
     .quiz-header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; color: #cbd5e1; }
@@ -133,15 +137,16 @@
     
     #quiz-waiting-overlay { 
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-      background: rgba(7, 9, 19, 0.92); border-radius: 16px; flex-direction: column; 
-      align-items: center; justify-content: center; z-index: 10; font-size: 1.3rem; 
-      color: var(--success); font-weight: bold; text-align: center; backdrop-filter: blur(6px);
+      background: rgba(7, 9, 19, 0.88); border-radius: 16px; flex-direction: column; 
+      align-items: center; justify-content: center; z-index: 10; font-size: 1.25rem; 
+      color: var(--success); font-weight: bold; text-align: center; backdrop-filter: blur(5px);
+      padding: 20px;
     }
 
     /* 主控台樣式 */
     .admin-container { width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
     .admin-dashboard { background: rgba(30,27,75,0.85); padding: 15px; border-radius: 14px; width: 100%; text-align: center; margin: 10px 0; border: 1px solid var(--primary); }
-    .progress-text { font-size: 1.5rem; font-weight: bold; color: var(--success); margin: 6px 0; }
+    .progress-text { font-size: 1.45rem; font-weight: bold; color: var(--success); margin: 6px 0; }
     .player-list-box { width: 100%; background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 12px; padding: 10px; margin: 10px 0; max-height: 150px; overflow-y: auto; }
     .player-chip { display: inline-flex; align-items: center; background: #1e293b; color: #f8fafc; padding: 5px 10px; border-radius: 16px; font-size: 0.82rem; margin: 4px; border: 1px solid #475569; }
     .player-chip span.kick-btn { color: var(--danger); margin-left: 6px; cursor: pointer; font-weight: bold; }
@@ -304,12 +309,11 @@
       <!-- 答題進度與氣球即時控場儀表板 -->
       <div id="admin-dashboard" class="admin-dashboard" style="display:block;">
         <div id="admin-q-title" style="font-size:1.05rem; font-weight:bold; color:#e2e8f0;">目前階段: 等候開始</div>
-        <div id="admin-progress-text" class="progress-text">已答: 0 / 0</div>
-        <div id="admin-live-balloons" style="font-size:1rem; color:var(--gold); margin-bottom:8px; display:none;">🎈 全場即時擊破氣球：<span id="admin-live-balloon-num" style="font-size:1.4rem; font-weight:900;">0</span> 顆</div>
-        <button class="btn-primary" id="btn-next-q" onclick="adminNextQuestion()" style="width:100%; padding:12px; font-size:1rem; display:none;">⏭️ 切換下一題</button>
+        <div id="admin-progress-text" class="progress-text">已完成題數人數: 0 / 0</div>
+        <div id="admin-live-balloons" style="font-size:1rem; color:var(--gold); margin-bottom:4px; display:none;">🎈 全場即時擊破氣球：<span id="admin-live-balloon-num" style="font-size:1.4rem; font-weight:900;">0</span> 顆</div>
       </div>
 
-      <button class="btn-primary" onclick="adminStartQuiz()" style="width:100%; max-width:480px; margin-bottom:8px;">1. 開始 15 題快問快答 (每題5秒)</button>
+      <button class="btn-primary" onclick="adminStartQuiz()" style="width:100%; max-width:480px; margin-bottom:8px;">1. 開始 15 題快問快答 (每題5秒自動跳題)</button>
       <button class="btn-danger" onclick="adminStartBalloon()" style="width:100%; max-width:480px;">2. 確認啟動 15 秒戳破焦慮氣球</button>
       <button class="btn-gold" id="btn-miracle" onclick="triggerMiracle()" style="width:100%; max-width:480px; display:none;">✨ 賜下平安 (全場氣球變大慢速！)</button>
       <button class="btn-primary" style="background:var(--success); margin-top:8px; width:100%; max-width:480px;" onclick="setStage('breathe')">3. 結束並進入深呼吸與結算報告</button>
@@ -317,7 +321,7 @@
     </div>
   </div>
 
-  <!-- 4. 快問快答 -->
+  <!-- 4. 快問快答 (每5秒自動跳下一題) -->
   <div id="screen-quiz" class="screen">
     <div class="quiz-header">
       <span id="quiz-progress-label">Question 1 / 15</span>
@@ -331,8 +335,8 @@
       </div>
       <div id="options-container"></div>
       <div id="quiz-waiting-overlay">
-        <div>✅ 已記錄你的直覺選擇！</div>
-        <div style="font-size:0.95rem; color:#cbd5e1; margin-top:10px; font-weight:normal;">等待帶領者切換下一題...</div>
+        <div id="quiz-overlay-title">✅ 已記錄選擇！</div>
+        <div id="quiz-overlay-sub" style="font-size:0.95rem; color:#cbd5e1; margin-top:10px; font-weight:normal;">倒數結束後將自動進入下一題...</div>
       </div>
     </div>
   </div>
@@ -375,13 +379,13 @@
           <canvas id="radarChart" style="max-height:220px;"></canvas>
         </div>
 
-        <!-- 找回：5種其他情緒占比 -->
+        <!-- 5種其他情緒占比 -->
         <div class="receipt-section">
           <h4><span>📊 伴隨其他情緒占比</span></h4>
           <div id="secondary-emotions-box"></div>
         </div>
 
-        <!-- 新增：這回合打破的氣球總數與各類型數量 -->
+        <!-- 這回合打破的氣球總數與各類型數量 -->
         <div class="receipt-section" style="background:#f5f3ff; border-color:#ddd6fe;">
           <h4>
             <span>🎈 這回合你擊破的壓力氣球</span>
@@ -466,7 +470,7 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    // 清脆泡泡破掉音效 (隨機微調音高，連戳時更有節奏感)
+    // 清脆泡泡破掉音效
     function playPopSound() {
       if (!audioCtx) return;
       const t = audioCtx.currentTime;
@@ -531,7 +535,7 @@
     function stopHeartbeat() { clearTimeout(heartbeatTimeout); }
 
     // ==========================================
-    // 3. 擴充版 24 種壓力氣球分類資料庫 (已刪除打手遊逃避)
+    // 3. 擴充版 24 種壓力氣球分類資料庫
     // ==========================================
     const balloonCatalog = [
       { word: "段考炸裂", cat: "課業與未來", color: "#8b5cf6" },
@@ -668,7 +672,7 @@
       ]
     };
 
-    // 40 題完整題庫 (已刪除打手遊字眼，強化未來大學、工作、家人期待與怕同儕關係不好)
+    // 40 題完整題庫
     const masterQuestions = [
       { cat: "未來升學與出路", q: "想到未來要考大學或選科系，完全不知道自己對什麼有興趣。", opts: [{ text: "覺得很茫然，乾脆先不去想，過一天算一天", tags: { escape: 2, future: 2 } }, { text: "壓力很大，怕選錯科系以後出社會找不到好工作", tags: { academic: 2, future: 2 } }, { text: "找信任的學長姐或師長聊聊，一步步探索方向", tags: { resilience: 2 } }]},
       { cat: "家人期待壓力", q: "長輩常說「現在不好好讀書，以後出社會只能領底薪」，聽了心裡很煩。", opts: [{ text: "直接臭臉走開或關起房門，心裡超悶", tags: { family: 2, fatigue: 1 } }, { text: "默默把焦慮吞下去，覺得自己好像真的很失敗", tags: { self_doubt: 2, family: 2 } }, { text: "明白長輩只是擔心，把專注力放回自己能掌控的事", tags: { resilience: 2 } }]},
@@ -722,11 +726,14 @@
     let myName = "";
     let isJesus = false;
     let activeQuestions = []; 
-    let clientCurrentQ = -1; 
-    let adminCurrentQ = 0;
+    let currentQ = 0; // 本地自動推進題號 (0~14)
+    let hasAnsweredThisQ = false;
     let totalPlayers = 0;
     let timer;
     let secInterval;
+    let adminAutoTimer;
+    let adminDisplayQ = 0;
+    let currentStageLocal = "";
     let scores = { academic: 0, fomo: 0, appearance: 0, loneliness: 0, fatigue: 0, resilience: 0, future: 0, family: 0, self_doubt: 0, escape: 0, mask: 0, anxiety: 0 };
     
     // 氣球統計變數
@@ -742,11 +749,11 @@
     // ==========================================
     function saveLocalData() {
       if (isJesus) return;
-      localStorage.setItem('anxietyGameData_v2', JSON.stringify({
-        myName, scores, clientCurrentQ, balloonPopped, poppedByCat, poppedByWord, activeQuestions
+      localStorage.setItem('anxietyGameData_v3', JSON.stringify({
+        myName, scores, currentQ, balloonPopped, poppedByCat, poppedByWord, activeQuestions
       }));
     }
-    function clearLocalData() { localStorage.removeItem('anxietyGameData_v2'); }
+    function clearLocalData() { localStorage.removeItem('anxietyGameData_v3'); }
     function logout() {
       if (myName) db.ref('players/' + myName).remove();
       clearLocalData();
@@ -754,20 +761,18 @@
     }
 
     window.onload = function() {
-      // 初始化分享網址與 QR
       const url = window.location.href;
       document.getElementById('share-url-text').innerText = url;
       document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}`;
 
-      // 檢查斷線存檔
-      const saved = localStorage.getItem('anxietyGameData_v2');
+      const saved = localStorage.getItem('anxietyGameData_v3');
       if (saved) {
         try {
           const data = JSON.parse(saved);
           if (data.myName) {
             myName = data.myName;
             scores = data.scores || scores;
-            clientCurrentQ = data.clientCurrentQ !== undefined ? data.clientCurrentQ : -1;
+            currentQ = data.currentQ || 0;
             balloonPopped = data.balloonPopped || 0;
             poppedByCat = data.poppedByCat || poppedByCat;
             poppedByWord = data.poppedByWord || {};
@@ -775,7 +780,7 @@
               activeQuestions = data.activeQuestions;
             }
             document.getElementById('waiting-my-name').innerText = myName;
-            db.ref('players/' + myName).update({ status: 'active', answeredQ: clientCurrentQ, balloons: balloonPopped });
+            db.ref('players/' + myName).update({ status: 'active', answeredQ: currentQ, balloons: balloonPopped });
             switchScreen('screen-waiting');
             listenToFirebase();
           }
@@ -825,7 +830,7 @@
       } else {
         document.getElementById('waiting-my-name').innerText = myName;
         db.ref('players/' + myName).set({
-          status: 'active', answeredQ: -1, balloons: 0,
+          status: 'active', answeredQ: 0, balloons: 0,
           poppedByCat: poppedByCat
         });
         saveLocalData();
@@ -837,13 +842,12 @@
     function setStage(stage) { db.ref('gameState/currentStage').set(stage); }
 
     function listenToFirebase() {
-      // 監聽玩家名單、人數與踢人狀態
+      // 監聽玩家名單、答題進度與踢人狀態
       db.ref('players').on('value', snap => {
         totalPlayers = snap.numChildren();
         document.getElementById('player-count').innerText = `目前連線人數: ${totalPlayers}`;
         document.getElementById('admin-player-count').innerText = `目前連線人數: ${totalPlayers}`;
         
-        // 若自己被主控台踢除
         if (!isJesus && myName && !snap.hasChild(myName)) {
           clearLocalData();
           alert("你已被主控台移出房間，請重新登入。");
@@ -852,24 +856,25 @@
         }
 
         if (isJesus) {
-          let ansCount = 0;
+          let finishedCount = 0;
           let liveBalloons = 0;
           let listHtml = "";
           snap.forEach(p => {
             const val = p.val();
             const pName = p.key;
-            if (val.answeredQ >= adminCurrentQ) ansCount++;
+            const qDone = val.answeredQ || 0;
+            if (qDone >= 15) finishedCount++;
             liveBalloons += (val.balloons || 0);
-            const doneMark = (val.answeredQ >= adminCurrentQ) ? "✅" : "⏳";
-            listHtml += `<div class="player-chip">${doneMark} ${pName} (${val.balloons || 0}🎈)<span class="kick-btn" onclick="kickPlayer('${pName}')">✕</span></div>`;
+            const statusBadge = qDone >= 15 ? "✅15/15" : `📝${qDone}/15`;
+            listHtml += `<div class="player-chip">${statusBadge} ${pName} (${val.balloons || 0}🎈)<span class="kick-btn" onclick="kickPlayer('${pName}')">✕</span></div>`;
           });
           document.getElementById('admin-player-list').innerHTML = listHtml || "尚無玩家加入...";
-          document.getElementById('admin-progress-text').innerText = `本題已答: ${ansCount} / ${totalPlayers}`;
+          document.getElementById('admin-progress-text').innerText = `已完成 15 題人數: ${finishedCount} / ${totalPlayers}`;
           document.getElementById('admin-live-balloon-num').innerText = liveBalloons;
         }
       });
 
-      // 監聽主控台神蹟祝福 (氣球變大慢速)
+      // 監聽主控台神蹟祝福
       db.ref('gameState/miracle').on('value', snap => {
         if (snap.val() && !isJesus) {
           isMiracleActive = true;
@@ -881,34 +886,32 @@
       // 監聽全局階段切換
       db.ref('gameState/currentStage').on('value', snap => {
         const stage = snap.val();
+        if (!stage || stage === currentStageLocal) return;
+        currentStageLocal = stage;
+
         if (isJesus) {
           if (stage === 'breathe') setTimeout(() => showResult(), 4000);
           else if (stage === 'result') showResult();
           return;
         }
-        if (stage === 'quiz') startQuizIfNeeded();
+
+        if (stage === 'quiz') startQuizAuto();
         else if (stage === 'balloon') startBalloon();
         else if (stage === 'breathe') startBreathe();
         else if (stage === 'result') showResult();
-        else if (stage === 'waiting') switchScreen('screen-waiting');
-      });
-
-      // 監聽當前題號切換
-      db.ref('gameState/currentQ').on('value', snap => {
-        const qIndex = snap.val();
-        if (qIndex !== null && qIndex !== undefined && !isJesus) {
-          startQuizIfNeeded();
-          if (qIndex !== clientCurrentQ) {
-            clientCurrentQ = qIndex;
-            switchScreen('screen-quiz');
-            renderQuestion(clientCurrentQ);
-          }
+        else if (stage === 'waiting') {
+          clearTimeout(timer);
+          clearInterval(secInterval);
+          stopHeartbeat();
+          currentQ = 0;
+          activeQuestions = [];
+          switchScreen('screen-waiting');
         }
       });
     }
 
     // ==========================================
-    // 9. Jesus 主控台專屬功能 (踢人雙重確認、控場、神蹟)
+    // 9. Jesus 主控台專屬功能 (只需按一次開始)
     // ==========================================
     function kickPlayer(targetName) {
       if (confirm(`確定要踢除玩家「${targetName}」嗎？`)) {
@@ -919,34 +922,29 @@
     }
 
     function adminStartQuiz() {
-      adminCurrentQ = 0;
-      document.getElementById('btn-next-q').style.display = 'block';
+      clearInterval(adminAutoTimer);
+      adminDisplayQ = 1;
       document.getElementById('admin-live-balloons').style.display = 'none';
       document.getElementById('btn-miracle').style.display = 'none';
-      updateAdminDashboardUI();
+      document.getElementById('admin-q-title').innerText = `自動快問快答進行中：第 1 / 15 題 (每5秒自動跳題)`;
+      
       db.ref('gameState/currentStage').set('quiz');
-      db.ref('gameState/currentQ').set(0);
-    }
 
-    function adminNextQuestion() {
-      adminCurrentQ++;
-      if (adminCurrentQ >= 15) {
-        alert("🎉 15 題已全數作答完畢！請點擊下方紅色按鈕啟動「15 秒戳破焦慮氣球」！");
-        adminCurrentQ = 14;
-        return;
-      }
-      updateAdminDashboardUI();
-      db.ref('gameState/currentQ').set(adminCurrentQ);
-    }
-
-    function updateAdminDashboardUI() {
-      document.getElementById('admin-q-title').innerText = `快問快答進度: 第 ${adminCurrentQ + 1} 題 / 共 15 題`;
-      document.getElementById('btn-next-q').innerText = (adminCurrentQ === 14) ? "✅ 已是最後一題" : `⏭️ 切換下一題 (第 ${adminCurrentQ + 2} 題)`;
+      // 主控台同步顯示目前全場自動推進的題號
+      adminAutoTimer = setInterval(() => {
+        adminDisplayQ++;
+        if (adminDisplayQ <= 15) {
+          document.getElementById('admin-q-title').innerText = `自動快問快答進行中：第 ${adminDisplayQ} / 15 題 (每5秒自動跳題)`;
+        } else {
+          clearInterval(adminAutoTimer);
+          document.getElementById('admin-q-title').innerText = `🎉 15 題時間到！請點擊按鈕 2 啟動戳氣球！`;
+        }
+      }, 5000);
     }
 
     function adminStartBalloon() {
-      document.getElementById('admin-q-title').innerText = `目前階段: 15 秒戳氣球大發洩`;
-      document.getElementById('btn-next-q').style.display = 'none';
+      clearInterval(adminAutoTimer);
+      document.getElementById('admin-q-title').innerText = `目前階段: 15 秒戳氣球大發洩進行中！`;
       document.getElementById('admin-live-balloons').style.display = 'block';
       document.getElementById('btn-miracle').style.display = 'block';
       db.ref('gameState/currentStage').set('balloon');
@@ -958,34 +956,49 @@
 
     function adminResetGame() {
       if (!confirm("確定要重置全場遊戲進度與氣球統計嗎？")) return;
-      db.ref('gameState').set({ currentStage: 'waiting', currentQ: null, miracle: null });
+      clearInterval(adminAutoTimer);
+      db.ref('gameState').set({ currentStage: 'waiting', miracle: null });
       db.ref('balloonWordsGlobal').remove();
       db.ref('players').once('value', snap => {
         snap.forEach(p => {
-          db.ref('players/' + p.key).update({ answeredQ: -1, balloons: 0, poppedByCat: null, topCategory: null });
+          db.ref('players/' + p.key).update({ answeredQ: 0, balloons: 0, poppedByCat: null, topCategory: null });
         });
       });
       document.getElementById('admin-q-title').innerText = "目前階段: 等候開始";
-      document.getElementById('btn-next-q').style.display = 'none';
       document.getElementById('admin-live-balloons').style.display = 'none';
       document.getElementById('btn-miracle').style.display = 'none';
     }
 
     // ==========================================
-    // 10. 快問快答邏輯 (40 題隨機抽 15 題，每題 5 秒)
+    // 10. 快問快答邏輯 (每題固定 5 秒，時間到全場自動跳下一題！)
     // ==========================================
-    function startQuizIfNeeded() {
+    function startQuizAuto() {
       if (activeQuestions.length !== 15) {
         scores = { academic: 0, fomo: 0, appearance: 0, loneliness: 0, fatigue: 0, resilience: 0, future: 0, family: 0, self_doubt: 0, escape: 0, mask: 0, anxiety: 0 };
         let shuffled = [...masterQuestions].sort(() => 0.5 - Math.random());
         activeQuestions = shuffled.slice(0, 15);
+        currentQ = 0;
         saveLocalData();
       }
       switchScreen('screen-quiz');
+      renderQuestion(currentQ);
     }
 
     function renderQuestion(qIndex) {
-      if (qIndex < 0 || qIndex >= activeQuestions.length) return;
+      clearTimeout(timer);
+      clearInterval(secInterval);
+      stopHeartbeat();
+
+      // 15 題全部完成後等待主控台啟動氣球
+      if (qIndex >= 15) {
+        document.getElementById('quiz-waiting-overlay').style.display = 'flex';
+        document.getElementById('quiz-overlay-title').innerText = "🎉 15 題快問快答完成！";
+        document.getElementById('quiz-overlay-sub').innerText = "請準備好你的雙手，等待主控台啟動「15 秒戳破焦慮氣球」...";
+        document.getElementById('quiz-timer-sec').innerText = "完成";
+        return;
+      }
+
+      hasAnsweredThisQ = false;
       document.getElementById('quiz-waiting-overlay').style.display = 'none';
       
       startHeartbeat();
@@ -997,51 +1010,73 @@
       
       let optsHtml = "";
       q.opts.forEach((opt, idx) => {
-        optsHtml += `<button class="btn-option" onclick="answer(${idx})">${opt.text}</button>`;
+        optsHtml += `<button class="btn-option" id="opt-btn-${idx}" onclick="answer(${idx})">${opt.text}</button>`;
       });
       document.getElementById('options-container').innerHTML = optsHtml;
 
       // 5秒進度條與秒數顯示
       let progress = document.getElementById('timer-progress');
-      progress.style.transition = 'none'; progress.style.width = '100%';
-      setTimeout(() => { progress.style.transition = 'width 5s linear'; progress.style.width = '0%'; }, 40);
+      progress.style.transition = 'none';
+      progress.style.width = '100%';
+      setTimeout(() => {
+        progress.style.transition = 'width 5s linear';
+        progress.style.width = '0%';
+      }, 40);
 
       let startT = Date.now();
-      clearInterval(secInterval);
       secInterval = setInterval(() => {
         let left = Math.max(0, 5 - (Date.now() - startT) / 1000);
         document.getElementById('quiz-timer-sec').innerText = `⏱️ ${left.toFixed(1)}s`;
       }, 100);
 
-      clearTimeout(timer);
-      timer = setTimeout(() => { answer(-1); }, 5000);
+      // 固定滿 5 秒自動進入下一題 (全場同步節奏)
+      timer = setTimeout(() => {
+        clearInterval(secInterval);
+        stopHeartbeat();
+        currentQ++;
+        if (!isJesus && myName) {
+          db.ref('players/' + myName + '/answeredQ').set(currentQ);
+          saveLocalData();
+        }
+        renderQuestion(currentQ);
+      }, 5000);
     }
 
     function answer(optIndex) {
-      clearTimeout(timer);
-      clearInterval(secInterval);
+      if (hasAnsweredThisQ) return;
+      hasAnsweredThisQ = true;
+      
       stopHeartbeat();
       playClickSound();
       
-      if (optIndex !== -1 && activeQuestions[clientCurrentQ]) {
-        const tags = activeQuestions[clientCurrentQ].opts[optIndex].tags;
+      const btn = document.getElementById(`opt-btn-${optIndex}`);
+      if (btn) btn.classList.add('selected-opt');
+
+      if (optIndex !== -1 && activeQuestions[currentQ]) {
+        const tags = activeQuestions[currentQ].opts[optIndex].tags;
         for (let key in tags) {
           if (scores[key] !== undefined) scores[key] += tags[key];
         }
       }
+
+      document.getElementById('quiz-overlay-title').innerText = "✅ 已記錄直覺選擇！";
+      document.getElementById('quiz-overlay-sub').innerText = "5 秒倒數結束後將自動跳下一題...";
       document.getElementById('quiz-waiting-overlay').style.display = 'flex';
-      db.ref('players/' + myName + '/answeredQ').set(clientCurrentQ);
       saveLocalData();
     }
 
     // ==========================================
-    // 11. 15 秒狂戳氣球大發洩 (多種類、滑過連爆、分類統計、無震動)
+    // 11. 15 秒狂戳氣球大發洩
     // ==========================================
     let balloonInterval;
     let balloonCountdownInterval;
 
     function startBalloon() {
+      clearTimeout(timer);
+      clearInterval(secInterval);
+      stopHeartbeat();
       initAudio();
+
       switchScreen('screen-balloon');
       balloonPopped = 0; 
       balloonCombo = 0;
@@ -1054,7 +1089,7 @@
       const area = document.getElementById('balloon-area'); 
       area.innerHTML = "";
 
-      // 支援手指滑過連爆 (Swipe to pop)
+      // 手指滑過連爆
       area.ontouchmove = function(e) {
         for (let i = 0; i < e.touches.length; i++) {
           let t = e.touches[i];
@@ -1065,7 +1100,6 @@
         }
       };
 
-      // 15 秒倒數計時器
       let timeLeft = 15;
       clearInterval(balloonCountdownInterval);
       balloonCountdownInterval = setInterval(() => {
@@ -1074,7 +1108,6 @@
         if (timeLeft <= 0) clearInterval(balloonCountdownInterval);
       }, 1000);
       
-      // 高密度生成氣球 (每 170ms 一顆，畫面超豐富)
       clearInterval(balloonInterval);
       balloonInterval = setInterval(() => {
         let item = balloonCatalog[Math.floor(Math.random() * balloonCatalog.length)];
@@ -1092,9 +1125,8 @@
         b.popFunc = function(cx, cy) {
           if (isPopped) return;
           isPopped = true;
-          playPopSound(); // 清脆泡泡破掉聲 (無震動)
+          playPopSound();
           
-          // Combo 連擊計算
           let now = Date.now();
           if (now - lastPopTime < 750) balloonCombo++;
           else balloonCombo = 1;
@@ -1103,7 +1135,6 @@
             document.getElementById('combo-badge').innerText = `🔥 ${balloonCombo} COMBO 連擊破除！`;
           }
 
-          // 粒子爆破動畫
           let rect = b.getBoundingClientRect();
           let px = cx || (rect.left + rect.width / 2);
           let py = cy || (rect.top + rect.height / 2);
@@ -1138,7 +1169,6 @@
         setTimeout(() => { if (b.parentNode) b.remove(); }, duration * 1000);
       }, 170); 
       
-      // 15 秒結束顯示統計預覽
       setTimeout(() => {
         clearInterval(balloonInterval);
         clearInterval(balloonCountdownInterval);
@@ -1268,7 +1298,6 @@
       document.getElementById('r-date').innerText = new Date().toLocaleDateString('zh-TW');
 
       if (isJesus) {
-        // 👑 主控台視角：顯示全場總氣球數、分類明細與各玩家列表
         document.getElementById('player-report-view').style.display = 'none';
         document.getElementById('admin-report-view').style.display = 'block';
 
@@ -1313,7 +1342,6 @@
         });
 
       } else {
-        // 👤 一般玩家視角：只看自己的報告、雷達圖、副情緒、個人氣球統計與專屬經文
         document.getElementById('player-report-view').style.display = 'block';
         document.getElementById('admin-report-view').style.display = 'none';
         
@@ -1326,7 +1354,6 @@
         renderSecondaryEmotions();
         renderPlayerBalloonBreakdown();
 
-        // 更新玩家最高焦慮類別至 Firebase 供主控台檢視
         db.ref('players/' + myName).update({ topCategory: remedies.topName });
 
         const cScores = getConsolidatedScores();
