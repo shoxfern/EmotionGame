@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>慮易on燃 - 心情旅途</title>
+  <title>慮易on燃 - 心靈旅途手札</title>
   <!-- 引入字體與套件 -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,15 +14,15 @@
     :root {
       /* 蒼月草與羊皮紙奇幻溫潤色調 */
       --bg-gradient: linear-gradient(160deg, #f5f2eb 0%, #e6eef2 55%, #eef2eb 100%);
-      --parchment: rgba(252, 250, 245, 0.94);
+      --parchment: rgba(252, 250, 245, 0.95);
       --moon-blue: #4a7c9b;
       --moon-light: #7da8c4;
       --sage-green: #5c8a72;
       --gold-accent: #c5a059;
       --gold-light: #e6d3a7;
       --rose-muted: #b85d6f;
-      --text-main: #2c353d;
-      --text-sub: #606f7b;
+      --text-main: #242c33;
+      --text-sub: #54636e;
       --border-line: #dcd6c8;
     }
 
@@ -34,27 +34,32 @@
       color: var(--text-main);
       font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
       overflow: hidden; width: 100vw; height: 100vh;
+      font-size: 17px;
     }
 
-    /* 漂浮魔法微光與蒼月草花瓣背景 */
+    /* 漂浮魔法微光與豐富泡泡背景 */
     .bg-mana {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none; z-index: 0; overflow: hidden;
     }
     .mana-orb {
-      position: absolute; bottom: -80px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(125,168,196,0.35) 60%, transparent 100%);
-      box-shadow: 0 0 18px rgba(197, 160, 89, 0.3);
+      position: absolute; bottom: -100px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(125,168,196,0.42) 60%, rgba(197,160,89,0.2) 100%);
+      box-shadow: 0 0 20px rgba(197, 160, 89, 0.35), inset 0 0 10px rgba(255,255,255,0.8);
       animation: floatMana linear infinite;
     }
     @keyframes floatMana {
-      0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
-      20% { opacity: 0.65; }
-      80% { opacity: 0.65; }
-      100% { transform: translateY(-110vh) translateX(25px) scale(1.15); opacity: 0; }
+      0% { transform: translateY(0) translateX(0) scale(0.85); opacity: 0; }
+      15% { opacity: 0.75; }
+      85% { opacity: 0.75; }
+      100% { transform: translateY(-115vh) translateX(30px) scale(1.2); opacity: 0; }
     }
 
-    /* 頂部工具列 */
+    /* 頂部左右工具列 (含團隊常駐登出按鈕) */
+    .top-bar-left {
+      position: fixed; top: 14px; left: 16px; z-index: 100;
+      display: none;
+    }
     .top-bar {
       position: fixed; top: 14px; right: 16px; z-index: 100;
       display: flex; gap: 8px;
@@ -62,16 +67,19 @@
     .btn-top {
       background: var(--parchment); color: var(--text-main);
       border: 1.5px solid var(--gold-accent);
-      padding: 7px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700;
-      cursor: pointer; width: auto; box-shadow: 0 3px 10px rgba(44, 53, 61, 0.08);
+      padding: 8px 15px; border-radius: 999px; font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; width: auto; box-shadow: 0 3px 10px rgba(44, 53, 61, 0.1);
       font-family: 'Noto Serif TC', serif;
+    }
+    .btn-logout-top {
+      border-color: var(--rose-muted); color: var(--rose-muted);
     }
 
     .screen {
       display: none; position: relative; z-index: 1;
       width: 100vw; height: 100vh; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 20px; overflow-y: auto; animation: gentleFade 0.45s ease-out;
+      padding: 20px; overflow-y: auto; animation: gentleFade 0.4s ease-out;
     }
     .active { display: flex; }
 
@@ -86,38 +94,38 @@
       border: 2px solid var(--gold-accent);
       outline: 1px solid var(--gold-light);
       outline-offset: -7px;
-      border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 400px;
+      border-radius: 22px; padding: 32px 24px; width: 100%; max-width: 420px;
       text-align: center;
-      box-shadow: 0 12px 32px rgba(44, 53, 61, 0.1), 0 2px 6px rgba(197, 160, 89, 0.15);
+      box-shadow: 0 12px 32px rgba(44, 53, 61, 0.12), 0 2px 6px rgba(197, 160, 89, 0.15);
       backdrop-filter: blur(8px);
     }
 
     h1 { 
       font-family: 'Noto Serif TC', serif;
-      font-size: 2.25rem; text-align: center; margin: 0 0 10px 0; 
+      font-size: 2.45rem; text-align: center; margin: 0 0 10px 0; 
       color: var(--text-main);
       letter-spacing: 3px; font-weight: 900;
       position: relative; display: inline-block;
     }
     h1::after {
       content: "✦ ─── ✦ ─── ✦";
-      display: block; font-size: 0.75rem; color: var(--gold-accent);
+      display: block; font-size: 0.8rem; color: var(--gold-accent);
       letter-spacing: 4px; margin-top: 4px; font-weight: normal;
     }
     
-    p.subtitle { color: var(--text-sub); text-align: center; font-size: 0.94rem; margin: 8px 0 22px 0; line-height: 1.6; }
+    p.subtitle { color: var(--text-sub); text-align: center; font-size: 1.05rem; margin: 8px 0 22px 0; line-height: 1.6; font-weight: 500; }
 
     input { 
-      width: 100%; padding: 14px 18px; border-radius: 12px; 
-      border: 1.5px solid var(--border-line); background: #ffffff;
-      color: var(--text-main); font-size: 1.08rem; font-weight: 600; text-align: center; margin-bottom: 16px;
+      width: 100%; padding: 15px 18px; border-radius: 14px; 
+      border: 2px solid var(--border-line); background: #ffffff;
+      color: var(--text-main); font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 16px;
       outline: none; transition: 0.25s;
     }
-    input:focus { border-color: var(--moon-blue); box-shadow: 0 0 0 3px rgba(74, 124, 155, 0.18); }
+    input:focus { border-color: var(--moon-blue); box-shadow: 0 0 0 3px rgba(74, 124, 155, 0.2); }
 
     button { 
-      width: 100%; padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); 
-      font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      width: 100%; padding: 15px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.3); 
+      font-size: 1.15rem; font-weight: 700; cursor: pointer;
       transition: all 0.2s ease;
       box-shadow: 0 4px 12px rgba(44, 53, 61, 0.12);
       font-family: 'Noto Serif TC', 'Noto Sans TC', sans-serif;
@@ -128,120 +136,122 @@
     .btn-primary { background: linear-gradient(135deg, #4a7c9b, #5c8a72); color: #fff; }
     .btn-secondary { background: linear-gradient(135deg, #6b7c93, #4a7c9b); color: #fff; margin-top: 10px; }
     .btn-gold { background: linear-gradient(135deg, #c5a059, #a8833e); color: #fff; margin-top: 10px; }
+    .btn-logout { background: #fff1f2; color: var(--rose-muted); border: 1.5px solid #fecdd3; margin-top: 12px; box-shadow: none; }
     
+    /* 放大選項按鈕字體 */
     .btn-option { 
-      width: 100%; max-width: 500px; background: var(--parchment); 
-      color: var(--text-main); margin: 8px 0; border: 1.5px solid var(--border-line); 
-      font-size: 1rem; font-weight: 500; text-align: left; padding: 15px 18px; border-radius: 14px;
-      box-shadow: 0 3px 10px rgba(44, 53, 61, 0.05); transition: 0.2s; line-height: 1.5;
-      font-family: 'Noto Sans TC', sans-serif; letter-spacing: 0.3px;
+      width: 100%; max-width: 520px; background: var(--parchment); 
+      color: var(--text-main); margin: 9px 0; border: 2px solid var(--border-line); 
+      font-size: 1.15rem; font-weight: 700; text-align: left; padding: 17px 20px; border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(44, 53, 61, 0.06); transition: 0.2s; line-height: 1.5;
+      font-family: 'Noto Sans TC', sans-serif;
     }
     .btn-option:hover, .btn-option:active { 
       border-color: var(--moon-blue); background: #f0f6fa; 
       transform: translateY(-1px);
     }
     .btn-option.selected-opt {
-      border-color: var(--sage-green); background: #e8f3ee; color: #234735;
-      font-weight: 700; box-shadow: 0 0 12px rgba(92, 138, 114, 0.25);
+      border-color: var(--sage-green); background: #e8f3ee; color: #1e3f2f;
+      font-weight: 900; box-shadow: 0 0 14px rgba(92, 138, 114, 0.3);
     }
 
     /* 快問快答進度與計時 */
-    .quiz-header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; font-weight: 700; color: var(--text-sub); font-family: 'Noto Serif TC', serif; }
-    #timer-bar { width: 100%; max-width: 500px; height: 8px; background: rgba(220,214,200,0.6); border-radius: 999px; margin-bottom: 16px; overflow: hidden; }
+    .quiz-header { width: 100%; max-width: 520px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 1.05rem; font-weight: 700; color: var(--text-sub); font-family: 'Noto Serif TC', serif; }
+    #timer-bar { width: 100%; max-width: 520px; height: 10px; background: rgba(220,214,200,0.7); border-radius: 999px; margin-bottom: 16px; overflow: hidden; }
     #timer-progress { width: 100%; height: 100%; background: linear-gradient(90deg, var(--sage-green), var(--moon-blue), var(--gold-accent)); transition: width 0.1s linear; }
     
     .question-box { 
-      width: 100%; max-width: 500px; flex: 1; display: flex; flex-direction: column; 
-      justify-content: flex-start; max-height: 80vh; position: relative; 
+      width: 100%; max-width: 520px; flex: 1; display: flex; flex-direction: column; 
+      justify-content: flex-start; max-height: 82vh; position: relative; 
     }
     .question-card {
-      background: var(--parchment); border: 1.5px solid var(--gold-accent);
-      border-radius: 18px; padding: 22px; margin-bottom: 12px;
-      box-shadow: 0 8px 24px rgba(44, 53, 61, 0.07);
+      background: var(--parchment); border: 2px solid var(--gold-accent);
+      border-radius: 20px; padding: 24px 22px; margin-bottom: 12px;
+      box-shadow: 0 8px 24px rgba(44, 53, 61, 0.08);
     }
     .question-tag {
       display: inline-block; background: #e6eef2; color: var(--moon-blue);
-      border: 1px solid #c2d6e3; padding: 3px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; margin-bottom: 10px;
+      border: 1px solid #c2d6e3; padding: 4px 14px; border-radius: 999px; font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;
     }
-    .question-text { font-size: 1.18rem; line-height: 1.6; margin: 0; color: var(--text-main); font-weight: 700; font-family: 'Noto Serif TC', serif; }
+    .question-text { font-size: 1.35rem; line-height: 1.6; margin: 0; color: var(--text-main); font-weight: 900; font-family: 'Noto Serif TC', serif; }
     
     #quiz-waiting-overlay { 
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-      background: rgba(252, 250, 245, 0.96); border-radius: 18px; flex-direction: column; 
-      align-items: center; justify-content: center; z-index: 10; font-size: 1.25rem; 
-      color: var(--sage-green); font-weight: 700; text-align: center;
-      padding: 24px; border: 1.5px solid var(--gold-accent);
+      background: rgba(252, 250, 245, 0.96); border-radius: 20px; flex-direction: column; 
+      align-items: center; justify-content: center; z-index: 10; font-size: 1.4rem; 
+      color: var(--sage-green); font-weight: 900; text-align: center;
+      padding: 24px; border: 2px solid var(--gold-accent);
       font-family: 'Noto Serif TC', serif;
     }
 
     /* 主控台樣式 */
-    .admin-container { width: 100%; max-width: 490px; max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
+    .admin-container { width: 100%; max-width: 500px; max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
     .admin-dashboard { background: var(--parchment); padding: 16px; border-radius: 16px; width: 100%; text-align: center; margin: 8px 0; border: 1.5px solid var(--gold-accent); }
-    .progress-text { font-size: 1.3rem; font-weight: 900; color: var(--sage-green); margin: 6px 0; }
-    .player-list-box { width: 100%; background: var(--parchment); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 12px; margin: 8px 0; max-height: 135px; overflow-y: auto; }
-    .player-chip { display: inline-flex; align-items: center; background: #fff; color: var(--text-main); padding: 4px 11px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin: 3px; border: 1px solid var(--border-line); }
+    .progress-text { font-size: 1.35rem; font-weight: 900; color: var(--sage-green); margin: 6px 0; }
+    .player-list-box { width: 100%; background: var(--parchment); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 12px; margin: 8px 0; max-height: 140px; overflow-y: auto; }
+    .player-chip { display: inline-flex; align-items: center; background: #fff; color: var(--text-main); padding: 5px 12px; border-radius: 999px; font-size: 0.88rem; font-weight: 700; margin: 3px; border: 1px solid var(--border-line); }
     .player-chip span.kick-btn { color: var(--rose-muted); margin-left: 6px; cursor: pointer; font-weight: 900; }
-    .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 8px; text-align: left; }
-    .config-item label { display: block; font-size: 0.8rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
-    .config-item input { margin-bottom: 0; padding: 9px; font-size: 1rem; border-radius: 8px; }
+    .config-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-top: 8px; text-align: left; }
+    .config-item label { display: block; font-size: 0.78rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
+    .config-item input { margin-bottom: 0; padding: 8px; font-size: 1.05rem; border-radius: 8px; }
 
-    /* 4秒深呼吸過場 (蒼月草微風感) */
+    /* 4秒深呼吸過場 */
     #screen-breathe { background: radial-gradient(circle at center, #eef5f9 0%, #dde8f0 100%); }
     .breathe-circle { 
-      width: 185px; height: 185px; border-radius: 50%; 
+      width: 200px; height: 200px; border-radius: 50%; 
       background: radial-gradient(circle, #ffffff 15%, rgba(125,168,196,0.45) 70%, transparent 100%); 
       color: var(--moon-blue); display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      font-size: 1.4rem; font-weight: 700; animation: breatheAnim 4s ease-in-out forwards; 
+      font-size: 1.55rem; font-weight: 900; animation: breatheAnim 4s ease-in-out forwards; 
       box-shadow: 0 0 50px rgba(74, 124, 155, 0.35); text-align: center;
       border: 2px solid rgba(255,255,255,0.85); font-family: 'Noto Serif TC', serif;
     }
     @keyframes breatheAnim {
       0% { transform: scale(0.55); opacity: 0; }
-      45% { transform: scale(1.4); opacity: 1; }
-      75% { transform: scale(1.4); opacity: 1; }
+      45% { transform: scale(1.42); opacity: 1; }
+      75% { transform: scale(1.42); opacity: 1; }
       100% { transform: scale(0.65); opacity: 0; }
     }
 
-    /* 戳氣球畫面 */
+    /* 戳氣球畫面 (氣球與字體全面放大、數量加倍) */
     #screen-balloon { padding: 10px; justify-content: flex-start; overflow: hidden; user-select: none; }
     .balloon-hud {
       z-index: 20; text-align: center; pointer-events: none; margin-top: 8px;
-      background: var(--parchment); padding: 10px 22px; border-radius: 18px;
-      box-shadow: 0 6px 18px rgba(44,53,61,0.08); border: 1.5px solid var(--gold-accent);
+      background: var(--parchment); padding: 12px 24px; border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(44,53,61,0.1); border: 1.5px solid var(--gold-accent);
     }
     #balloon-area { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: 5; touch-action: none; }
     
     .balloon { 
-      position: absolute; bottom: -130px; width: 84px; height: 100px; 
+      position: absolute; bottom: -150px; width: 104px; height: 122px; 
       border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%; 
       display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      font-size: 0.84rem; font-weight: 700; color: #ffffff; text-align: center;
+      font-size: 1.12rem; font-weight: 900; color: #ffffff; text-align: center;
       cursor: pointer; user-select: none; 
-      box-shadow: inset -6px -8px 12px rgba(0,0,0,0.18), inset 6px 6px 12px rgba(255,255,255,0.5), 0 6px 16px rgba(44,53,61,0.15);
-      animation: floatUp linear forwards; padding: 6px; line-height: 1.25;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      box-shadow: inset -6px -8px 12px rgba(0,0,0,0.2), inset 8px 8px 16px rgba(255,255,255,0.55), 0 8px 18px rgba(44,53,61,0.18);
+      animation: floatUp linear forwards; padding: 8px; line-height: 1.25;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
     .balloon.blessed {
-      width: 110px !important; height: 128px !important; font-size: 0.98rem !important;
-      box-shadow: 0 0 28px var(--gold-accent), inset 0 0 18px #fff !important;
-      border: 2px solid #fff;
+      width: 132px !important; height: 152px !important; font-size: 1.28rem !important;
+      box-shadow: 0 0 32px var(--gold-accent), inset 0 0 20px #fff !important;
+      border: 2.5px solid #fff;
     }
-    .balloon::after { content: ""; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); width: 1.5px; height: 14px; background: rgba(197, 160, 89, 0.7); }
-    .balloon-cat-tag { font-size: 0.63rem; background: rgba(0,0,0,0.22); padding: 1px 6px; border-radius: 8px; margin-bottom: 3px; }
+    .balloon::after { content: ""; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); width: 2px; height: 16px; background: rgba(197, 160, 89, 0.8); }
+    .balloon-cat-tag { font-size: 0.75rem; background: rgba(0,0,0,0.28); padding: 2px 8px; border-radius: 999px; margin-bottom: 4px; font-weight: 700; }
 
     @keyframes floatUp {
       0% { transform: translateY(0) rotate(-2deg); }
-      25% { transform: translateY(-30vh) rotate(3deg) translateX(8px); }
-      50% { transform: translateY(-60vh) rotate(-3deg) translateX(-8px); }
-      75% { transform: translateY(-90vh) rotate(2deg) translateX(5px); }
-      100% { transform: translateY(-125vh) rotate(0deg); }
+      25% { transform: translateY(-30vh) rotate(3deg) translateX(10px); }
+      50% { transform: translateY(-60vh) rotate(-3deg) translateX(-10px); }
+      75% { transform: translateY(-90vh) rotate(2deg) translateX(6px); }
+      100% { transform: translateY(-128vh) rotate(0deg); }
     }
 
-    /* 氣球化為花瓣與微光粒子特效 */
-    .pop-effect { position: fixed; font-weight: 700; color: var(--moon-blue); font-size: 1.1rem; pointer-events: none; z-index: 30; animation: popAnim 0.5s ease-out forwards; text-shadow: 0 0 8px #ffffff; font-family: 'Noto Serif TC', serif; }
-    @keyframes popAnim { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.4) translateY(-30px); opacity: 0; } }
+    /* 氣球爆破粒子與大字特效 */
+    .pop-effect { position: fixed; font-weight: 900; color: var(--moon-blue); font-size: 1.35rem; pointer-events: none; z-index: 30; animation: popAnim 0.5s ease-out forwards; text-shadow: 0 0 10px #ffffff; font-family: 'Noto Serif TC', serif; }
+    @keyframes popAnim { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.45) translateY(-35px); opacity: 0; } }
     
-    .pop-particle { position: fixed; width: 8px; height: 8px; border-radius: 50% 0 50% 50%; pointer-events: none; z-index: 29; animation: particleFly 0.55s ease-out forwards; }
+    .pop-particle { position: fixed; width: 10px; height: 10px; border-radius: 50% 0 50% 50%; pointer-events: none; z-index: 29; animation: particleFly 0.55s ease-out forwards; }
     @keyframes particleFly {
       0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
       100% { transform: translate(var(--tx), var(--ty)) rotate(120deg) scale(0); opacity: 0; }
@@ -250,24 +260,24 @@
     /* 結算手札收據樣式 */
     .receipt { 
       background: var(--parchment); color: var(--text-main); padding: 24px 20px; border-radius: 20px; 
-      width: 100%; max-width: 435px; max-height: 90vh; overflow-y: auto; 
-      box-shadow: 0 16px 36px rgba(44, 53, 61, 0.14); text-align: left; position: relative;
+      width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; 
+      box-shadow: 0 16px 36px rgba(44, 53, 61, 0.15); text-align: left; position: relative;
       border: 2px solid var(--gold-accent);
     }
-    .receipt h2 { font-family: 'Noto Serif TC', serif; text-align: center; border-bottom: 1.5px dashed var(--gold-accent); padding-bottom: 10px; color: var(--text-main); margin: 0 0 10px 0; font-size: 1.45rem; letter-spacing: 2px; }
-    .receipt-section { background: rgba(255,255,255,0.75); border: 1px solid var(--border-line); border-radius: 14px; padding: 13px 15px; margin: 12px 0; }
-    .receipt-section h4 { font-family: 'Noto Serif TC', serif; margin: 0 0 8px 0; color: var(--text-main); font-size: 0.95rem; display: flex; align-items: center; justify-content: space-between; }
+    .receipt h2 { font-family: 'Noto Serif TC', serif; text-align: center; border-bottom: 1.5px dashed var(--gold-accent); padding-bottom: 10px; color: var(--text-main); margin: 0 0 10px 0; font-size: 1.55rem; letter-spacing: 2px; }
+    .receipt-section { background: rgba(255,255,255,0.8); border: 1.5px solid var(--border-line); border-radius: 14px; padding: 14px 16px; margin: 12px 0; }
+    .receipt-section h4 { font-family: 'Noto Serif TC', serif; margin: 0 0 8px 0; color: var(--text-main); font-size: 1.05rem; display: flex; align-items: center; justify-content: space-between; }
     
     /* 副情緒占比條 */
-    .emotion-bar-row { margin: 8px 0; font-size: 0.84rem; }
-    .emotion-bar-label { display: flex; justify-content: space-between; margin-bottom: 3px; font-weight: 600; color: var(--text-sub); }
-    .emotion-bar-bg { width: 100%; height: 8px; background: #e6e2d8; border-radius: 999px; overflow: hidden; }
+    .emotion-bar-row { margin: 9px 0; font-size: 0.92rem; }
+    .emotion-bar-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 700; color: var(--text-sub); }
+    .emotion-bar-bg { width: 100%; height: 9px; background: #e6e2d8; border-radius: 999px; overflow: hidden; }
     .emotion-bar-fill { height: 100%; border-radius: 999px; transition: width 0.8s ease-out; }
 
     /* 氣球統計小標籤 */
-    .balloon-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
-    .balloon-stat-item { background: #fff; border: 1px solid var(--border-line); border-radius: 8px; padding: 6px 10px; font-size: 0.82rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-    .balloon-stat-count { font-weight: 800; color: var(--moon-blue); font-size: 0.92rem; }
+    .balloon-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
+    .balloon-stat-item { background: #fff; border: 1px solid var(--border-line); border-radius: 8px; padding: 7px 11px; font-size: 0.9rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+    .balloon-stat-count { font-weight: 900; color: var(--moon-blue); font-size: 1rem; }
 
     /* 彈出視窗 */
     .modal-overlay {
@@ -277,34 +287,44 @@
     }
     .modal-box {
       background: var(--parchment); border: 2px solid var(--gold-accent); color: var(--text-main);
-      padding: 22px; border-radius: 20px; width: 100%; max-width: 400px; max-height: 85vh;
+      padding: 22px; border-radius: 20px; width: 100%; max-width: 410px; max-height: 85vh;
       overflow-y: auto; text-align: center; box-shadow: 0 20px 45px rgba(0,0,0,0.22);
     }
-    .verse-list-item { text-align: left; font-size: 0.85rem; padding: 8px 0; border-bottom: 1px solid var(--border-line); line-height: 1.5; color: var(--text-main); }
+    .verse-list-item { text-align: left; font-size: 0.95rem; padding: 9px 0; border-bottom: 1px solid var(--border-line); line-height: 1.55; color: var(--text-main); font-weight: 500; }
   </style>
 </head>
 <body>
 
-  <!-- 蒼月草微光粒子背景 -->
+  <!-- 豐富蒼月草微光泡泡背景 (12顆漂浮泡泡) -->
   <div class="bg-mana">
-    <div class="mana-orb" style="width:70px; height:70px; left:10%; animation-duration:18s;"></div>
-    <div class="mana-orb" style="width:45px; height:45px; left:28%; animation-duration:14s; animation-delay:3s;"></div>
-    <div class="mana-orb" style="width:85px; height:85px; left:62%; animation-duration:22s; animation-delay:1s;"></div>
-    <div class="mana-orb" style="width:55px; height:55px; left:80%; animation-duration:16s; animation-delay:5s;"></div>
-    <div class="mana-orb" style="width:40px; height:40px; left:45%; animation-duration:13s; animation-delay:2s;"></div>
+    <div class="mana-orb" style="width:85px; height:85px; left:6%; animation-duration:16s;"></div>
+    <div class="mana-orb" style="width:55px; height:55px; left:18%; animation-duration:12s; animation-delay:2s;"></div>
+    <div class="mana-orb" style="width:95px; height:95px; left:32%; animation-duration:20s; animation-delay:4s;"></div>
+    <div class="mana-orb" style="width:65px; height:65px; left:46%; animation-duration:14s; animation-delay:1s;"></div>
+    <div class="mana-orb" style="width:110px; height:110px; left:60%; animation-duration:22s; animation-delay:3s;"></div>
+    <div class="mana-orb" style="width:50px; height:50px; left:72%; animation-duration:13s; animation-delay:5s;"></div>
+    <div class="mana-orb" style="width:80px; height:80px; left:84%; animation-duration:17s; animation-delay:2.5s;"></div>
+    <div class="mana-orb" style="width:60px; height:60px; left:92%; animation-duration:15s; animation-delay:0.5s;"></div>
+    <div class="mana-orb" style="width:70px; height:70px; left:12%; animation-duration:19s; animation-delay:6s;"></div>
+    <div class="mana-orb" style="width:45px; height:45px; left:52%; animation-duration:11s; animation-delay:3.5s;"></div>
   </div>
 
-  <!-- 右上角單純分享按鈕 (不顯示任何雙模式字眼) -->
+  <!-- 左上角常駐登出按鈕 (登入後顯示，方便團隊模式隨時登出換帳號) -->
+  <div id="top-bar-left" class="top-bar-left">
+    <button class="btn-top btn-logout-top" onclick="logout()">🚪 登出</button>
+  </div>
+
+  <!-- 右上角單純分享按鈕 -->
   <div class="top-bar">
     <button class="btn-top" onclick="openQrModal()">✦ 分享連結</button>
   </div>
 
-  <!-- 單純的分享彈窗 (玩家完全看不到多人/單人切換痕跡) -->
+  <!-- 單純的分享彈窗 -->
   <div id="qr-modal" class="modal-overlay" onclick="closeQrModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin-top:0; font-family:'Noto Serif TC',serif; color:var(--moon-blue);">✦ 邀請進入《慮易on燃》</h3>
       <img id="qr-img" src="" alt="QR Code" style="width:190px; height:190px; border-radius:12px; border:1.5px solid var(--gold-accent); padding:8px; margin:10px auto; display:block; background:#fff;">
-      <p id="share-url-text" style="font-size:0.78rem; word-break:break-all; color:var(--text-sub); background:#fff; padding:8px; border-radius:8px; border:1px solid var(--border-line);"></p>
+      <p id="share-url-text" style="font-size:0.82rem; word-break:break-all; color:var(--text-sub); background:#fff; padding:8px; border-radius:8px; border:1px solid var(--border-line);"></p>
       <button class="btn-primary" style="margin-bottom:8px; padding:12px;" onclick="copyCurrentUrl()">複製遊戲連結</button>
       <button style="background:#e6e2d8; color:var(--text-main); padding:10px; box-shadow:none;" onclick="document.getElementById('qr-modal').style.display='none'">關閉</button>
     </div>
@@ -319,7 +339,7 @@
     </div>
   </div>
 
-  <!-- 1. 登入畫面 (完全移除個人版/團體版提示字眼) -->
+  <!-- 1. 登入畫面 -->
   <div id="screen-login" class="screen active">
     <div class="story-card">
       <h1>慮易on燃</h1>
@@ -329,59 +349,64 @@
     </div>
   </div>
 
-  <!-- 2. 等候室 (僅一般網址使用) -->
+  <!-- 2. 團隊等候室 (必須等主控台按下開始才會進入遊戲，絕不自動偷跑) -->
   <div id="screen-waiting" class="screen">
     <div class="story-card">
-      <h1>旅途準備中</h1>
-      <p class="subtitle">請稍候片刻，旅程即將展開...</p>
-      <div style="background:#ffffff; border:1.5px solid var(--border-line); padding:18px; border-radius:14px; margin-bottom:18px;">
-        <div style="font-size:0.82rem; color:var(--text-sub);">旅人名字</div>
-        <div id="waiting-my-name" style="font-size:1.5rem; font-weight:900; color:var(--moon-blue); margin:6px 0; font-family:'Noto Serif TC',serif;">-</div>
+      <h1>旅途等候室</h1>
+      <p class="subtitle">請稍候片刻，等待主控台按下開始...</p>
+      <div style="background:#ffffff; border:1.5px solid var(--border-line); padding:18px; border-radius:14px; margin-bottom:16px;">
+        <div style="font-size:0.88rem; color:var(--text-sub); font-weight:700;">旅人名字</div>
+        <div id="waiting-my-name" style="font-size:1.65rem; font-weight:900; color:var(--moon-blue); margin:6px 0 10px 0; font-family:'Noto Serif TC',serif;">-</div>
+        <div id="player-count" style="font-size:1.05rem; color:var(--sage-green); font-weight:700;">目前在場旅人: 0</div>
       </div>
-      <button style="background:#e6e2d8; color:var(--text-main); font-size:0.92rem; padding:11px; box-shadow:none;" onclick="logout()">更改名字</button>
+      <button class="btn-logout" onclick="logout()">🚪 登出 / 換個名字</button>
     </div>
   </div>
 
-  <!-- 3. Jesus 主控台 (新增題數與氣球秒數調整，以及雙網址複製工具) -->
-  <div id="screen-admin" class="screen" style="justify-content:flex-start; padding-top:45px;">
+  <!-- 3. Jesus 主控台 -->
+  <div id="screen-admin" class="screen" style="justify-content:flex-start; padding-top:55px;">
     <div class="admin-container">
-      <h1 style="font-size:1.75rem;">👑 旅途引導主控台</h1>
+      <h1 style="font-size:1.8rem;">👑 旅途引導主控台</h1>
       <p id="admin-player-count" style="color:var(--sage-green); font-weight:700; margin:4px 0;">目前連線人數: 0</p>
       
-      <!-- 參數調整面板 (可自由設定題數與打氣球秒數) -->
+      <!-- 參數調整面板 (可設定題數、每題秒數預設7秒、氣球秒數) -->
       <div class="admin-dashboard">
-        <div style="font-size:0.9rem; font-weight:700; color:var(--moon-blue); font-family:'Noto Serif TC',serif;">⚙️ 遊戲參數設定 (修改後即時套用)</div>
+        <div style="font-size:0.95rem; font-weight:700; color:var(--moon-blue); font-family:'Noto Serif TC',serif;">⚙️ 遊戲參數設定 (修改後即時套用)</div>
         <div class="config-grid">
           <div class="config-item">
-            <label>快問快答題數 (1~40題)</label>
+            <label>總題數 (1~40)</label>
             <input type="number" id="cfg-q-count" min="1" max="40" value="15" onchange="saveGameSettings()">
           </div>
           <div class="config-item">
-            <label>戳氣球時間 (5~120秒)</label>
+            <label>每題秒數 (預設7秒)</label>
+            <input type="number" id="cfg-q-sec" min="3" max="30" value="7" onchange="saveGameSettings()">
+          </div>
+          <div class="config-item">
+            <label>氣球秒數 (5~120)</label>
             <input type="number" id="cfg-b-sec" min="5" max="120" value="15" onchange="saveGameSettings()">
           </div>
         </div>
         <div style="display:flex; gap:6px; margin-top:10px;">
-          <button style="font-size:0.78rem; padding:8px; background:#e6eef2; color:var(--moon-blue); box-shadow:none;" onclick="copyAdminModeUrl('group')">📋 複製團康控場網址</button>
-          <button style="font-size:0.78rem; padding:8px; background:#e8f3ee; color:var(--sage-green); box-shadow:none;" onclick="copyAdminModeUrl('solo')">📋 複製單人獨立網址</button>
+          <button style="font-size:0.82rem; padding:9px; background:#e6eef2; color:var(--moon-blue); box-shadow:none;" onclick="copyAdminModeUrl('group')">📋 複製團康控場網址</button>
+          <button style="font-size:0.82rem; padding:9px; background:#e8f3ee; color:var(--sage-green); box-shadow:none;" onclick="copyAdminModeUrl('solo')">📋 複製單人獨立網址</button>
         </div>
       </div>
 
       <div class="player-list-box">
-        <div style="font-size:0.78rem; color:var(--text-sub); font-weight:700; margin-bottom:5px;">場上名單 (點擊 ✕ 可移出)：</div>
+        <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700; margin-bottom:5px;">場上名單 (點擊 ✕ 可移出)：</div>
         <div id="admin-player-list">尚無旅人加入...</div>
       </div>
 
       <div class="admin-dashboard">
-        <div id="admin-q-title" style="font-size:1rem; font-weight:700; color:var(--text-main);">目前階段: 等候開始</div>
+        <div id="admin-q-title" style="font-size:1.05rem; font-weight:700; color:var(--text-main);">目前階段: 等候室待機中 (等待主控台按開始)</div>
         <div id="admin-progress-text" class="progress-text">已完成人數: 0 / 0</div>
-        <div id="admin-live-balloons" style="font-size:0.95rem; color:var(--gold-accent); font-weight:700; margin-bottom:4px; display:none;">🎈 全場即時擊破氣球：<span id="admin-live-balloon-num" style="font-size:1.35rem; font-weight:900;">0</span> 顆</div>
+        <div id="admin-live-balloons" style="font-size:1rem; color:var(--gold-accent); font-weight:700; margin-bottom:4px; display:none;">🎈 全場即時擊破氣球：<span id="admin-live-balloon-num" style="font-size:1.4rem; font-weight:900;">0</span> 顆</div>
       </div>
 
-      <button class="btn-primary" id="btn-admin-start-quiz" onclick="adminStartQuiz()" style="margin-bottom:8px;">1. 開始快問快答 (每題5秒自動推進)</button>
-      <button class="btn-secondary" id="btn-admin-start-balloon" onclick="adminStartBalloon()">2. 啟動戳氣球 (結束後自動深呼吸結算)</button>
+      <button class="btn-primary" id="btn-admin-start-quiz" onclick="adminStartQuiz()" style="margin-bottom:8px;">1. 開始 15 題快問快答 (每題7秒自動推進)</button>
+      <button class="btn-secondary" id="btn-admin-start-balloon" onclick="adminStartBalloon()">2. 啟動 15 秒戳氣球 (結束後自動深呼吸結算)</button>
       <button class="btn-gold" id="btn-miracle" onclick="triggerMiracle()" style="display:none;">✨ 降下蒼月草祝福 (氣球變大慢速！)</button>
-      <button style="background:#dcd6c8; color:var(--text-main); margin-top:16px; padding:11px; box-shadow:none;" onclick="adminResetGame()">🔄 重置全場遊戲狀態</button>
+      <button style="background:#dcd6c8; color:var(--text-main); margin-top:14px; padding:12px; box-shadow:none;" onclick="adminResetGame()">🔄 重置全場回等候室</button>
     </div>
   </div>
 
@@ -389,7 +414,7 @@
   <div id="screen-quiz" class="screen">
     <div class="quiz-header">
       <span id="quiz-progress-label">第 1 / 15 題</span>
-      <span id="quiz-timer-sec" style="color:var(--moon-blue);">⏱️ 5.0s</span>
+      <span id="quiz-timer-sec" style="color:var(--moon-blue);">⏱️ 7.0s</span>
     </div>
     <div id="timer-bar"><div id="timer-progress"></div></div>
     <div class="question-box">
@@ -401,9 +426,9 @@
       
       <!-- 答題完畢或啟動氣球過場遮罩 -->
       <div id="quiz-waiting-overlay">
-        <div id="quiz-overlay-title" style="font-size:1.4rem;">✦ 已記下你的心聲</div>
-        <div id="quiz-overlay-sub" style="font-size:0.92rem; color:var(--text-sub); margin:10px 0 18px 0; font-family:'Noto Sans TC',sans-serif; font-weight:500; line-height:1.55;">片刻後將繼續前行...</div>
-        <button id="btn-solo-start-balloon" class="btn-primary" style="display:none; max-width:270px;" onclick="startBalloon()">🎈 開始擊破思緒氣球</button>
+        <div id="quiz-overlay-title" style="font-size:1.5rem;">✦ 已記下你的心聲</div>
+        <div id="quiz-overlay-sub" style="font-size:1.05rem; color:var(--text-sub); margin:10px 0 18px 0; font-family:'Noto Sans TC',sans-serif; font-weight:700; line-height:1.55;">倒數結束後將自動前往下一題...</div>
+        <button id="btn-solo-start-balloon" class="btn-primary" style="display:none; max-width:280px;" onclick="startBalloon()">🎈 開始拂去思緒氣球</button>
       </div>
     </div>
   </div>
@@ -411,13 +436,13 @@
   <!-- 5. 戳氣球發洩 -->
   <div id="screen-balloon" class="screen">
     <div class="balloon-hud">
-      <h1 style="font-size:1.6rem; margin-bottom:2px;">✦ 拂去思緒氣球</h1>
-      <p style="margin:0; font-size:0.82rem; color:var(--text-sub);">輕觸或滑過氣球，將累積的壓力化作花瓣消散</p>
-      <div style="display:flex; align-items:center; justify-content:center; gap:20px; margin-top:5px; font-weight:700; font-family:'Noto Serif TC',serif;">
-        <div>已拂去：<span id="balloon-score" style="font-size:1.85rem; color:var(--sage-green);">0</span></div>
-        <div>剩餘：<span id="balloon-timer" style="font-size:1.65rem; color:var(--rose-muted);">15</span> 秒</div>
+      <h1 style="font-size:1.75rem; margin-bottom:2px;">✦ 拂去思緒氣球</h1>
+      <p style="margin:0; font-size:0.92rem; color:var(--text-sub); font-weight:700;">輕觸或滑過氣球，將累積的壓力化作花瓣消散</p>
+      <div style="display:flex; align-items:center; justify-content:center; gap:22px; margin-top:5px; font-weight:900; font-family:'Noto Serif TC',serif;">
+        <div>已拂去：<span id="balloon-score" style="font-size:2.1rem; color:var(--sage-green);">0</span></div>
+        <div>剩餘：<span id="balloon-timer" style="font-size:1.85rem; color:var(--rose-muted);">15</span> 秒</div>
       </div>
-      <div id="combo-badge" style="font-size:0.95rem; color:var(--gold-accent); font-weight:700; height:20px;"></div>
+      <div id="combo-badge" style="font-size:1.05rem; color:var(--gold-accent); font-weight:900; height:22px;"></div>
     </div>
     <div id="balloon-area"></div>
   </div>
@@ -426,7 +451,7 @@
   <div id="screen-breathe" class="screen">
     <div class="breathe-circle">
       <div>深呼吸...</div>
-      <div style="font-size:0.82rem; font-weight:normal; margin-top:6px; color:var(--text-sub); font-family:'Noto Sans TC',sans-serif;">感受微風吹過心頭的平靜</div>
+      <div style="font-size:0.92rem; font-weight:700; margin-top:6px; color:var(--text-sub); font-family:'Noto Sans TC',sans-serif;">感受微風吹過心頭的平靜</div>
     </div>
   </div>
 
@@ -434,16 +459,16 @@
   <div id="screen-result" class="screen">
     <div class="receipt">
       <h2>📜 心靈旅途手札</h2>
-      <div style="display:flex; justify-content:space-between; font-size:0.84rem; color:var(--text-sub); margin-bottom:8px; font-weight:600;">
-        <span>旅人: <strong id="r-name" style="color:var(--moon-blue); font-size:0.95rem;"></strong></span>
+      <div style="display:flex; justify-content:space-between; font-size:0.92rem; color:var(--text-sub); margin-bottom:8px; font-weight:700;">
+        <span>旅人: <strong id="r-name" style="color:var(--moon-blue); font-size:1.05rem;"></strong></span>
         <span id="r-date"></span>
       </div>
       
       <!-- 👤 玩家報告 -->
       <div id="player-report-view">
         <div class="receipt-section">
-          <h4><span>🧭 思緒與壓力來源分佈</span><span id="top-anxiety-badge" style="color:var(--moon-blue); font-size:0.78rem; font-family:'Noto Sans TC',sans-serif;"></span></h4>
-          <canvas id="radarChart" style="max-height:215px;"></canvas>
+          <h4><span>🧭 思緒與壓力來源分佈</span><span id="top-anxiety-badge" style="color:var(--moon-blue); font-size:0.85rem; font-family:'Noto Sans TC',sans-serif;"></span></h4>
+          <canvas id="radarChart" style="max-height:220px;"></canvas>
         </div>
 
         <div class="receipt-section">
@@ -454,35 +479,36 @@
         <div class="receipt-section" style="background:#f5f8fa; border-color:#c9dce8;">
           <h4>
             <span style="color:var(--moon-blue);">🎈 本回拂去的壓力氣球</span>
-            <span style="font-size:1.15rem; color:var(--rose-muted); font-weight:900;"><span id="player-total-popped">0</span> 顆</span>
+            <span style="font-size:1.25rem; color:var(--rose-muted); font-weight:900;"><span id="player-total-popped">0</span> 顆</span>
           </h4>
-          <div style="font-size:0.78rem; color:var(--text-sub); margin-bottom:6px;">各類被你親手釋放的壓力明細：</div>
+          <div style="font-size:0.85rem; color:var(--text-sub); margin-bottom:6px; font-weight:700;">各類被你親手釋放的壓力明細：</div>
           <div id="player-balloon-breakdown" class="balloon-stat-grid"></div>
         </div>
 
         <div class="receipt-section" style="background:#f0f6f2; border-color:#bdd6c8;">
           <h4 style="color:#2d5a43;">🌿 日常前行的微小建議</h4>
-          <div id="action-text" style="font-size:0.9rem; color:#234735; line-height:1.55;">載入中...</div>
+          <div id="action-text" style="font-size:1rem; color:#234735; line-height:1.6; font-weight:700;">載入中...</div>
         </div>
 
         <div class="receipt-section" style="background:#faf6ec; border-color:#e2d1a8;">
           <h4 style="color:#7c5e26;">
             <span>📖 旅途中的祝福話語</span>
-            <button onclick="rerollVerse()" style="width:auto; padding:4px 12px; font-size:0.75rem; background:var(--gold-accent); color:#fff; border-radius:999px; box-shadow:none;">換一句</button>
+            <button onclick="rerollVerse()" style="width:auto; padding:5px 14px; font-size:0.82rem; background:var(--gold-accent); color:#fff; border-radius:999px; box-shadow:none;">換一句</button>
           </h4>
-          <div id="verse-text" style="font-size:0.92rem; color:#4a3814; line-height:1.6; font-weight:700; font-family:'Noto Serif TC',serif;">載入中...</div>
-          <button onclick="openBibleModal()" style="width:100%; margin-top:10px; padding:9px; font-size:0.8rem; background:#efe5cc; color:#634a1b; border-radius:10px; box-shadow:none;">展開翻閱全部 52 句話語</button>
+          <div id="verse-text" style="font-size:1.02rem; color:#4a3814; line-height:1.65; font-weight:700; font-family:'Noto Serif TC',serif;">載入中...</div>
+          <button onclick="openBibleModal()" style="width:100%; margin-top:10px; padding:10px; font-size:0.88rem; background:#efe5cc; color:#634a1b; border-radius:10px; box-shadow:none;">展開翻閱全部 52 句話語</button>
         </div>
 
         <button class="btn-primary" style="margin-top:12px;" onclick="restartClean()">✦ 收起手札，再次啟程</button>
+        <button class="btn-logout" onclick="logout()">🚪 登出 / 換個名字</button>
       </div>
 
       <!-- 👑 Jesus 主控台專屬全場統計報告 -->
       <div id="admin-report-view" style="display:none;">
         <div class="receipt-section" style="background:#f5f8fa; border-color:#c9dce8; text-align:center;">
           <h3 style="color:var(--moon-blue); margin:5px 0; font-family:'Noto Serif TC',serif;">👑 全場旅人釋放總結算</h3>
-          <div style="font-size:0.88rem; color:var(--text-sub);">本回合全場總共拂去壓力氣球：</div>
-          <div style="font-size:2.4rem; color:var(--rose-muted); font-weight:900; margin:4px 0;"><span id="admin-total-balloons">0</span> <span style="font-size:1rem;">顆</span></div>
+          <div style="font-size:0.92rem; color:var(--text-sub); font-weight:700;">本回合全場總共拂去壓力氣球：</div>
+          <div style="font-size:2.5rem; color:var(--rose-muted); font-weight:900; margin:4px 0;"><span id="admin-total-balloons">0</span> <span style="font-size:1.05rem;">顆</span></div>
         </div>
 
         <div class="receipt-section">
@@ -492,12 +518,12 @@
 
         <div class="receipt-section">
           <h4>🔥 全場被打破最多的具體壓力字眼 TOP 8</h4>
-          <div id="admin-balloon-word-breakdown" style="font-size:0.84rem; color:var(--text-main); line-height:1.7;"></div>
+          <div id="admin-balloon-word-breakdown" style="font-size:0.9rem; color:var(--text-main); line-height:1.7;"></div>
         </div>
 
         <div class="receipt-section">
           <h4>👥 各旅人擊破氣球與主要思緒明細</h4>
-          <div id="admin-player-summary-list" style="font-size:0.84rem; color:var(--text-main); max-height:180px; overflow-y:auto;"></div>
+          <div id="admin-player-summary-list" style="font-size:0.9rem; color:var(--text-main); max-height:180px; overflow-y:auto;"></div>
         </div>
 
         <button class="btn-primary" style="width:100%; margin-top:10px;" onclick="switchScreen('screen-admin')">返回主控台</button>
@@ -525,16 +551,17 @@
     const db = firebase.database();
     const GAS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby5zQjffGtHQbviJFg-Cl0wNCSGjjFJaP9MqsoVkaL1TyLViNKgOR89qBvEpGCnl9I/exec";
 
-    // 自動判斷網址是否為「獨立單人暢玩 (?mode=solo)」，外觀完全不顯示差異
+    // 自動判斷網址是否為「獨立單人暢玩 (?mode=solo)」
     const urlParams = new URLSearchParams(window.location.search);
     let isSoloMode = (urlParams.get('mode') === 'solo');
 
-    // 可由主控台動態調整的參數 (預設 15 題、15 秒)
+    // 預設參數：15 題、每題 7 秒、氣球 15 秒
     let targetQuestionCount = 15;
+    let targetQuestionSeconds = 7;
     let targetBalloonSeconds = 15;
 
     // ==========================================
-    // 2. Web Audio API 音效引擎 (溫潤泡泡聲與心跳聲)
+    // 2. Web Audio API 音效引擎 (溫潤泡泡聲與 7 秒心跳聲)
     // ==========================================
     let audioCtx;
     let heartbeatTimeout;
@@ -550,10 +577,10 @@
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      const baseFreq = 500 + Math.random() * 200;
+      const baseFreq = 500 + Math.random() * 220;
       osc.frequency.setValueAtTime(baseFreq, t);
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.1, t + 0.085);
-      gain.gain.setValueAtTime(0.38, t);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.15, t + 0.085);
+      gain.gain.setValueAtTime(0.42, t);
       gain.gain.exponentialRampToValueAtTime(0.01, t + 0.085);
       osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(t); osc.stop(t + 0.085);
@@ -567,7 +594,7 @@
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(440, t);
       osc.frequency.exponentialRampToValueAtTime(660, t + 0.06);
-      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.setValueAtTime(0.22, t);
       gain.gain.exponentialRampToValueAtTime(0.01, t + 0.06);
       osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(t); osc.stop(t + 0.06);
@@ -591,13 +618,13 @@
     function startHeartbeat() {
       clearTimeout(heartbeatTimeout);
       let startTime = Date.now();
-      let duration = 5000;
+      let duration = targetQuestionSeconds * 1000;
       function nextBeat() {
         let elapsed = Date.now() - startTime;
         if (elapsed > duration) return;
         playSingleHeartbeat();
         let progress = elapsed / duration;
-        let currentBpm = 62 + (90 * progress); 
+        let currentBpm = 60 + (95 * progress); 
         heartbeatTimeout = setTimeout(nextBeat, 60000 / currentBpm);
       }
       nextBeat();
@@ -606,7 +633,7 @@
     function stopHeartbeat() { clearTimeout(heartbeatTimeout); }
 
     // ==========================================
-    // 3. 24 種壓力氣球資料庫 (芙莉蓮溫潤奇幻色調)
+    // 3. 24 種壓力氣球資料庫
     // ==========================================
     const balloonCatalog = [
       { word: "段考炸裂", cat: "課業與未來", color: "#5b7c99" },
@@ -805,8 +832,12 @@
     let adminAutoTimer;
     let adminBalloonAutoTimer;
     let adminDisplayQ = 0;
-    let currentStageLocal = "";
     let hasShownResult = false;
+    
+    // 防偷跑關鍵：記錄玩家加入等候室當下的時間與場次 ID
+    let joinedAtRoundId = null;
+    let isListeningFirebase = false;
+
     let scores = { academic: 0, fomo: 0, appearance: 0, loneliness: 0, fatigue: 0, resilience: 0, future: 0, family: 0, self_doubt: 0, escape: 0, mask: 0, anxiety: 0 };
     
     let balloonPopped = 0;
@@ -821,14 +852,19 @@
     // ==========================================
     function saveLocalData() {
       if (isJesus) return;
-      localStorage.setItem('anxietyGameData_v6', JSON.stringify({
-        myName, scores, currentQ, balloonPopped, poppedByCat, poppedByWord, activeQuestions, isSoloMode
+      localStorage.setItem('anxietyGameData_v7', JSON.stringify({
+        myName, scores, currentQ, balloonPopped, poppedByCat, poppedByWord, activeQuestions, isSoloMode, joinedAtRoundId
       }));
     }
-    function clearLocalData() { localStorage.removeItem('anxietyGameData_v6'); }
+    function clearLocalData() { localStorage.removeItem('anxietyGameData_v7'); }
     
     function logout() {
-      if (myName && !isSoloMode) db.ref('players/' + myName).remove();
+      clearTimeout(timer);
+      clearInterval(secInterval);
+      stopHeartbeat();
+      if (myName && !isSoloMode) {
+        db.ref('players/' + myName).remove();
+      }
       clearLocalData();
       location.reload();
     }
@@ -842,16 +878,20 @@
       return window.location.origin + window.location.pathname;
     }
 
-    // 監聽主控台設定的題數與氣球秒數
+    // 監聽主控台設定的題數、每題秒數(預設7秒)與氣球秒數
     function listenToGameSettings() {
       db.ref('gameSettings').on('value', snap => {
         const val = snap.val();
         if (val) {
           targetQuestionCount = Math.min(40, Math.max(1, parseInt(val.qCount) || 15));
+          targetQuestionSeconds = Math.min(30, Math.max(3, parseInt(val.qSec) || 7));
           targetBalloonSeconds = Math.min(120, Math.max(5, parseInt(val.bSec) || 15));
+          
           const qInput = document.getElementById('cfg-q-count');
+          const sInput = document.getElementById('cfg-q-sec');
           const bInput = document.getElementById('cfg-b-sec');
           if (qInput && document.activeElement !== qInput) qInput.value = targetQuestionCount;
+          if (sInput && document.activeElement !== sInput) sInput.value = targetQuestionSeconds;
           if (bInput && document.activeElement !== bInput) bInput.value = targetBalloonSeconds;
           updateAdminButtonLabels();
         }
@@ -860,29 +900,30 @@
 
     function saveGameSettings() {
       const qVal = Math.min(40, Math.max(1, parseInt(document.getElementById('cfg-q-count').value) || 15));
+      const sVal = Math.min(30, Math.max(3, parseInt(document.getElementById('cfg-q-sec').value) || 7));
       const bVal = Math.min(120, Math.max(5, parseInt(document.getElementById('cfg-b-sec').value) || 15));
       targetQuestionCount = qVal;
+      targetQuestionSeconds = sVal;
       targetBalloonSeconds = bVal;
-      db.ref('gameSettings').set({ qCount: qVal, bSec: bVal });
+      db.ref('gameSettings').set({ qCount: qVal, qSec: sVal, bSec: bVal });
       updateAdminButtonLabels();
     }
 
     function updateAdminButtonLabels() {
       const btnQ = document.getElementById('btn-admin-start-quiz');
       const btnB = document.getElementById('btn-admin-start-balloon');
-      if (btnQ) btnQ.innerText = `1. 開始 ${targetQuestionCount} 題快問快答 (每題5秒自動推進)`;
+      if (btnQ) btnQ.innerText = `1. 開始 ${targetQuestionCount} 題快問快答 (每題${targetQuestionSeconds}秒自動推進)`;
       if (btnB) btnB.innerText = `2. 啟動 ${targetBalloonSeconds} 秒戳氣球 (結束後自動深呼吸結算)`;
     }
 
     window.onload = function() {
       listenToGameSettings();
 
-      // 分享彈窗只單純顯示當前網址與 QR，不露出任何雙模式切換器
       const currentFullUrl = window.location.href;
       document.getElementById('share-url-text').innerText = currentFullUrl;
       document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(currentFullUrl)}`;
 
-      const saved = localStorage.getItem('anxietyGameData_v6');
+      const saved = localStorage.getItem('anxietyGameData_v7');
       if (saved) {
         try {
           const data = JSON.parse(saved);
@@ -893,9 +934,12 @@
             balloonPopped = data.balloonPopped || 0;
             poppedByCat = data.poppedByCat || poppedByCat;
             poppedByWord = data.poppedByWord || {};
+            joinedAtRoundId = data.joinedAtRoundId || null;
             if (data.activeQuestions && data.activeQuestions.length > 0) {
               activeQuestions = data.activeQuestions;
             }
+            document.getElementById('top-bar-left').style.display = 'block';
+
             if (isSoloMode) {
               if (currentQ < activeQuestions.length) {
                 switchScreen('screen-quiz');
@@ -923,7 +967,6 @@
       navigator.clipboard.writeText(window.location.href).then(() => alert("已複製連結！"));
     }
 
-    // 主控台專用：複製團康網址或單人獨立網址
     function copyAdminModeUrl(mode) {
       const base = getBaseUrl();
       const url = (mode === 'solo') ? `${base}?mode=solo` : base;
@@ -946,7 +989,7 @@
     }
 
     // ==========================================
-    // 8. 登入與分流控制
+    // 8. 登入與分流控制 (防偷跑機制)
     // ==========================================
     function switchScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -958,37 +1001,54 @@
       if (!myName) return alert("請先寫下你的名字或暱稱！");
       initAudio();
       playClickSound();
+      document.getElementById('top-bar-left').style.display = 'block';
       
       if (myName.toLowerCase() === "jesus") {
         isJesus = true; 
         isSoloMode = false;
+        // 主控台一登入，自動將資料庫殘留的舊遊戲階段重設為 waiting，徹底防止新玩家誤觸舊場次！
+        db.ref('gameState').set({ currentStage: 'waiting', roundId: Date.now(), miracle: null });
         switchScreen('screen-admin');
         listenToFirebase();
         return;
       }
 
       if (isSoloMode) {
-        // 單人網址：直接開始題目，不顯示任何等候室或團隊跡象
         db.ref('players/' + myName).set({
           status: 'solo', answeredQ: 0, balloons: 0, poppedByCat: poppedByCat
         });
         startQuizAuto();
       } else {
         document.getElementById('waiting-my-name').innerText = myName;
-        db.ref('players/' + myName).set({
-          status: 'active', answeredQ: 0, balloons: 0, poppedByCat: poppedByCat
+        // 先讀取目前資料庫的 roundId 作為基準，確保只有主控台「之後新按下的開始」才會觸發遊戲！
+        db.ref('gameState').once('value', snap => {
+          const st = snap.val() || {};
+          // 若主控台還沒重置、資料庫殘留舊的 quiz/balloon/result，記錄舊 roundId 並忽略它，乖乖待在等候室
+          joinedAtRoundId = st.roundId || 0;
+          currentQ = 0;
+          activeQuestions = [];
+          db.ref('players/' + myName).set({
+            status: 'active', answeredQ: 0, balloons: 0, poppedByCat: poppedByCat
+          });
+          saveLocalData();
+          switchScreen('screen-waiting');
+          listenToFirebase();
         });
-        saveLocalData();
-        switchScreen('screen-waiting');
-        listenToFirebase();
       }
     }
 
-    function setStage(stage) { db.ref('gameState/currentStage').set(stage); }
+    function setStage(stage) {
+      db.ref('gameState').update({ currentStage: stage, roundId: Date.now() });
+    }
 
     function listenToFirebase() {
+      if (isListeningFirebase) return;
+      isListeningFirebase = true;
+
       db.ref('players').on('value', snap => {
         totalPlayers = snap.numChildren();
+        const pCountEl = document.getElementById('player-count');
+        if (pCountEl) pCountEl.innerText = `目前在場旅人: ${totalPlayers}`;
         document.getElementById('admin-player-count').innerText = `目前總參與人數: ${totalPlayers}`;
         
         if (!isJesus && !isSoloMode && myName && !snap.hasChild(myName)) {
@@ -1024,11 +1084,14 @@
         }
       });
 
-      db.ref('gameState/currentStage').on('value', snap => {
+      // 監聽主控台發出的階段指令 (搭配 roundId 防止舊資料偷跑)
+      db.ref('gameState').on('value', snap => {
         if (isSoloMode) return;
-        const stage = snap.val();
-        if (!stage || stage === currentStageLocal) return;
-        currentStageLocal = stage;
+        const stateObj = snap.val();
+        if (!stateObj) return;
+
+        const stage = stateObj.currentStage;
+        const incomingRoundId = stateObj.roundId || 0;
 
         if (isJesus) {
           if (stage === 'breathe') startBreathe();
@@ -1036,27 +1099,43 @@
           return;
         }
 
-        if (stage === 'quiz') {
-          hasShownResult = false;
-          startQuizAuto();
-        }
-        else if (stage === 'balloon') startBalloon();
-        else if (stage === 'breathe') startBreathe();
-        else if (stage === 'result') showResult();
-        else if (stage === 'waiting') {
+        // 如果狀態是 waiting，無條件回到等候室並重置準備
+        if (stage === 'waiting') {
           clearTimeout(timer);
           clearInterval(secInterval);
           stopHeartbeat();
           currentQ = 0;
           activeQuestions = [];
           hasShownResult = false;
+          joinedAtRoundId = incomingRoundId;
+          saveLocalData();
           switchScreen('screen-waiting');
+          return;
         }
+
+        // 關鍵防偷跑：如果收到的 roundId 跟玩家剛進等候室時看到的舊 roundId 一樣，代表那是上一場殘留的狀態，直接忽略！
+        if (joinedAtRoundId !== null && incomingRoundId <= joinedAtRoundId) {
+          return;
+        }
+
+        // 確認是主控台最新按下的指令，更新 roundId 並執行對應階段
+        joinedAtRoundId = incomingRoundId;
+        saveLocalData();
+
+        if (stage === 'quiz') {
+          hasShownResult = false;
+          activeQuestions = [];
+          currentQ = 0;
+          startQuizAuto();
+        }
+        else if (stage === 'balloon') startBalloon();
+        else if (stage === 'breathe') startBreathe();
+        else if (stage === 'result') showResult();
       });
     }
 
     // ==========================================
-    // 9. Jesus 主控台功能 (支援動態題數與動態氣球秒數)
+    // 9. Jesus 主控台功能
     // ==========================================
     function kickPlayer(targetName) {
       if (confirm(`確定要移出「${targetName}」嗎？`)) {
@@ -1074,19 +1153,24 @@
       adminDisplayQ = 1;
       document.getElementById('admin-live-balloons').style.display = 'none';
       document.getElementById('btn-miracle').style.display = 'none';
-      document.getElementById('admin-q-title').innerText = `快問快答進行中：第 1 / ${targetQuestionCount} 題 (每5秒自動推進)`;
+      document.getElementById('admin-q-title').innerText = `快問快答進行中：第 1 / ${targetQuestionCount} 題 (每${targetQuestionSeconds}秒自動推進)`;
       
-      db.ref('gameState/currentStage').set('quiz');
+      // 發送全新 roundId，讓等候室所有玩家同步開始！
+      db.ref('gameState').set({
+        currentStage: 'quiz',
+        roundId: Date.now(),
+        miracle: null
+      });
 
       adminAutoTimer = setInterval(() => {
         adminDisplayQ++;
         if (adminDisplayQ <= targetQuestionCount) {
-          document.getElementById('admin-q-title').innerText = `快問快答進行中：第 ${adminDisplayQ} / ${targetQuestionCount} 題 (每5秒自動推進)`;
+          document.getElementById('admin-q-title').innerText = `快問快答進行中：第 ${adminDisplayQ} / ${targetQuestionCount} 題 (每${targetQuestionSeconds}秒自動推進)`;
         } else {
           clearInterval(adminAutoTimer);
           document.getElementById('admin-q-title').innerText = `✦ ${targetQuestionCount} 題時間到！請點擊按鈕 2 啟動戳氣球！`;
         }
-      }, 5000);
+      }, targetQuestionSeconds * 1000);
     }
 
     function adminStartBalloon() {
@@ -1097,10 +1181,19 @@
       document.getElementById('admin-q-title').innerText = `目前階段: ${targetBalloonSeconds} 秒戳氣球 (結束後自動深呼吸結算)`;
       document.getElementById('admin-live-balloons').style.display = 'block';
       document.getElementById('btn-miracle').style.display = 'block';
-      db.ref('gameState/currentStage').set('balloon');
+      
+      db.ref('gameState').set({
+        currentStage: 'balloon',
+        roundId: Date.now(),
+        miracle: null
+      });
 
       adminBalloonAutoTimer = setTimeout(() => {
-        db.ref('gameState/currentStage').set('breathe');
+        db.ref('gameState').set({
+          currentStage: 'breathe',
+          roundId: Date.now(),
+          miracle: null
+        });
       }, targetBalloonSeconds * 1000);
     }
 
@@ -1109,24 +1202,24 @@
     }
 
     function adminResetGame() {
-      if (!confirm("確定要重置全場遊戲進度與氣球統計嗎？")) return;
+      if (!confirm("確定要重置全場遊戲進度，讓所有人回到等候室嗎？")) return;
       clearInterval(adminAutoTimer);
       clearTimeout(adminBalloonAutoTimer);
       hasShownResult = false;
-      db.ref('gameState').set({ currentStage: 'waiting', miracle: null });
+      db.ref('gameState').set({ currentStage: 'waiting', roundId: Date.now(), miracle: null });
       db.ref('balloonWordsGlobal').remove();
       db.ref('players').once('value', snap => {
         snap.forEach(p => {
           db.ref('players/' + p.key).update({ answeredQ: 0, balloons: 0, poppedByCat: null, topCategory: null });
         });
       });
-      document.getElementById('admin-q-title').innerText = "目前階段: 等候開始";
+      document.getElementById('admin-q-title').innerText = "目前階段: 等候室待機中 (等待主控台按開始)";
       document.getElementById('admin-live-balloons').style.display = 'none';
       document.getElementById('btn-miracle').style.display = 'none';
     }
 
     // ==========================================
-    // 10. 快問快答邏輯
+    // 10. 快問快答邏輯 (預設每題 7 秒同步推進)
     // ==========================================
     function startQuizAuto() {
       if (activeQuestions.length !== targetQuestionCount) {
@@ -1156,6 +1249,7 @@
       stopHeartbeat();
 
       const totalQ = activeQuestions.length || targetQuestionCount;
+      const qSec = targetQuestionSeconds;
 
       if (qIndex >= totalQ) {
         if (isSoloMode) {
@@ -1163,7 +1257,7 @@
         } else {
           document.getElementById('quiz-waiting-overlay').style.display = 'flex';
           document.getElementById('quiz-overlay-title').innerText = "✦ 思緒整理完成";
-          document.getElementById('quiz-overlay-sub').innerText = "請稍候片刻，即將進入下一段旅程...";
+          document.getElementById('quiz-overlay-sub').innerText = "請稍候片刻，等待主控台啟動下一階段...";
           document.getElementById('btn-solo-start-balloon').style.display = 'none';
           document.getElementById('quiz-timer-sec').innerText = "完成";
         }
@@ -1191,19 +1285,20 @@
       progress.style.transition = 'none';
       progress.style.width = '100%';
       setTimeout(() => {
-        progress.style.transition = 'width 5s linear';
+        progress.style.transition = `width ${qSec}s linear`;
         progress.style.width = '0%';
       }, 40);
 
       let startT = Date.now();
+      document.getElementById('quiz-timer-sec').innerText = `⏱️ ${qSec.toFixed(1)}s`;
       secInterval = setInterval(() => {
-        let left = Math.max(0, 5 - (Date.now() - startT) / 1000);
+        let left = Math.max(0, qSec - (Date.now() - startT) / 1000);
         document.getElementById('quiz-timer-sec').innerText = `⏱️ ${left.toFixed(1)}s`;
       }, 100);
 
       timer = setTimeout(() => {
         goToNextQuestion();
-      }, 5000);
+      }, qSec * 1000);
     }
 
     function goToNextQuestion() {
@@ -1236,15 +1331,14 @@
       }
       saveLocalData();
 
-      // 無論是單人網址或團康網址，皆維持每 5 秒同步推進下一題
       document.getElementById('quiz-overlay-title').innerText = "✦ 已記下你的心聲";
-      document.getElementById('quiz-overlay-sub').innerText = "倒數結束後將自動前往下一題...";
+      document.getElementById('quiz-overlay-sub').innerText = `${targetQuestionSeconds} 秒倒數結束後將自動前往下一題...`;
       document.getElementById('btn-solo-start-balloon').style.display = 'none';
       document.getElementById('quiz-waiting-overlay').style.display = 'flex';
     }
 
     // ==========================================
-    // 11. 戳氣球發洩 (支援主控台設定的動態秒數)
+    // 11. 戳氣球發洩 (氣球數量大幅增加：每 105ms 產生一顆，字體加大)
     // ==========================================
     let balloonInterval;
     let balloonCountdownInterval;
@@ -1288,16 +1382,17 @@
         if (timeLeft <= 0) clearInterval(balloonCountdownInterval);
       }, 1000);
       
+      // 每 105ms 生成一顆大氣球，畫面滿滿泡泡超好按！
       clearInterval(balloonInterval);
       balloonInterval = setInterval(() => {
         let item = balloonCatalog[Math.floor(Math.random() * balloonCatalog.length)];
         let b = document.createElement('div');
         b.className = 'balloon' + (isMiracleActive ? ' blessed' : '');
         b.innerHTML = `<span class="balloon-cat-tag">${item.cat}</span><span>${item.word}</span>`;
-        b.style.left = (Math.random() * 80 + 2) + '%'; 
-        b.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85) 0%, ${item.color} 48%, ${item.color} 100%)`;
+        b.style.left = (Math.random() * 76 + 2) + '%'; 
+        b.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.88) 0%, ${item.color} 45%, ${item.color} 100%)`;
         
-        let duration = isMiracleActive ? (Math.random() * 2 + 4.2) : (Math.random() * 1.8 + 2.3);
+        let duration = isMiracleActive ? (Math.random() * 2 + 4.2) : (Math.random() * 1.8 + 2.4);
         b.style.animationDuration = duration + 's';
         area.appendChild(b);
         
@@ -1347,7 +1442,7 @@
         });
 
         setTimeout(() => { if (b.parentNode) b.remove(); }, duration * 1000);
-      }, 165); 
+      }, 105); 
       
       // 氣球時間結束後，直接自動進入 4 秒深呼吸與結算報告
       balloonEndTimeout = setTimeout(() => {
@@ -1362,8 +1457,8 @@
       let popText = document.createElement('div');
       popText.className = 'pop-effect';
       popText.innerText = `✦ ${word} 消散`;
-      popText.style.left = (x - 45) + 'px';
-      popText.style.top = (y - 15) + 'px';
+      popText.style.left = (x - 50) + 'px';
+      popText.style.top = (y - 18) + 'px';
       document.body.appendChild(popText);
       setTimeout(() => popText.remove(), 500);
 
@@ -1374,7 +1469,7 @@
         p.style.top = y + 'px';
         p.style.background = i % 2 === 0 ? color : '#c5a059';
         let angle = (Math.PI * 2 * i) / 6;
-        let dist = 30 + Math.random() * 24;
+        let dist = 32 + Math.random() * 26;
         p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
         p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
         document.body.appendChild(p);
@@ -1400,7 +1495,7 @@
     }
 
     // ==========================================
-    // 13. 結算手札報告 (靜默傳送至同一個 Firebase 與 GAS)
+    // 13. 結算手札報告
     // ==========================================
     let currentTopCat = 'academic';
     let radarChartInstance = null;
@@ -1522,7 +1617,7 @@
           snap.forEach(w => { wordsArr.push({ word: w.key, count: w.val() }); });
           wordsArr.sort((a, b) => b.count - a.count);
           let topWordsHtml = wordsArr.slice(0, 8).map((item, idx) => 
-            `<span style="display:inline-block; background:#fff; border:1px solid var(--border-line); border-radius:10px; padding:3px 10px; margin:3px; font-weight:600;">#${idx+1} ${item.word} (${item.count}顆)</span>`
+            `<span style="display:inline-block; background:#fff; border:1px solid var(--border-line); border-radius:10px; padding:4px 11px; margin:3px; font-weight:700;">#${idx+1} ${item.word} (${item.count}顆)</span>`
           ).join('');
           document.getElementById('admin-balloon-word-breakdown').innerHTML = topWordsHtml || "尚無氣球紀錄";
         });
@@ -1542,7 +1637,6 @@
 
         const cScores = getConsolidatedScores();
         
-        // 背景靜默寫入 Firebase 與 GAS，不顯示任何文字提示
         db.ref('players/' + myName).update({
           topCategory: remedies.topName,
           scores: cScores,
@@ -1579,15 +1673,20 @@
           datasets: [{
             label: '思緒比重',
             data: [cScores.academic, cScores.fomo, cScores.appearance, cScores.loneliness, cScores.fatigue],
-            backgroundColor: 'rgba(74, 124, 155, 0.22)',
+            backgroundColor: 'rgba(74, 124, 155, 0.25)',
             borderColor: '#4a7c9b',
             pointBackgroundColor: '#c5a059',
-            borderWidth: 2
+            borderWidth: 2.5
           }]
         },
         options: { 
           scales: { 
-            r: { beginAtZero: true, suggestedMax: 10, ticks: { display: false } } 
+            r: { 
+              beginAtZero: true, 
+              suggestedMax: 10, 
+              ticks: { display: false },
+              pointLabels: { font: { size: 12, weight: 'bold' }, color: '#242c33' }
+            } 
           },
           plugins: { legend: { display: false } }
         }
